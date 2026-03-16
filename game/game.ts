@@ -26,6 +26,15 @@ import { VERSION, versionFromString } from '../utils/constants-build'
 import { console_log } from '../ui/remote/remote'
 import { tr } from '../utils/translation'
 import { firewall } from '../utils/proxy/proxy-firewall'
+import { fs_readdir, fs_readFile } from '../utils/data/fs'
+import { gcPkg } from '../utils/data/packages'
+import path from 'node:path'
+
+import { withProperty } from "../utils/config"
+const SPELL_CRASH_DETECTED = 'game-client-spell-crash-detected'
+const config = withProperty(SPELL_CRASH_DETECTED, false)
+export const isSpellCrashDetected = () => config[SPELL_CRASH_DETECTED]
+const setSpellCrashDetected = () => config[SPELL_CRASH_DETECTED] = true
 
 export const versionNumber = versionFromString(VERSION)
 
@@ -35,7 +44,7 @@ interface GameEvents {
     start: CustomEvent,
     wait: CustomEvent,
     launch: CustomEvent,
-    crash: CustomEvent,
+    crash: CustomEvent<{ isSpellCrash: boolean }>,
     stop: CustomEvent,
     joined: CustomEvent<GamePlayer>,
     chat: CustomEvent<ChatEventDetail>,
@@ -554,9 +563,27 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
             return false
         }
     }
-    private onClientExit = (/*code, signal*/) => {
-        if(this.launched)
-            this.safeDispatchEvent('crash')
+    private onClientExit = async (code?: number, signal?: string) => {
+        const opts = safeOptions
+        if(!this.launched) return
+
+        let isSpellCrash = false
+        if(code == 253){
+            const exeDirEntries = await fs_readdir(gcPkg.exeDir, opts)
+            const latestR3DLogName = exeDirEntries.filter(name => name.endsWith('_r3dlog.txt')).toSorted().at(-1)
+            if(latestR3DLogName){
+                const r3dLogTxtPath = path.join(gcPkg.exeDir, latestR3DLogName)
+                const r3dLogTxtContent = await fs_readFile(r3dLogTxtPath, { ...opts, encoding: 'utf8' })
+                if(
+                    r3dLogTxtContent?.includes('Function: Spellbook::AvatarInit') &&
+                    r3dLogTxtContent?.includes('Expression: spellName != "" || !"Avatar spell not found!"')
+                ){
+                    setSpellCrashDetected()
+                    isSpellCrash = true
+                }
+            }
+        }
+        this.safeDispatchEvent('crash', { detail: { isSpellCrash } })
     }
 
     public set<T extends PPP>(prop: T, value: GamePlayer[T]['value']){

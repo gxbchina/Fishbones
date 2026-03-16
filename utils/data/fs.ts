@@ -125,15 +125,18 @@ export async function fs_chmod(path: string, mode: number | string, opts: Requir
     return result
 }
 
-export async function fs_moveFile(src: string, dest: string, opts: Required<AbortOptions>, log = true){
+export async function fs_moveFile(src: string, dest: string, opts: { rethrow?: boolean } & Required<AbortOptions>, log = true){
     if(src === dest) return true
     let result = false
     try {
+        //TODO: Handle EXDEV
         await fs.rename(src, dest)
         result = true
     } catch(err) {
         if(log)
             console_log_fs_err(tr('Moving file failed', {}), `${src} -> ${dest}`, err)
+        if(opts.rethrow)
+            throw err
     }
     opts.signal.throwIfAborted()
     return result
@@ -178,12 +181,14 @@ export async function fs_truncate(path: string, len: number, opts: Required<Abor
     return result
 }
 
-const FS_ERR_CODES: Record<string, string> = {
-    ENOENT: tr('File not found', {}),
-}
 export function console_log_fs_err(operationFailed: string, path: string, unk_err: unknown){
     const err = unk_err as ErrnoException
-    const desc = err.code ? (FS_ERR_CODES[err.code] ?? tr('Code', {}) + `: ${err.code}`) : tr('Unknown', {})
+    let desc = ''
+    switch(err.code){
+        case undefined: desc = tr('Unknown', {}); break
+        case 'ENOENT': desc = tr('File not found', {}); break
+        default: desc = tr('Code:', {}) + ' ' + err.code; break
+    }
     console_log(`${operationFailed}. ${desc}:\n${path}`)
 }
 

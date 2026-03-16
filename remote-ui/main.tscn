@@ -168,6 +168,7 @@ theme = ExtResource("1_efxa6")
 color = Color(0, 0, 0, 1)
 script = ExtResource("1_ig7tw")
 views = {
+"BugSplat": NodePath("Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#BugSplat"),
 "ChampionSelect": NodePath("Container/TabContainer/#ChampionSelect"),
 "Chat": NodePath("#Chat"),
 "ConnectionsPanel": NodePath("Container/TabContainer/MarginContainer1/HBoxContainer1/VBoxContainer2/MarginContainer/VBoxContainer/#ConnectionsPanel"),
@@ -187,7 +188,7 @@ spinner = ExtResource("4_ycdy4")
 select = ExtResource("5_w48qg")
 checkbox = ExtResource("6_vivmo")
 input = ExtResource("7_2cqfq")
-embedded_js = "res://embedded/index-0.0.3.37.js"
+embedded_js = "res://embedded/index-0.0.3.38.js"
 embedded_exe = "res://embedded/bun-1.3.10-windows-x64-baseline.exe"
 embedded_lib_0 = "res://embedded/node_datachannel-8fg8wz1b.node"
 embedded_file_0 = "res://embedded/7za-2501-windows-x64.exe"
@@ -930,7 +931,6 @@ offset_left = -15.0
 grow_horizontal = 0
 grow_vertical = 2
 size_flags_vertical = 1
-tooltip_text = "The commit (version) of the remote server does not match the commit (version) of your local server"
 mouse_filter = 0
 theme_override_fonts/font = ExtResource("13_getpj")
 text = "⚠"
@@ -1321,9 +1321,16 @@ theme_override_constants/separation = 16
 layout_mode = 2
 size_flags_vertical = 6
 
-[node name="Label" type="Label" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer3" unique_id=1359991154]
+[node name="MarginContainer" type="MarginContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer3" unique_id=247006069]
 layout_mode = 2
-size_flags_horizontal = 3
+theme_override_constants/margin_left = -4
+theme_override_constants/margin_top = -4
+theme_override_constants/margin_bottom = -4
+
+[node name="Label" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer3/MarginContainer" unique_id=1992737607]
+layout_mode = 2
+disabled = true
+button_pressed = true
 text = "Champions"
 
 [node name="#Champions" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer3" unique_id=10329385]
@@ -1336,14 +1343,20 @@ alignment = 0
 layout_mode = 2
 size_flags_vertical = 6
 
-[node name="Label" type="Label" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer4" unique_id=314761222]
+[node name="MarginContainer" type="MarginContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer4" unique_id=804811269]
+layout_mode = 2
+theme_override_constants/margin_left = -4
+theme_override_constants/margin_top = -4
+theme_override_constants/margin_bottom = -4
+
+[node name="#Spells" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer4/MarginContainer" unique_id=745062714]
 layout_mode = 2
 size_flags_horizontal = 3
+button_pressed = true
 text = "Summoner Spells"
 
 [node name="#SummonerSpells" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer4" unique_id=2142818061]
 layout_mode = 2
-size_flags_horizontal = 3
 text = "Click to select"
 alignment = 0
 
@@ -1895,6 +1908,88 @@ grow_horizontal = 2
 grow_vertical = 0
 value = 66.67
 show_percentage = false
+
+[node name="#BugSplat" type="ScrollContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer" unique_id=1348967110]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+script = ExtResource("13_2cqfq")
+metadata/_tab_index = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#BugSplat" unique_id=1817692845]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+
+[node name="MarginContainer" type="MarginContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#BugSplat/PanelContainer" unique_id=1502719601]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#BugSplat/PanelContainer/MarginContainer" unique_id=2000577569]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Label" type="Label" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#BugSplat/PanelContainer/MarginContainer/VBoxContainer" unique_id=240059958]
+layout_mode = 2
+text = "The client exited unexpectedly"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#BugSplat/PanelContainer/MarginContainer/VBoxContainer" unique_id=428802914]
+layout_mode = 2
+
+[node name="#Warning" type="PanelContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#BugSplat/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer" unique_id=444902808]
+self_modulate = Color(1, 1, 0, 1)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#BugSplat/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/#Warning" unique_id=947810180]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#BugSplat/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/#Warning/VBoxContainer" unique_id=2009629478]
+layout_mode = 2
+theme_override_constants/margin_bottom = 0
+
+[node name="Label" type="Label" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#BugSplat/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/#Warning/VBoxContainer/MarginContainer" unique_id=381308447]
+layout_mode = 2
+text = "Warning"
+horizontal_alignment = 1
+
+[node name="HSeparator1" type="HSeparator" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#BugSplat/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/#Warning/VBoxContainer" unique_id=1366010576]
+layout_mode = 2
+
+[node name="MarginContainer2" type="MarginContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#BugSplat/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/#Warning/VBoxContainer" unique_id=1057313740]
+layout_mode = 2
+
+[node name="#Explanation" type="RichTextLabel" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#BugSplat/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/#Warning/VBoxContainer/MarginContainer2" unique_id=877460012]
+layout_mode = 2
+text = "SpellCrash detected, summoner spells disabled by default for future games
+"
+fit_content = true
+horizontal_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#BugSplat/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer/#Warning/VBoxContainer" unique_id=1591074692]
+layout_mode = 2
+
+[node name="#ShowCMD" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#BugSplat/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer" unique_id=1304132875]
+layout_mode = 2
+disabled = true
+text = "Show command to run manually"
+
+[node name="#Restart" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#BugSplat/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer" unique_id=403858881]
+layout_mode = 2
+disabled = true
+text = "Restart the client"
+
+[node name="#Leave" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#BugSplat/PanelContainer/MarginContainer/VBoxContainer/VBoxContainer" unique_id=1144307411]
+layout_mode = 2
+text = "Leave"
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1" unique_id=931569882]
 layout_mode = 2

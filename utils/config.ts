@@ -1,35 +1,48 @@
 import type { AbortOptions } from '@libp2p/interface'
 import { downloads, fs_readFile, fs_writeFile } from './data/fs'
-import { AUTO_LOCALE, setUsedLocale } from './translation'
-import { gsPkg } from './data/packages'
+import { safeOptions } from './process/process'
 import path from 'node:path'
 
-export const REMOTE_IDX = 'game-server-git-remote-index'
-export const LOCALE_STR = 'locale'
+type Config = Record<string, any>
+const defaultConfig: Config = {}
+const config: Config = {}
 
-type Config = typeof defaultConfig
-const defaultConfig = {
-    [REMOTE_IDX]: 0,
-    [LOCALE_STR]: AUTO_LOCALE,
+const callbacks: Record<string, (value: any) => void> = {}
+
+export { configProxy as config }
+const configProxy = new Proxy(config, {
+    get(target, key: string){
+        return config[key] ?? defaultConfig[key]
+    },
+    set(target, key: string, value){
+        config[key] = value
+        callbacks[key]?.(value)
+        saveConfig(config, safeOptions)
+        return true
+    }
+})
+
+export function withProperty<K extends string, V>(key: K, defaultValue: V, cb: (value: V) => void = () => {}): Record<K, V> {
+    defaultConfig[key] = defaultValue
+    callbacks[key] = cb
+    return configProxy as Record<K, V>
 }
 
-export let config = Object.assign({}, defaultConfig)
 export async function loadConfig(opts: Required<AbortOptions>){
-    let configJSON: string | undefined
-    await fs_readFile(configFile, { ...opts, encoding: 'utf8' })
+    const configJSON = await fs_readFile(configFile, { ...opts, encoding: 'utf8' })
     if(configJSON){
-        config = JSON.parse(configJSON) as Config
+        Object.assign(config, JSON.parse(configJSON))
     } else {
         await saveConfig(defaultConfig, opts)
     }
 
-    gsPkg.setRemoteByIndex(config[REMOTE_IDX])
-    //setUsedLocale(config[LOCALE_STR])
+    for(const [key, cb] of Object.entries(callbacks))
+        cb(config[key] ?? defaultConfig[key])
 
     return config
 }
 
 const configFile = path.join(downloads, 'config.json')
-export async function saveConfig(config: Config, opts: Required<AbortOptions>){
+async function saveConfig(config: Config, opts: Required<AbortOptions>){
     return fs_writeFile(configFile, JSON.stringify(config, null, 4), { ...opts, encoding: 'utf8' })
 }

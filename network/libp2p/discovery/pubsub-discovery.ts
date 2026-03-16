@@ -21,7 +21,7 @@ const h = 60*m
 const TTL_MARGIN = 7.5*s
 const RECORD_LIFETIME = 15*m
 const REANNOUNCE_INTERVAL = RECORD_LIFETIME - TTL_MARGIN
-const POSITIVELY_REACHABLE_TIMEOUT = 100*ms
+const OPTIMISTICALLY_REACHABLE_TIMEOUT = 250*ms
 
 export interface PubsubPeerDiscoveryInit {
     topic?: string
@@ -264,7 +264,7 @@ export class PubSubPeerDiscovery extends TypedEventEmitter<PeerDiscoveryEvents &
                         else if(cm.getDialQueue().find(dial => dial.peerId == peerId)) //TODO: Should I check the status?
                             newPWD.status = Status.Unreachable
                         else
-                            setTimeout(this.onPositiveTimeout, POSITIVELY_REACHABLE_TIMEOUT, { detail: peerId })
+                            setTimeout(this.onPositiveTimeout, OPTIMISTICALLY_REACHABLE_TIMEOUT, { detail: peerId })
                     }
 
                     return newPWD

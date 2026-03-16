@@ -280,7 +280,6 @@ const championsIcons = [
 ]
 
 const charactersDirRelative = path.join('%DATA%', 'Characters')
-const charactersDir = path.join(gcPkg.dir, 'DATA', 'Characters')
 
 const championsIconsCache = Object.fromEntries(
     championsIcons
@@ -300,6 +299,7 @@ export const champions = championsTable
 
 const icmp = (a: string | undefined, b: string) => a?.toLowerCase() === b.toLowerCase()
 export async function loadSkins(opts: Required<AbortOptions>){
+    const charactersDir = charactersDirRelative.replace('%DATA%', gcPkg.dir)
     for(const info of champions){
         const filenames = await fs_readdir(path.join(charactersDir, info.short), opts)
         info.skins = filenames.flatMap(filename => {

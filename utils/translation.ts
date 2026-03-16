@@ -1,10 +1,14 @@
 //@ts-expect-error: Cannot find module or its corresponding type declarations.
 import csv from '../remote-ui/translation/translation.csv' with { type: 'text' }
 import { setLocale } from '../ui/remote/remote'
+import { withProperty } from './config'
 import { args } from './args'
 
+export const LOCALE_STR = 'locale'
 export const AUTO_LOCALE = 'auto'
 export const DEFAULT_LOCALE = 'en_US'
+
+const config = withProperty(LOCALE_STR, AUTO_LOCALE, locale => setUsedLocale(locale))
 
 const CSV_COLUMN_REGEX = /(?:"((?:""|[^"]|\n)*)")?(,|\n|$)/g
 
@@ -45,7 +49,7 @@ const cache = new Map(table.map(row => [ row[0], row.slice(1) ]))
 
 export function tr(str: string, obj?: Record<string, string | number>){
     //if(!obj) return str
-    str = cache.get(str)?.[usedLocaleIndex] ?? str
+    str = cache?.get(str)?.[usedLocaleIndex] ?? str
     if(obj)
     for(const [key, value] of Object.entries(obj)){
         str = str.replaceAll(`{${key}}`, value.toString())

@@ -453,15 +453,17 @@ async function moveFoundFilesToDir(foundPkgDir: string, pkg: PkgInfo, opts: Requ
         }),
     ])
     async function moveToPkgDir(fileName: string){
-        return fs.rename(
+        return fs_moveFile(
             path.join(foundPkgDir, fileName),
             path.join(pkg.dir, fileName),
+            { ...opts, rethrow: true },
+            false,
         )
     }
     //opts.signal.throwIfAborted()
 
     // Try to delete the folder if it is empty.
-    await fs_rmdir(foundPkgDir, opts, false)
+    await fs_rmdir(foundPkgDir, { ...opts, recursive: false }, false)
 
     return successfullyMovedRequiredFiles
 }
@@ -519,7 +521,7 @@ export async function repairArchived(pkg: PkgInfo, opts: Required<AbortOptions> 
                 }
             } else {
                 const missingEntries = [...requiredEntres.difference(foundEntries)].join(', ')
-                console_log(tr(`Skipping "{foundPkgDir}" because it does not contain some files: {missingEntries}`, { foundPkgDir, missingEntries }))
+                console_log(tr(`Skipping "{foundPkgDir}" because it does not contain some files:`, { foundPkgDir }), missingEntries)
             }
         }
     }

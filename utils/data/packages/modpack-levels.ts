@@ -21,7 +21,7 @@ export const modPck1 = new class ModPackOne extends PkgInfo {
     size = 928982413
 
     zip = path.join(downloads, this.zipName)
-    dir = path.join(path.dirname(gcPkg.dir), this.dirName)
+    dir = ''
 
     zipTorrentEmbedded = embedded.modPck1ZipTorrent
     zipTorrentName = `${this.zipName}.torrent`
@@ -33,9 +33,8 @@ export const modPck1 = new class ModPackOne extends PkgInfo {
         `${HARDCODED_HTTP_SERVER_URL}/${this.zipName}`,
     ]
 
-    //TODO: Set meaningful value.
-    checkUnpackBy = path.join(this.dir, 'LEVELS', 'Map6', 'Scene', 'room.nvr')
-    lockFile = path.join(gcPkg.dir, 'MODS', `${this.id}.installed`)
+    checkUnpackBy = ''
+    lockFile = ''
 
     topLevelEntries = []
     topLevelEntriesOptional = []
@@ -81,4 +80,17 @@ export const modPck1 = new class ModPackOne extends PkgInfo {
         //    bots: [],
         //},
     ]
+
+    constructor(){
+        super()
+        this.setDir(gcPkg.dir)
+    }
+
+    setDir(gcPkg_dir: string){
+        this.dir = path.join(path.dirname(gcPkg_dir), this.dirName)
+        this.checkUnpackBy = path.join(this.dir, 'LEVELS', 'Map6', 'Scene', 'room.nvr') //TODO: Set meaningful value.
+        this.lockFile = path.join(gcPkg_dir, 'MODS', `${this.id}.installed`)
+    }
 }
+
+gcPkg.onDirSet = modPck1.setDir.bind(modPck1)

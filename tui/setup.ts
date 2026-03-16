@@ -1,5 +1,5 @@
 import type { AbortOptions } from "@libp2p/interface";
-import type { Game } from "../game/game";
+import { isSpellCrashDetected, type Game } from "../game/game";
 import type { LocalServer } from "../game/server";
 import { render } from "../ui/remote/view";
 import { Features, GameType, PlayerCount, TickRate } from "../utils/constants";
@@ -10,6 +10,8 @@ import { AbortPromptError } from "@inquirer/core";
 
 export async function setup(game: Game, server: LocalServer, opts: Required<AbortOptions>){
     
+    game.features.set(Features.SPELLS_DISABLED, isSpellCrashDetected())
+
     server.loadSettings()
     
     const gameMode = () => {
@@ -44,9 +46,14 @@ export async function setup(game: Game, server: LocalServer, opts: Required<Abor
         HalfPing: checkbox(game.features.isHalfPingEnabled, value => game.features.set(Features.HALF_PING_MODE_ENABLED, value)),
         Firewall: checkbox(game.features.isFirewallEnabled, value => game.features.set(Features.FIREWALL_ENABLED, value)),
         Bypass: checkbox(game.features.isBypassEnabled, value => game.features.set(Features.BYPASS_ENABLED, value)),
+        Spells: checkbox(game.features.isSpellsEnabled, value => {
+            game.features.set(Features.SPELLS_DISABLED, !value)
+            view.get('SummonerSpells').update(button(undefined, !value))
+        }),
         
         Champions: button(() => { server.champions.uinput(opts).catch(() => { /* Ignore */ }) }),
-        SummonerSpells: button(() => { server.spells.uinput(opts).catch(() => { /* Ignore */ }) }),
+        //SpellsEnabled: checkbox(server.spells.value.length > 0, value => { server.spells.value = value ? [] : [] })
+        SummonerSpells: button(() => { server.spells.uinput(opts).catch(() => { /* Ignore */ }) }, !game.features.isSpellsEnabled),
 
         PlayAlone: button(() => { game.isPrivate = true; view.resolve() }),
         PublishGame: button(() => { game.isPrivate = false; view.resolve() }),
@@ -56,4 +63,7 @@ export async function setup(game: Game, server: LocalServer, opts: Required<Abor
     await view.promise
 
     server.saveSettings()
+
+    if(!game.features.isSpellsEnabled)
+        server.spells.value = []
 }

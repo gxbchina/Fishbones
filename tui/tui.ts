@@ -14,6 +14,8 @@ import { lobby_pick } from './lobby/pick'
 import * as masteries from './masteries'
 import { chat } from './chat'
 import { tr } from '../utils/translation'
+import { render } from '../ui/remote/view'
+import { button, form } from '../ui/remote/types'
 
 export async function main(node: LibP2PNode, opts: Required<AbortOptions>){
     process.title = TITLE
@@ -30,6 +32,7 @@ interface Context {
     signal: AbortSignal,
     clearPromptOnDone: boolean,
     controller: AbortController,
+    isSpellCrash: boolean,
     game: Game,
 }
 
@@ -50,6 +53,7 @@ async function lobby(game: Game, opts: Required<AbortOptions>){
     const ctx: Context = {
         signal: createSignal(),
         clearPromptOnDone: true,
+        isSpellCrash: false,
         controller,
         game,
     }
@@ -58,12 +62,15 @@ async function lobby(game: Game, opts: Required<AbortOptions>){
         controller.abort(new SwitchViewError({ cause: to }))
     }
     const handlers = {
-        kick: () => switchView(null),
-        start: () => switchView(lobby_pick),
-        wait: () => switchView(lobby_wait_for_start),
-        crash: () => switchView(lobby_crash_report),
-        launch: () => switchView(lobby_wait_for_end),
-        stop: () => switchView(lobby_gather),
+        'kick': () => switchView(null),
+        'start': () => switchView(lobby_pick),
+        'wait': () => switchView(lobby_wait_for_start),
+        'crash': (event: CustomEvent<{ isSpellCrash: boolean }>) => {
+            ctx.isSpellCrash = event.detail.isSpellCrash
+            switchView(lobby_crash_report)
+        },
+        'launch': () => switchView(lobby_wait_for_end),
+        'stop': () => switchView(lobby_gather),
     }
     
     const handlers_keys = Object.keys(handlers) as (keyof typeof handlers)[]
@@ -119,20 +126,16 @@ async function abortableSpinner(message: string, ctx: Context){
 }
 
 async function lobby_crash_report(ctx: Context){
-    const { game } = ctx
-
-    type Action = ['show_cmd'] | ['relaunch'] | ['exit']
-    
+    const { game, isSpellCrash } = ctx
     while(true){
-        const [action] = await select({
-            message: tr('The client exited unexpectedly'),
-            choices: [
-                { value: ['show_cmd'] as Action, name: tr('Show command to run manually') },
-                { value: ['relaunch'] as Action, name: tr('Restart the client') },
-                { value: ['exit'] as Action, name: tr('Leave') },
-            ],
-            pageSize: 20,
-        }, ctx)
+        type Action = ['show_cmd'] | ['relaunch'] | ['exit']
+        const view = render<Action>('BugSplat', form({
+            Warning: { $type: 'base', visible: isSpellCrash },
+            ShowCMD: button(() => view.resolve(['show_cmd']), isSpellCrash),
+            Restart: button(() => view.resolve(['relaunch']), isSpellCrash),
+            Leave: button(() => view.resolve(['exit'])),
+        }), ctx)
+        const [action] = await view.promise
         if(action === 'relaunch'){
             game.relaunch()
             //return await lobby_wait_for_end(ctx)

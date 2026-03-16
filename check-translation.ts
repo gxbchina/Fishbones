@@ -52,7 +52,7 @@ const csv = await file('./remote-ui/translation/translation.csv').text()
 const translatedStrings = new Set<string>(
     csv.split('\n')
         .map(line => line.split(',')[0]!)
-        .map(str => str.replace(/^"|"$/g, ''))
+        .map(str => str.replace(/^"|"$/g, '').replaceAll('""', '"'))
 )
 
 //console.log('strings to translate', JSON.stringify([...usedStrings.difference(translatedStrings)], null, 4))

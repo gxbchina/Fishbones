@@ -3,8 +3,12 @@ import { downloads } from '../fs'
 import embedded from '../embedded/embedded'
 import { gdrive, magnet, PkgInfoCSProj, type PkgInfoGit } from './shared'
 import { HARDCODED_HTTP_SERVER_URL } from '../../constants-build'
+import { withProperty } from '../../config'
 import { tr } from '../../translation'
 import { sdkPkg } from './sdk'
+
+export const REMOTE_IDX = 'game-server-git-remote-index'
+const config = withProperty(REMOTE_IDX, 0, index => gsPkg.setRemoteByIndex(index))
 
 export const gsPkg = new class extends PkgInfoCSProj implements PkgInfoGit {
     name = tr('Game Server')
@@ -31,10 +35,6 @@ export const gsPkg = new class extends PkgInfoCSProj implements PkgInfoGit {
     zipEmbded = embedded.gsPkgZip
 
     gitRevision = '4592f1379ddaa972ce0b5dc6cebb9caf09c812ab'
-    gitLabMRs = 'https://gitgud.io/api/v4/projects/40035/merge_requests?state=opened'
-    gitOriginURL = 'https://gitgud.io/skelsoft/brokenwings.git'
-    gitBranchName = 'master'
-    gitRemoteName = 'skelsoft'
 
     projName = 'ChildrenOfTheGraveServerConsole'
     csProjDir = path.join(this.dir, this.projName)
@@ -93,6 +93,10 @@ export const gsPkg = new class extends PkgInfoCSProj implements PkgInfoGit {
         'FAQ.md',
     ]
 
+    gitLabMRs = ''
+    gitOriginURL = ''
+    gitBranchName = ''
+    gitRemoteName = ''
     remotes = [
         {
             name: 'skelsoft',
@@ -109,6 +113,11 @@ export const gsPkg = new class extends PkgInfoCSProj implements PkgInfoGit {
             gitBranchName: 'master',
         },
     ]
+
+    constructor(){
+        super()
+        this.setRemoteByIndex(0)
+    }
 
     setRemoteByIndex(index: number){
         const remote = this.remotes[index]

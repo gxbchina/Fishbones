@@ -7,7 +7,7 @@ import { PeerMap } from '@libp2p/peer-collections'
 import type { PeerIdWithData } from '../network/libp2p/discovery/pubsub-discovery'
 import type { Peer } from '../message/peer'
 import { LocalGame } from '../game/game-local'
-import type { Game } from '../game/game'
+import { type Game, isSpellCrashDetected } from '../game/game'
 import { render } from '../ui/remote/view'
 import { button, form, label, list, type Base, type Button, type Checkbox, type Form, type Label } from '../ui/remote/types'
 import { getUsername } from '../utils/namegen/namegen'
@@ -56,9 +56,8 @@ export async function browser(node: LibP2PNode, lobby: Lobby, setup: Setup, opts
         }
     }
 
-    type Action = ['join', RemoteGame] | ['host'] | ['quit']
-
     loop: while(true){
+        type Action = ['join', RemoteGame] | ['host'] | ['quit']
         const view = render<Action>('CustomsBrowser', form({
             Rooms: list(
                 {}, //getChoices(node),
@@ -270,26 +269,31 @@ function gameInfoToChoice(
 
     const getPing = game.node.services.ping.getPing.bind(game.node.services.ping);
 
-    (choice.fields!.Owner as Label).text = getUsername(pwd.id);
-    (choice.fields!.Ping as Label).text = (getPing(pwd.id)?.toFixed()?.concat(' ' + tr('ms')) ?? '');
-    (choice.fields!.Name as Label).text = game.name.toString();
-    (choice.fields!.Slots as Label).text = `${players}/${playersMax}`;
-    (choice.fields!.Mode as Label).text = game.mode.toString();
-    (choice.fields!.Map as Label).text = game.map.toString();
+    ;(choice.fields!.Owner as Label).text = getUsername(pwd.id)
+    ;(choice.fields!.Ping as Label).text = getPing(pwd.id)?.toFixed()?.concat(' ' + tr('ms')) ?? ''
+    ;(choice.fields!.Name as Label).text = game.name.toString()
+    ;(choice.fields!.Slots as Label).text = `${players}/${playersMax}`
+    ;(choice.fields!.Mode as Label).text = game.mode.toString()
+    ;(choice.fields!.Map as Label).text = game.map.toString()
     
-    (choice.fields!.Password as Checkbox).visible = game.password.isSet;
-    (choice.fields!.Manacosts as Checkbox).visible = game.features.isManacostsEnabled;
-    (choice.fields!.Cooldowns as Checkbox).visible = game.features.isCooldownsEnabled;
-    (choice.fields!.Minions as Checkbox).visible = game.features.isMinionsEnabled;
-    (choice.fields!.Cheats as Checkbox).visible = game.features.isCheatsEnabled;
+    ;(choice.fields!.Password as Checkbox).visible = game.password.isSet
+    ;(choice.fields!.Manacosts as Checkbox).visible = game.features.isManacostsEnabled
+    ;(choice.fields!.Cooldowns as Checkbox).visible = game.features.isCooldownsEnabled
+    ;(choice.fields!.Minions as Checkbox).visible = game.features.isMinionsEnabled
+    ;(choice.fields!.Cheats as Checkbox).visible = game.features.isCheatsEnabled
 
-    const commitHashMismatch =
-        game.features.isHalfPingEnabled &&
-        game.commit.value != gsPkg.gitRevision;
-    (choice.fields!.Explanation as Base).visible = commitHashMismatch;
-    (choice.fields!.Join as Button).disabled = commitHashMismatch;
+    const commitHashMismatch = game.features.isHalfPingEnabled && game.commit.value != gsPkg.gitRevision
+    const dangerOfCrash = game.features.isSpellsEnabled && server.spells.value.length > 0 && isSpellCrashDetected()
 
-    //TODO: (choice.fields!.Join as Button).disabled = !localClientMaps.includes(game.map.value!);
+    let explanation = ''
+    if(commitHashMismatch) explanation += tr('The commit (version) of the remote server does not match the commit (version) of your local server') + '\n'
+    if(dangerOfCrash) explanation += tr('The game client will crash at the beginning of the game') + '\n'
+
+    ;(choice.fields!.Explanation as Base).visible = explanation != ''
+    ;(choice.fields!.Explanation as Base).tooltip_text = explanation.trim()
+    ;(choice.fields!.Join as Button).disabled = commitHashMismatch
+
+    //TODO: ;(choice.fields!.Join as Button).disabled = !localClientMaps.includes(game.map.value!)
 
     return choice
 }

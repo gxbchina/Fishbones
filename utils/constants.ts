@@ -132,6 +132,7 @@ export enum Features {
     HALF_PING_MODE_ENABLED = 1 << 4,
     FIREWALL_ENABLED = 1 << 5,
     BYPASS_ENABLED = 1 << 6,
+    SPELLS_DISABLED = 1 << 7,
 }
 
 export class FeaturesEnabled extends Enabled {
@@ -144,6 +145,7 @@ export class FeaturesEnabled extends Enabled {
         [Features.HALF_PING_MODE_ENABLED]: tr('Enable Half-Ping Mode'),
         [Features.FIREWALL_ENABLED]: tr('Enable Firewall Mode'),
         [Features.BYPASS_ENABLED]: tr('Enable Bypass Mode'),
+        [Features.SPELLS_DISABLED]: tr('Disable Summoner Spells'),
     }
     public static readonly choices = PickableValue.normalize(FeaturesEnabled.values)
     
@@ -154,4 +156,5 @@ export class FeaturesEnabled extends Enabled {
     public get isHalfPingEnabled(){ return this.value.includes(Features.HALF_PING_MODE_ENABLED) }
     public get isFirewallEnabled(){ return this.value.includes(Features.FIREWALL_ENABLED) }
     public get isBypassEnabled(){ return this.value.includes(Features.BYPASS_ENABLED) }
+    public get isSpellsEnabled(){ return !this.value.includes(Features.SPELLS_DISABLED) }
 }

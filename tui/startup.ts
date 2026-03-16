@@ -2,10 +2,9 @@ import type { AbortOptions } from "@libp2p/interface";
 import { render } from "../ui/remote/view";
 import { button, checkbox, form, option } from "../ui/remote/types";
 import { args } from "../utils/args";
-import { gsPkg } from "../utils/data/packages";
-import { safeOptions } from "../utils/process/process";
-import { AUTO_LOCALE, DEFAULT_LOCALE, setUsedLocale, systemLocale, systemLocaleSupported, tr, usedLocale } from "../utils/translation";
-import { config, LOCALE_STR, REMOTE_IDX, saveConfig } from "../utils/config";
+import { gsPkg, REMOTE_IDX } from "../utils/data/packages/game-server";
+import { LOCALE_STR, AUTO_LOCALE, DEFAULT_LOCALE, systemLocale, systemLocaleSupported, tr, usedLocale } from "../utils/translation";
+import { config } from "../utils/config";
 
 enum DownloadSource {
     Torrents_and_Mega = 3,
@@ -38,9 +37,9 @@ export async function startup(opts: Required<AbortOptions>){
             gsPkg.remotes.map((origin, id) => ({ id, text: origin.name })),
             config[REMOTE_IDX],
             (index) => {
-                gsPkg.setRemoteByIndex(index)
+                //gsPkg.setRemoteByIndex(index)
                 config[REMOTE_IDX] = index
-                void saveConfig(config, safeOptions)
+                //void saveConfig(config, safeOptions)
             }
         ),
         //EditServerOrigins: button(),
@@ -51,9 +50,9 @@ export async function startup(opts: Required<AbortOptions>){
             $listeners: {
                 toggled(on){
                     const locale = on ? DEFAULT_LOCALE : AUTO_LOCALE
-                    setUsedLocale(locale)
+                    //setUsedLocale(locale)
                     config[LOCALE_STR] = locale
-                    void saveConfig(config, safeOptions)
+                    //void saveConfig(config, safeOptions)
                 },
             }
         },
