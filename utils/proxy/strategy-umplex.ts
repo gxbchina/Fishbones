@@ -3,7 +3,7 @@ import { logger } from "@libp2p/logger"
 import { isENet, type BunSocket } from "../../network/umplex"
 import * as uMplex from '../../network/umplex'
 import { UTPMatcher } from "../../network/libp2p/utp"
-import { ConnectionStrategy, type AnySocket } from "./shared"
+import { ConnectionStrategy, type SocketToRemote, type OnDataFromRemote, DEFAULT_REMOTE_STREAM_INDEX } from "./shared"
 
 const log = logger('launcher:proxy')
 
@@ -12,8 +12,8 @@ type HostPortStr = string
 export class ShareSocketWithExistingUTPConnection extends ConnectionStrategy {
     
     protected mainSocketToRemote: BunSocket | undefined
-    protected readonly socketsByRemoteHostPort = new Map<HostPortStr, AnySocket & {
-        onData(data: Buffer, remotePort: number, remoteHost: string): void
+    protected readonly socketsByRemoteHostPort = new Map<HostPortStr, SocketToRemote & {
+        onData: OnDataFromRemote
     }>()
 
     private getRemoteHostPorts(id: PeerId): HostPortStr[] {
@@ -46,7 +46,7 @@ export class ShareSocketWithExistingUTPConnection extends ConnectionStrategy {
                     if(!socket){
                         log.error('external socket: ignoring pkt from unknown addr %s:%d', remoteHost, remotePort)
                     } else {
-                        socket.onData(data, remotePort, remoteHost)
+                        socket.onData(data, DEFAULT_REMOTE_STREAM_INDEX, remoteHostPort)
                     }
                 },
             }
@@ -60,7 +60,7 @@ export class ShareSocketWithExistingUTPConnection extends ConnectionStrategy {
     }
 
     // eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-unused-vars
-    public async createSocketToRemote(id: PeerId, onData: (data: Buffer, remoteHostPort: string) => void, opts: Required<AbortOptions>): Promise<AnySocket> {
+    public async createSocketToRemote(id: PeerId, streamsCount: number, onData: OnDataFromRemote, opts: Required<AbortOptions>): Promise<SocketToRemote> {
         
         let remoteHostLastUsed = '',
             remotePortLastUsed = 0,
@@ -94,7 +94,7 @@ export class ShareSocketWithExistingUTPConnection extends ConnectionStrategy {
                 const remoteHostPort = `${remoteHost}:${remotePort}`
                 remoteHostLastUsed = remoteHost
                 remotePortLastUsed = remotePort
-                onData(data, remoteHostPort)
+                onData(data, DEFAULT_REMOTE_STREAM_INDEX, remoteHostPort)
             },
         }
 

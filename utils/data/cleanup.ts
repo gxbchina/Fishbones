@@ -7,7 +7,7 @@ import { gitPkg } from "./packages";
 import { fbPkg } from "./upgrade";
 
 const regexes = [
-    /^dotnet-sdk-(?:.*?)-(?:win|linux)-x64(?:\.zip|\.tar.gz)?(?:\.torrent)?$/,
+    /^dotnet-sdk-(?:.*?)-(?:win|linux)-x64(?:\.zip|\.tar\.gz)?(?:\.torrent)?$/,
     /^PortableGit-(?:.*?)-64-bit.7z.exe(?:\.torrent)?$/,
     /^bun-(?:.*?)-(?:windows|linux)-x64-baseline.exe$/,
     /^(?:7zzs|7za)-(?:.*?)-(?:windows|linux)-x64\.exe$/,

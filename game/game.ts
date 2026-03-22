@@ -15,7 +15,7 @@ import { ClientServerProxy } from '../utils/proxy/proxy-client-server'
 import type { WriteonlyMessageStream } from '../utils/pb-stream'
 import { launchClient, relaunchClient, stopClient } from '../utils/process/client'
 import { launchServer, stopServer, getRunningServerPort } from '../utils/process/server'
-import { safeOptions, shutdownOptions } from '../utils/process/process'
+import { safeOptions, shutdownOptions, TerminationError } from '../utils/process/process'
 import { Deferred } from '../utils/promises'
 import { logger } from '../utils/log'
 import { getBotName, getName } from '../utils/namegen/namegen'
@@ -329,6 +329,7 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
                         playerId: playerTo.id,
                         pickRequest: {
                             fullyConnected: playerTo.fullyConnected.encode(),
+                            talents: undefined!,
                         }
                     }]
                 },
@@ -519,7 +520,7 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
         const { clientId } = res
         
         const ip = LOCALHOST
-        let port = getRunningServerPort()
+        let port = getRunningServerPort()!
 
         if(this.features.isBypassEnabled && port){
             // Do nothing. Connect directly to the server.
@@ -543,7 +544,8 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
             return true
         } catch(err) {
             logger.log('Failed to start client:', Bun.inspect(err))
-            this.onClientExit()
+            const code = (err instanceof TerminationError) ? err.cause?.code ?? null : null
+            this.onClientExit(code)
             return false
         }
     }
@@ -559,11 +561,12 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
             return true
         } catch(err) {
             logger.log('Failed to restart client:', Bun.inspect(err))
-            this.onClientExit()
+            const code = (err instanceof TerminationError) ? err.cause?.code ?? null : null
+            this.onClientExit(code)
             return false
         }
     }
-    private onClientExit = async (code?: number, signal?: string) => {
+    private onClientExit = async (code: number | null, signal?: string) => {
         const opts = safeOptions
         if(!this.launched) return
 
@@ -583,6 +586,7 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
                 }
             }
         }
+        logger.log('SpellCrash detection result:', isSpellCrash)
         this.safeDispatchEvent('crash', { detail: { isSpellCrash } })
     }
 
@@ -617,7 +621,9 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
                 }
                 for(const player of players){
                     let reqIsEmpty = true
-                    const pickRequest: PickRequest = {}
+                    const pickRequest: PickRequest = {
+                        talents: undefined!,
+                    }
                     for(const prop of ['champion', 'spell1', 'spell2'] as const){
                         if(player[prop].value === undefined){
                             player[prop].setRandom()

@@ -275,14 +275,30 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
                 try {
                     await build(gsPkg, opts)
                 } catch(err) {
+                    let tryToRepairSDK = true
+                    if(err instanceof Error){
+                        const exception = err as ErrnoException
+                        if(exception.code == 'ENOENT'){ //TODO: Investigate.
+                            const desc1 = tr('SDK installation is probably corrupted')
+                            const desc2 = tr('File not found')
+                            console_log(`${desc1}. ${desc2}:\n`, exception.path ?? '')
+                            tryToRepairSDK = true
+                        }
+                    }
                     if(err instanceof TerminationError){
                         const exitCode = err.cause?.code ?? 0
                         if(DOTNET_INSTALL_CORRUPT_EXIT_CODES.includes(exitCode)){
-                            console_log(tr(`SDK installation is probably corrupted (exit code is {exitCode})`, { exitCode }))
-                            await repairArchived(sdkPkg, { ...opts, ignoreUnpacked: true })
-                            await build(gsPkg, opts)
-                        } else throw err
-                    } else throw err
+                            const desc1 = tr('SDK installation is probably corrupted')
+                            const desc2 = tr(`exit code is {exitCode}`, { exitCode })
+                            console_log(`${desc1} (${desc2})`)
+                            tryToRepairSDK = true
+                        }
+                    }
+                    if(tryToRepairSDK){
+                        await repairArchived(sdkPkg, { ...opts, ignoreUnpacked: true })
+                        await build(gsPkg, opts)
+                    } else
+                        throw err
                 }
             }
             await fs_ensureDir(gsPkg.infoDir, opts)

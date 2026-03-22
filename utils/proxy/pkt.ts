@@ -1,7 +1,7 @@
-import { getBitFlagLE, getX, getZ, setBitFlagLE, vec2, Vector2, Vector3 } from "./math";
+import { getBitFlagLE, getX, getXi, getZ, getZi, ivec2, setBitFlagLE, uInt32Tofloat32, vec2, Vector2, Vector2Int, Vector3 } from "./math";
 import type { AIState, Orders, Teams } from "./enums";
 import { Reader, Writer } from "./enet";
-import { replacer } from "./utils";
+import { replacer, type bool, type float, type int } from "./utils";
 
 const SByte_MaxValue = +127
 const SByte_MinValue = -128
@@ -927,9 +927,17 @@ export class S2C_DisplayLocalizedTutorialChatText extends GamePacket {
 }
 export class S2C_ChainMissileSync extends GamePacket {
     public _type(){ return Type.S2C_ChainMissileSync }
+
     //int size;
-    //ulong ownerNetworkID;
-    //ulong targets[32];
+    public ownerNetworkID: number = 0 //ulong ownerNetworkID;
+    public targets: number[] = [] //ulong targets[32];
+
+    public override _read(reader: Reader){
+        const size = reader.readInt32()
+        this.ownerNetworkID = reader.readUInt32()
+        for(let i = 0; i < size; i++)
+            this.targets[i] = reader.readUInt32()
+    }
 }
 export class OnReplication_Acc extends GamePacket {
     public _type(){ return Type.OnReplication_Acc }
@@ -1173,7 +1181,7 @@ export class MovementDataNormal extends MovementData {
     teleportNetID: number = 0
     hasTeleportID: boolean = false
     teleportID: number = 0
-    waypoints: Vector2[] = []
+    waypoints: Vector2Int[] = []
     public override _type(){ return MovementDataType.Normal }
     public override _read(reader: Reader){
         this.hasTeleportID = (reader.readUInt16("flags") & 1) != 0
@@ -1189,7 +1197,7 @@ export class MovementDataNormal extends MovementData {
 
             let lastX = reader.readInt16("firstX")
             let lastZ = reader.readInt16("firstZ")
-            this.waypoints.push(vec2(lastX, lastZ))
+            this.waypoints.push(ivec2(lastX, lastZ))
             
             for(let i = 1, flag = 0; i < size; i++){
                 if(getBitFlagLE(flags, flag++)){
@@ -1202,7 +1210,7 @@ export class MovementDataNormal extends MovementData {
                 } else {
                     lastZ = reader.readInt16("lastZ")
                 }
-                this.waypoints.push(vec2(lastX, lastZ))
+                this.waypoints.push(ivec2(lastX, lastZ))
             }
         }
     }
@@ -1211,9 +1219,9 @@ export class MovementDataNormal extends MovementData {
         writer.writeUInt16(+this.hasTeleportID, 'hasTeleportID')
         writer.writeUInt16(this.waypoints.length, 'waypoints.length')
         if(this.waypoints.length){
-            writer.writeUInt32(this.teleportNetID)
+            writer.writeUInt32(this.teleportNetID, 'teleportNetID')
             if(this.hasTeleportID)
-                writer.writeByte(this.teleportID)
+                writer.writeByte(this.teleportID, 'teleportID')
 
             const size = this.waypoints.length
             const count = Math.floor((size - 2) / 4 + 1)
@@ -1224,8 +1232,8 @@ export class MovementDataNormal extends MovementData {
             writer.position += count
 
             let prevWaypoint  = this.waypoints[0]!
-            let prevWaypointX = Math.floor(getX(prevWaypoint))
-            let prevWaypointZ = Math.floor(getZ(prevWaypoint))
+            let prevWaypointX = Math.floor(getXi(prevWaypoint))
+            let prevWaypointZ = Math.floor(getZi(prevWaypoint))
 
             writer.writeInt16(prevWaypointX, 'firstX')
             writer.writeInt16(prevWaypointZ, 'firstZ')
@@ -1233,8 +1241,8 @@ export class MovementDataNormal extends MovementData {
             for(let i = 1, j = 0; i < this.waypoints.length; i++){
 
                 const waypoint  = this.waypoints[i]!
-                const waypointX = Math.floor(getX(waypoint))
-                const waypointZ = Math.floor(getZ(waypoint))
+                const waypointX = Math.floor(getXi(waypoint))
+                const waypointZ = Math.floor(getZi(waypoint))
                 
                 const relativeX = waypointX - prevWaypointX;
                 const flagX = relativeX <= SByte_MaxValue && relativeX >= SByte_MinValue
@@ -1754,32 +1762,30 @@ export class C2S_AntiBotDP extends GamePacket {
 export class S2C_CreateHero extends GamePacket {
     public _type(){ return Type.S2C_CreateHero }
 
-    //ulong netObjID;
-    //ulong playerUID;
-    //uchar netNodeID;
-    //uchar skillLevel;
-    //uchar teamIsOrder;
-    //uchar isBot;
-    //uchar botRank;
-    //uchar spawnPosIndex;
-    //int skinID;
-    //char name[40];
-    //char skin[40];
-
-    netObjID: number = 0
-    playerUID: number = 0
-    netNodeID: number = 0
-    skillLevel: number = 0
-    teamIsOrder: boolean = false
-    isBot: boolean = false
-    botRank: number = 0
-    spawnPosIndex: number = 0
-    skinID: number = 0
-    name: string = ''
-    skin: string = ''
+    netObjID: number = 0 //ulong netObjID;
+    playerUID: number = 0 //ulong playerUID;
+    netNodeID: number = 0 //uchar netNodeID;
+    skillLevel: number = 0 //uchar skillLevel;
+    teamIsOrder: boolean = false //uchar teamIsOrder;
+    isBot: boolean = false //uchar isBot;
+    botRank: number = 0 //uchar botRank;
+    spawnPosIndex: number = 0 //uchar spawnPosIndex;
+    skinID: number = 0 //int skinID;
+    name: string = '' //char name[40];
+    skin: string = '' //char skin[40];
 
     public override _read(reader: Reader){
-        throw new Error("Method not implemented.");
+        this.netObjID = reader.readUInt32('netObjID')
+        this.playerUID = reader.readUInt32('playerUID')
+        this.netNodeID = reader.readByte('netNodeID')
+        this.skillLevel = reader.readByte('skillLevel')
+        this.teamIsOrder = reader.readBool('teamIsOrder')
+        this.isBot = reader.readBool('isBot')
+        this.botRank = reader.readByte('botRank')
+        this.spawnPosIndex = reader.readByte('spawnPosIndex')
+        this.skinID = reader.readUInt32('skinID')
+        this.name = reader.readFixedString(40, 'name')
+        this.skin = reader.readFixedString(40, 'skin')
     }
     public override _write(writer: Writer){
         writer.writeUInt32(this.netObjID)
@@ -2000,51 +2006,67 @@ export class OnReplication extends GamePacket {
     //uchar data[0];
 
     syncID: number = 0
-    datas: ReplicationData[] = []
+    data: ReplicationData[] = []
 
     public override _read(reader: Reader){
         this.syncID = reader.readUInt32()
-        //const count = reader.readByte()
-        //for(let i = 0; i < count; i++){
-        //    const data = new ReplicationData()
-        //          data._read(reader)
-        //    this.datas.push(data)
-        //}
+        const count = reader.readByte()
+        for(let i = 0; i < count; i++){
+            const data = new ReplicationData()
+                  data._read(reader)
+            this.data.push(data)
+        }
     }
     public override _write(writer: Writer){
         writer.writeUInt32(this.syncID)
-        writer.writeByte(this.datas.length)
-        for(const data of this.datas)
+        writer.writeByte(this.data.length)
+        for(const data of this.data)
             data.write(writer)
     }
 }
 export class ReplicationData extends BasePacket {
     
     unitNetID: number = 0
-    values: number[] = []
-    skip: boolean[] = []
+    data: number[][] = []
 
     public override _read(reader: Reader){
-        this.values.push(reader.readByte())
-        this.skip.push(false)
+        const primaryIDs = reader.readByte()
         this.unitNetID = reader.readUInt32()
-        //const count = 0
-        //for(let i = 1; i < count; i++){
-        //    this.values.push(reader.readUInt32())
-        //    this.skip.push(false)
-        //}
-    }
-
-    public override _write(writer: Writer){
-        writer.writeByte(this.values[0]!)
-        writer.writeUInt32(this.unitNetID)
-        console.assert(this.values.length == this.skip.length)
-        for(let i = 1; i < this.values.length; i++){
-            if(this.skip[i]) continue
-            writer.writeUInt32(this.values[i]!)
+        for(let primaryID = 0; primaryID < 8; primaryID++){
+            if((primaryIDs & (1 << primaryID)) != 0){
+                const secondaryIDs = reader.readUInt32()
+                for(let secondaryID = 0; secondaryID < 32; secondaryID++){
+                    if((secondaryIDs & (1 << secondaryID)) != 0){
+                        (this.data[primaryID] ??= [])[secondaryID] = reader.readUInt32()
+                    }
+                }
+            }
         }
     }
+
+    public hasPrimaryID(primaryId: number){
+        return this.data[primaryId] != undefined
+    }
+
+    public getFloat(primaryID: number, secondaryID: number, obj: Record<string, any>, prop: string, digits: number){
+        const value = this.data[primaryID]?.[secondaryID]
+        if(value != undefined)
+            obj[prop] = uInt32Tofloat32(value)
+    }
+
+    public getUInt(primaryID: number, secondaryID: number, obj: Record<string, any>, prop: string){
+        const value = this.data[primaryID]?.[secondaryID]
+        if(value != undefined)
+            obj[prop] = value
+    }
+
+    public getBool(primaryID: number, secondaryID: number, obj: Record<string, any>, prop: string){
+        const value = this.data[primaryID]?.[secondaryID]
+        if(value != undefined)
+            obj[prop] = !!value
+    }
 }
+
 /*
 export class ReplicationData extends BasePacket {
     
@@ -2389,7 +2411,15 @@ export class ServerTick extends GamePacket {
 }
 export class AI_TargetS2C extends GamePacket {
     public _type(){ return Type.AI_TargetS2C }
-    //ulong targetID;
+    
+    targetID: number = 0 //ulong targetID;
+
+    public override _read(reader: Reader){
+        this.targetID = reader.readUInt32("targetID")
+    }
+    public override _write(writer: Writer){
+        writer.writeUInt32(this.targetID, "targetID")
+    }
 }
 export class ResumePacket extends GamePacket {
     public _type(){ return Type.ResumePacket }

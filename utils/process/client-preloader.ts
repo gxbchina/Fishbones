@@ -7,7 +7,7 @@ import {
     relaunchClient as originalRelaunchClient,
 } from "./client"
 import { Peer, type WrappedPacket } from "../proxy/peer"
-import { Proxy, type SocketToProgram } from "../proxy/proxy"
+import { Proxy } from "../proxy/proxy"
 import { firewall } from "../proxy/proxy-firewall"
 import { ProxyClient } from "../proxy/proxy-client"
 import { ENetChannels, type BasePacket } from "../proxy/pkt"
@@ -22,12 +22,12 @@ import { vec2, Vector3 } from "../proxy/math"
 const blowfishKey = "17BLOhi6KZsTtldTsizvHg=="
 const LOCALHOST = '127.0.0.1'
 
-type OnData = (data: Buffer<ArrayBufferLike>, programHostPort: string) => void
+import { type SocketToProgram, type OnDataFromProgram, DEFAULT_REMOTE_STREAM_INDEX, type RemoteStreamIndex } from "../proxy/shared"
 
 let launchArgs: [ ip: string, port: number, key: string, clientId: number, gameInfo: GameInfo ] | undefined
 let clientSubprocess: ChildProcess | undefined
 let socketToProgram: SocketToProgram | undefined
-let socketToProgram_onData: OnData | undefined
+let socketToProgram_onData: OnDataFromProgram | undefined
 
 const clientState = new class ClientState {
     loaded = false
@@ -98,7 +98,7 @@ function sendToServer<T extends BasePacket>(packet: T, fields: Partial<T>, chann
     }]
     const wrapped = Buffer.from(Wrapped.encode({ packets }))
     const programHostPort = socketToProgram!.sourceHostPort
-    socketToProgram_onData!(wrapped, programHostPort)
+    socketToProgram_onData!(wrapped, DEFAULT_REMOTE_STREAM_INDEX, programHostPort)
 }
 
 function sendToClient<T extends BasePacket>(packet: T, fields: Partial<T> = {}, channelID = ENetChannels.GENERIC_APP_BROADCAST){
@@ -185,11 +185,11 @@ export const clientPreloaderCallbacks = {
         socketToProgram.close = () => {}
     },
     getOnData(){
-        return (data: Buffer, programHostPort: string) => {
-            socketToProgram_onData?.(data, programHostPort)
+        return (data: Buffer, streamIdx: RemoteStreamIndex, programHostPort: string) => {
+            socketToProgram_onData?.(data, streamIdx, programHostPort)
         }
     },
-    setOnData(onData: OnData){
+    setOnData(onData: OnDataFromProgram){
         socketToProgram_onData = onData
     },
 

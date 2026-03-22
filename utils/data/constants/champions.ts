@@ -299,7 +299,7 @@ export const champions = championsTable
 
 const icmp = (a: string | undefined, b: string) => a?.toLowerCase() === b.toLowerCase()
 export async function loadSkins(opts: Required<AbortOptions>){
-    const charactersDir = charactersDirRelative.replace('%DATA%', gcPkg.dir)
+    const charactersDir = charactersDirRelative.replace('%DATA%', path.join(gcPkg.dir, 'DATA'))
     for(const info of champions){
         const filenames = await fs_readdir(path.join(charactersDir, info.short), opts)
         info.skins = filenames.flatMap(filename => {

@@ -1,7 +1,7 @@
 import type { LibP2PNode } from "../../node/node"
 import type { PeerId, AbortOptions } from "@libp2p/interface"
 import { UseExistingLibP2PConnection } from "./strategy-libp2p"
-import { Role, type AnySocket } from "./shared"
+import { DEFAULT_REMOTE_STREAM_INDEX, Role, type OnDataFromProgram, type SocketToProgram, type SocketToRemote } from "./shared"
 import { Peer } from "./peer"
 
 //import { LOCALHOST } from "./constants"
@@ -20,20 +20,15 @@ type PeerIdStr = string
 
 export interface PeerData {
     peerId: PeerId,
-    socketToRemote: AnySocket,
+    socketToRemote: SocketToRemote,
     socketToProgram: SocketToProgram,
     peerToProgram?: Peer,
-}
-
-export type SocketToProgram = AnySocket & {
-    setPort(port: number): void
-    port: number
-    peer?: Peer
 }
 
 export class Proxy {
     
     public dataTransmitted: number = 0
+    public streamsCount: number = 1
 
     protected readonly strategy: UseExistingLibP2PConnection
     protected readonly peersByPeerId = new Map<PeerIdStr, PeerData>()
@@ -60,14 +55,18 @@ export class Proxy {
 
         const peer: PeerData = {
             peerId: id,
-            socketToRemote: this.node.peerId.equals(id) ? undefined! : await this.strategy.createSocketToRemote(id, (data: Buffer, remoteHostPort: string) => {
+            socketToRemote: this.node.peerId.equals(id) ? undefined! : await this.strategy.createSocketToRemote(id, this.streamsCount, (data: Buffer, streamIdx: number, remoteHostPort: string) => {
                 log.trace('external socket: redirecting pkt from %s through %s to %s', remoteHostPort, peer.socketToProgram.sourceHostPort, peer.socketToProgram.targetHostPort)
-                peer.socketToProgram.send(data)
+                peer.socketToProgram.send(data, streamIdx)
             }, opts),
-            socketToProgram: await this.createSocketToProgram(programHost, programPort, (data: Buffer, programHostPort: string) => {
+            socketToProgram: await this.createSocketToProgram(programHost, programPort, (data: Buffer, streamIdx: number, programHostPort: string) => {
+                if(!peer.socketToRemote){
+                    log.trace('internal socket: dropping pkt from %s because the remote is not connected')
+                    return
+                }
                 log.trace('internal socket: redirecting pkt from %s through %s to %s', programHostPort, peer.socketToRemote.sourceHostPort, peer.socketToRemote.targetHostPort)
                 this.dataTransmitted += data.length
-                peer.socketToRemote.send(data)
+                peer.socketToRemote.send(data, streamIdx)
             }, opts)
         }
         //openSockets.add(peer.socketToProgram)
@@ -81,7 +80,7 @@ export class Proxy {
         return peer
     }
 
-    protected async createSocketToProgram(programHost: string, programPort: number, onData: (data: Buffer, programHostPort: string) => void, opts: Required<AbortOptions>): Promise<SocketToProgram> {
+    protected async createSocketToProgram(programHost: string, programPort: number, onData: OnDataFromProgram, opts: Required<AbortOptions>): Promise<SocketToProgram> {
         let programHostLastUsed: string = programHost
         let programPortLastUsed: number = programPort
         const socket = await Bun.udpSocket({
@@ -96,7 +95,7 @@ export class Proxy {
                     const programHostPort = `${programHost}:${programPort}`
                     programHostLastUsed = programHost
                     programPortLastUsed = programPort
-                    onData(data, programHostPort)
+                    onData(data, DEFAULT_REMOTE_STREAM_INDEX, programHostPort)
                 },
             }
         })

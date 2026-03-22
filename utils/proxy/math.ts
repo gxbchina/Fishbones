@@ -1,17 +1,21 @@
 import { Reader, Writer } from "./enet"
 
 const arraybuffer1 = new ArrayBuffer(2*4)
+const int16array1 = new Int16Array(arraybuffer1)
 const float16array1 = new Float16Array(arraybuffer1)
 const bigint64array1 = new BigUint64Array(arraybuffer1)
 
 const arraybuffer2 = new ArrayBuffer(2*4)
+const int16array2 = new Int16Array(arraybuffer2)
 const float16array2 = new Float16Array(arraybuffer2)
 const bigint64array2 = new BigUint64Array(arraybuffer2)
 
 export type Vector2 = bigint & { readonly brand: unique symbol }
+export type Vector2Int = bigint & { readonly brand: unique symbol }
 export type Vector3 = bigint & { readonly brand: unique symbol }
 export type Vector4 = bigint & { readonly brand: unique symbol }
 export type Vector = Vector2 | Vector3 | Vector4
+export type VectorInt = Vector2Int
 
 export namespace Vector4 {
     export function read(reader: Reader, name?: string){
@@ -79,12 +83,38 @@ export namespace Vector2 {
     }
 }
 
+export namespace Vector2Int {
+    export function write(writer: Writer, v: Vector2Int){
+        bigint64array1[0] = v
+        writer.writeInt16(int16array1[0]!)
+        writer.writeInt16(int16array1[1]!)
+    }
+    export function read(reader: Reader){
+        int16array1[0] = reader.readInt16()
+        int16array1[2] = 0
+        int16array1[1] = reader.readInt16()
+        int16array1[3] = 0
+        return bigint64array1[0] as Vector2Int
+    }
+}
+
 export function vec2(x: number, z: number): Vector2 {
     float16array1[0] = x
     float16array1[2] = 0
     float16array1[1] = z
     float16array1[3] = 0
-    return bigint64array1[0] as Vector2
+    const v = bigint64array1[0] as Vector2
+    //console.log('in ', x, z)
+    //console.log('out', getX(v), getZ(v))
+    return v
+}
+
+export function ivec2(x: number, z: number): Vector2Int {
+    int16array1[0] = x
+    int16array1[2] = 0
+    int16array1[1] = z
+    int16array1[3] = 0
+    return bigint64array1[0] as Vector2Int
 }
 
 export function vec3(x: number, y: number, z: number): Vector3 {
@@ -108,23 +138,38 @@ export function toString(v: Vector){
     return `${float16array1[0]}, ${float16array1[2]}, ${float16array1[1]}, ${float16array1[3]}`
 }
 
+export function toStringInt(v: VectorInt){
+    bigint64array1[0] = v
+    return `${int16array1[0]}, ${int16array1[2]}, ${int16array1[1]}, ${int16array1[3]}`
+}
+
 export function getX(v: Vector2 | Vector3 | Vector4){
     bigint64array1[0] = v
     return float16array1[0]!
 }
 
+export function getXi(v: Vector2Int){
+    bigint64array1[0] = v
+    return int16array1[0]!
+}
+
 export function getY(v: Vector3 | Vector4){
-    bigint64array1[2] = v
+    bigint64array1[0] = v
     return float16array1[2]!
 }
 
 export function getZ(v: Vector2 | Vector3 | Vector4){
-    bigint64array1[1] = v
+    bigint64array1[0] = v
     return float16array1[1]!
 }
 
+export function getZi(v: Vector2Int){
+    bigint64array1[0] = v
+    return int16array1[1]!
+}
+
 export function getW(v: Vector4){
-    bigint64array1[1] = v
+    bigint64array1[0] = v
     return float16array1[3]!
 }
 
@@ -153,6 +198,28 @@ export function sub(v1: Vector, v2: Vector): Vector {
     float16array1[1]! -= float16array2[1]!
     float16array1[2]! -= float16array2[2]!
     float16array1[3]! -= float16array2[3]!
+    return bigint64array1[0] as Vector
+}
+
+export function subi(v1: VectorInt, v2: VectorInt): VectorInt {
+    bigint64array1[0] = v1
+    bigint64array2[0] = v2
+    int16array1[0]! -= int16array2[0]!
+    int16array1[1]! -= int16array2[1]!
+    int16array1[2]! -= int16array2[2]!
+    int16array1[3]! -= int16array2[3]!
+    return bigint64array1[0] as VectorInt
+}
+
+export function mul(v: Vector2, s: number): Vector2
+export function mul(v: Vector3, s: number): Vector3
+export function mul(v: Vector4, s: number): Vector4
+export function mul(v: Vector, s: number): Vector {
+    bigint64array1[0] = v
+    float16array1[0]! *= s
+    float16array1[1]! *= s
+    float16array1[2]! *= s
+    float16array1[3]! *= s
     return bigint64array1[0] as Vector
 }
 
@@ -186,8 +253,12 @@ const arraybuffer3 = new ArrayBuffer(4)
 const float32array3 = new Float32Array(arraybuffer3)
 const uint32array3 = new Uint32Array(arraybuffer3)
 export function float32ToUInt32(value: number){
-  float32array3[0] = value
-  return uint32array3[0]!
+    float32array3[0] = value
+    return uint32array3[0]!
+}
+export function uInt32Tofloat32(value: number){
+    uint32array3[0] = value
+    return float32array3[0]!
 }
 
 //const buffer1 = Buffer.alloc(4)
@@ -214,4 +285,24 @@ export function toObject(v: Vector){
         z: float16array1[1]!,
         w: float16array1[3]!,
     }
+}
+
+export function len(v: Vector){
+    bigint64array1[0] = v
+    return Math.sqrt( 
+        + (float16array1[0]! ** 2)
+        + (float16array1[2]! ** 2)
+        + (float16array1[1]! ** 2)
+        + (float16array1[3]! ** 2)
+    )
+}
+
+export function leni(v: VectorInt){
+    bigint64array1[0] = v
+    return Math.sqrt( 
+        + (int16array1[0]! ** 2)
+        + (int16array1[2]! ** 2)
+        + (int16array1[1]! ** 2)
+        + (int16array1[3]! ** 2)
+    )
 }

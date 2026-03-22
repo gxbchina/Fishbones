@@ -3,8 +3,8 @@ import { PeerMap } from "@libp2p/peer-collections"
 import { logger } from "@libp2p/logger"
 import { pipe } from "it-pipe"
 import * as lp from 'it-length-prefixed'
-import { AbortError, pushable, type Pushable } from 'it-pushable'
-import { ConnectionStrategy, Role, type AnySocket } from "./shared"
+import { AbortError, pushable as createPushable, type Pushable } from 'it-pushable'
+import { ConnectionStrategy, DEFAULT_REMOTE_STREAM_INDEX, Role, type OnDataFromRemote, type RemoteStreamIndex, type SocketToRemote } from "./shared"
 import type { Registrar } from "@libp2p/interface-internal"
 
 //import { PROXY_PROTOCOL } from "./constants"
@@ -54,10 +54,10 @@ class ProxyService implements Startable {
 
 export class UseExistingLibP2PConnection extends ConnectionStrategy {
 
-    socketsByPeerId = new PeerMap<AnySocket & {
-        onData(data: Buffer, remoteHostPort: string): void
-        pushable: Pushable<Buffer>
-        stream?: Stream
+    socketsByPeerId = new PeerMap<SocketToRemote & {
+        onData: OnDataFromRemote
+        pushables: Pushable<Buffer>[]
+        streams: Stream[]
     }>()
 
     closeSockets(): void {
@@ -92,33 +92,38 @@ export class UseExistingLibP2PConnection extends ConnectionStrategy {
     }
 
     //// eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-unused-vars
-    async createSocketToRemote(id: PeerId, onData: (data: Buffer, remoteHostPort: string) => void, opts: Required<AbortOptions>): Promise<AnySocket> {
+    async createSocketToRemote(id: PeerId, streamsCount: number, onData: OnDataFromRemote, opts: Required<AbortOptions>): Promise<SocketToRemote> {
 
         const socket = {
-            stream: undefined! as Stream | undefined,
-
+            
             sourceHostPort: this.node.peerId.toString(),
             targetHostPort: id.toString(),
             
             onData,
-            pushable: pushable<Buffer>({ objectMode: false }),
-            send(data: Buffer){
-                this.pushable.push(data)
+            streams: [] as Stream[],
+            pushables: [] as Pushable<Buffer>[],
+            send(data: Buffer, streamIdx: number){
+                let pushable = this.pushables[streamIdx]
+                    pushable ??= this.pushables[DEFAULT_REMOTE_STREAM_INDEX]
+                pushable?.push(data)
                 return true
             },
             
-            get connected(){ return this.stream?.status === 'open' },
-            get opened(){ return this.stream?.status === 'open' },
+            //get connected(){ return this.stream?.status === 'open' },
+            //get opened(){ return this.stream?.status === 'open' },
+
             close(){
-                this.pushable.end(new AbortError())
-                this.stream?.close().catch(err => log.error(err))
+                for(let streamIdx = 0; streamIdx < this.pushables.length; streamIdx++)
+                    this.pushables[streamIdx]!.end(new AbortError())
+                for(let streamIdx = 0; streamIdx < this.streams.length; streamIdx++)
+                    this.streams[streamIdx]!.close().catch(err => log.error(err))
             }
         }
 
         this.socketsByPeerId.set(id, socket)
         
         if(this.role === Role.Client){
-            await this.connectToRemote(id, opts)
+            await this.connectToRemote(id, streamsCount, opts)
         }
         
         return socket
@@ -127,12 +132,12 @@ export class UseExistingLibP2PConnection extends ConnectionStrategy {
     async connectSockets(opts: Required<AbortOptions>){
         return Promise.all(
             [...this.socketsByPeerId.entries()].map(async ([ id ]) => {
-                return this.connectToRemote(id, opts)
+                return this.connectToRemote(id, 1, opts)
             })
         )
     }
 
-    async connectToRemote(id: PeerId, opts: Required<AbortOptions>){
+    async connectToRemote(id: PeerId, streamsCount: number, opts: Required<AbortOptions>){
         let relativeRole = this.role
         if((this.role & Role.Client) != 0 && (this.role & Role.Server) != 0){
             const a = this.node.peerId.toString()
@@ -148,10 +153,13 @@ export class UseExistingLibP2PConnection extends ConnectionStrategy {
                 connections.at(0) ?? await this.node.dial(id, { ...opts, force: false })
             const streams = connection.streams
                 .filter(stream => stream.status === 'open' && stream.protocol === PROXY_PROTOCOL)
-            const stream =
-                streams.find(stream => stream.direction === 'outbound') ??
-                streams.at(0) ?? await connection.newStream(PROXY_PROTOCOL, opts)
-            this.handleStream(id, stream)
+                .sort((a, b) => +(a.direction == 'outbound') - +(b.direction == 'outbound'))
+            await Promise.all(
+                Array(streamsCount).fill(undefined).map(async (_, i) => {
+                    const stream = streams[i] ?? await connection.newStream(PROXY_PROTOCOL, opts)
+                    this.handleStream(id, stream)
+                })
+            )
         }
         if((relativeRole & Role.Server) != 0){
             await new Promise<void>((resolve, reject) => {
@@ -190,9 +198,13 @@ export class UseExistingLibP2PConnection extends ConnectionStrategy {
 
     protected handleStream(peerId: PeerId, stream: Stream){
         const socket = this.socketsByPeerId.get(peerId)!
+        const pushable = createPushable<Buffer>({ objectMode: false })
 
-        //TODO: Handle multiple streams.
-        socket.stream = stream
+        const i = socket.pushables.push(pushable) 
+        const streamIdx = socket.streams.push(stream) as RemoteStreamIndex
+        console.assert(i == streamIdx, 'Assertion failed: i == streamIdx')
+
+        //console.log(Role[this.role], 'handleStream', streamIdx)
 
         pipe(
             stream.source,
@@ -200,13 +212,13 @@ export class UseExistingLibP2PConnection extends ConnectionStrategy {
             async source => {
                 for await (const chunk of source) {
                     const data = Buffer.from(chunk.slice())
-                    socket.onData(data, peerId.toString())
+                    socket.onData(data, streamIdx, peerId.toString())
                 }
             },
         ).catch(err => log.error(err))
 
         pipe(
-            socket.pushable,
+            pushable,
             source => lp.encode(source),
             stream.sink,
         ).catch(err => log.error(err))

@@ -229,7 +229,7 @@ export class Writer {
     }
     public writeInt16(value: number, name?: string){
         const result = this.funcs.writeInt16.call(this.buffer, value, this.position);
-        if(this.debug) console.log('writeUInt16', name, this.buffer.subarray(this.position, this.position + 2).toString('hex'))
+        if(this.debug) console.log('writeInt16', name, this.buffer.subarray(this.position, this.position + 2).toString('hex'))
         this.position += 2;
         return result
     }
