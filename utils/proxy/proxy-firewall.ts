@@ -1,10 +1,10 @@
 import { Peer, type WrappedPacket } from './peer'
 import { Proxy } from './proxy'
 import { Wrapped } from '../../message/proxy'
-import { Role, type OnDataFromProgram, type RemoteStreamIndex } from './shared'
+import { Role, type RemoteStreamIndex } from './shared'
 import { decrypt, encrypt } from './blowfish'
 import * as PKT from './pkt'
-import { Vector2Int, leni, subi, toStringInt } from './math'
+import { Vector2Int, Vector2Single, sadd, sdiv, fromIntToSingle, fromSingleToInt, ilen, slen, smul, isub, ssub, toStringInt } from './math'
 import { type bool, type float, type int } from './utils'
 import type { ClientPreloaderCallbacks } from '../process/client-preloader'
 import os from 'node:os'
@@ -31,8 +31,10 @@ class Unit extends Entity {
     public waypoints: Vector2Int[] = []
     public isAttacking: boolean = false
     public isMoving: boolean = false
-    public movementSpeed: number = 319
+    public movementSpeed: number = 319.29998779296875
+    //public movementSpeed: number = 310
     public waypointsSynced: Vector2Int[] = []
+    public currentPosition?: Vector2Single
     public stats?: Stats
     public targetID: number = 0
     public repeats: number = 0
@@ -406,7 +408,7 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
                     message.movements = message.movements.filter(movement => {
 
                         const { unit, unitCreated } = getUnit(movement.teleportNetID)
-
+                        
                         //if(movement.hasTeleportID)
                         //unit.teleportID = movement.teleportID
                         //unit.waypoints = movement.waypoints
@@ -428,13 +430,16 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
                         //const waypointsChanged = true
                         const teleportIDChanged = unitCreated || movement.hasTeleportID && movement.teleportID != unit.teleportID
                         const waypointsChanged = unitCreated || movement.waypoints.length != unit.waypoints.length || !movement.waypoints.every((newWaypoint, i) => {
-                            //if(i == 0) return true
+                            if(i == 0) return true
                             const prevWaypoint = unit.waypoints[i]!
                             console.assert(prevWaypoint != undefined, 'Assertion failed: prevWaypoint != undefined')
-                            if(i == 0 && leni(subi(prevWaypoint, newWaypoint)) < CELL_SIZE) return true //HACK:
+                            //if(i == 0 && leni(subi(prevWaypoint, newWaypoint)) < CELL_SIZE) return true //HACK:
                             return newWaypoint == prevWaypoint
                         })
-                        //const waypointsChanged = unitCreated || movement.waypoints.length > unit.waypoints.length || !movement.waypoints.every((newWaypoint, i) => {
+                        //const waypointsChanged = unitCreated
+                        //|| (movement.waypoints.length <= 1 && unit.waypoints.length > 1)
+                        //|| (movement.waypoints.length > unit.waypoints.length)
+                        //|| !movement.waypoints.every((newWaypoint, i) => {
                         //    if(i == 0) return true // Current position.
                         //    //if(i >= 2) return true // Everything past the first waypoint.
                         //    const prevWaypoint = unit.waypoints[unit.waypoints.length - movement.waypoints.length + i]
@@ -442,6 +447,9 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
                         //    return newWaypoint == prevWaypoint
                         //})
 
+                        //if(unit.waypoints.length > 0)
+                        //    console.log(unit.id, leni(subi(unit.waypoints[0]!, movement.waypoints[0]!)))
+                        //unit.waypoints[0] = movement.waypoints[0]!
                         
                         if(teleportIDChanged || waypointsChanged){
 
@@ -560,6 +568,34 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
             //for(const packet of packets)
             //    console.log(Date.now(), Role[this['role']], 'receives packet on', `Stream[${streamIdx}]`, /*PKT.ENetChannels[packet.channelID]*/)
             
+            /*
+            if(autoFilter)
+            packets = packets.filter((packet) => {
+
+                let messageAccepted = true
+
+                const decryptedData = decrypt(packet.data)
+                const packet_type = decryptedData[0] as PKT.Type
+
+                if(packet_type == PKT.Type.WaypointGroup){
+                    const message = new PKT.WaypointGroup().read(decryptedData)
+                    
+                    messageAccepted = false
+
+                    for(const movement of message.movements){
+                        const { unit, unitCreated } = getUnit(movement.teleportNetID)
+                        if(movement.hasTeleportID)
+                        unit.teleportID = movement.teleportID
+                        //unit.currentPosition = fromIntToSingle(movement.waypoints[0]!)
+                        unit.waypoints = movement.waypoints
+                        unit.repeats = 0
+                    }
+                }
+
+                return messageAccepted
+            })
+            */
+
             if(autoFilter && callbacks && this['role'] == Role.Client)
                 packets = callbacks.filterIncoming(packets)
 
@@ -576,9 +612,19 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
 
         if(callbacks && this['role'] == Role.Client)
             callbacks.setSocketToProgram(socketToProgram)
-
-        //if(this['role'] == Role.Server)
-        //    setInterval(fixedUpdate, deltaTime, units, onData).unref()
+        
+        /*
+        if(this['role'] == Role.Client){
+            const send = (packet: PKT.BasePacket, channel = PKT.ENetChannels.GENERIC_APP_BROADCAST) => {
+                peerToProgram.sendUnreliable([{
+                    fragment: undefined,
+                    data: encrypt(packet.write()),
+                    channelID: channel,
+                }])
+            }
+            setInterval(() => fixedUpdate(units, send), deltaTime).unref()
+        }
+        */
 
         return socketToProgram
     }
@@ -587,79 +633,66 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
 }
 
 const deltaTime = 1000 / 30
-//const startTime = Date.now()
 const k = 0.00001
-//let syncID = 0
 
-//function fixedUpdate(units: Map<number, Unit>, onData: OnDataFromProgram){
-//
-//    const movements: PKT.MovementDataNormal[] = []
-//    for(const unit of units.values()){
-//
-//        let distanceToPass = unit.movementSpeed * 0.001 * deltaTime
-//        while(unit.waypoints.length >= 2 && distanceToPass > k){
-//
-//            const currentPosition = unit.waypoints[0]!
-//            const nearestWaypoint = unit.waypoints[1]!
-//           
-//            const directionToNearestWaypoint = sub(nearestWaypoint, currentPosition)
-//            const distanceToNearestWaypoint = len(directionToNearestWaypoint)
-//            if(distanceToPass >= distanceToNearestWaypoint){
-//                distanceToPass -= distanceToNearestWaypoint
-//                unit.waypoints.shift()
-//                continue
-//            } else {
-//                const directionToNearestWaypointNormalized =
-//                    (distanceToNearestWaypoint > k) ?
-//                        div(directionToNearestWaypoint, distanceToNearestWaypoint) :
-//                        Vector2.Zero
-//                unit.waypoints[0] = add(currentPosition, mul(directionToNearestWaypointNormalized, distanceToPass))
-//                distanceToPass = 0
-//                break
-//            }
-//        }
-//
-//        const waypointsChanged = true
-//            unit.waypoints.length >= 2 && unit.waypointsSynced.length < 2 ||
-//            unit.waypoints.length < 2 && unit.waypointsSynced.length >= 2 ||
-//            unit.waypoints[1] != unit.waypointsSynced[1]
-//       
-//        if(waypointsChanged){
-//
-//            unit.waypointsSynced = unit.waypoints.slice(0, 2)
-//           
-//            const movementData = new PKT.MovementDataNormal()
-//            //movementData.syncID = syncID++
-//            movementData.syncID = Math.floor(os.uptime() * 1000)
-//            movementData.waypoints = unit.waypointsSynced
-//            //movementData.teleportID = unit.teleportID || 1
-//            movementData.teleportNetID = unit.id
-//            //movementData.hasTeleportID = true
-//            movements.push(movementData)
-//
-//            console.log('sending', unit.id, `[${movementData.waypoints.map(v => `(${toString(v)})`).join(', ')}]`)
-//        }
-//    }
-//    if(movements.length > 0){
-//
-//        const message = new PKT.WaypointGroup()
-//        message.movements = movements
-//        //message.syncID = syncID++
-//        //message.syncID = Date.now() - startTime
-//        //message.syncID = Math.floor(process.uptime() * 1000)
-//        message.syncID = Math.floor(os.uptime() * 1000)
-//
-//        const packet = {
-//            fragment: undefined,
-//            data: encrypt(message.write()),
-//            channelID: PKT.ENetChannels.GENERIC_APP_BROADCAST,
-//        }
-//
-//        //console.log('sending', JSON.stringify(message, replacer, 4), 'on', packet.channelID)
-//
-//        const packets = [ packet ]
-//        const programHostPort = 'undefined:undefined'
-//        const wrapped = Buffer.from(Wrapped.encode({ packets }))
-//        onData(wrapped, DEFAULT_STREAM_IDX, programHostPort)
-//    }
-//}
+function fixedUpdate(units: Map<number, Unit>, send: (packet: PKT.BasePacket, channel?: PKT.ENetChannels) => void){
+
+    const movements: PKT.MovementDataNormal[] = []
+    for(const unit of units.values()){
+
+        if(unit.waypoints.length == 0) continue
+
+        let currentPosition = unit.currentPosition ??= fromIntToSingle(unit.waypoints[0]!)
+        
+        let distancePassed = 0
+        let distanceToPass = unit.movementSpeed * 0.001 * deltaTime * 0.5
+        while(unit.waypoints.length >= 2 && distanceToPass > k){
+
+            const nearestWaypoint = fromIntToSingle(unit.waypoints[1]!)
+            
+            const directionToNearestWaypoint = ssub(nearestWaypoint, currentPosition)
+            const distanceToNearestWaypoint = slen(directionToNearestWaypoint)
+            if(distanceToPass >= distanceToNearestWaypoint){
+                distancePassed += distanceToNearestWaypoint
+                distanceToPass -= distanceToNearestWaypoint
+                currentPosition = nearestWaypoint
+                unit.waypoints.shift()
+                continue
+            } else {
+                distancePassed += distanceToPass
+                const directionToNearestWaypointNormalized =
+                    (distanceToNearestWaypoint > k) ?
+                        sdiv(directionToNearestWaypoint, distanceToNearestWaypoint) :
+                        Vector2Single.Zero
+                currentPosition = sadd(currentPosition, smul(directionToNearestWaypointNormalized, distanceToPass))
+                distanceToPass = 0
+                break
+            }
+        }
+
+        //const distance = slen(ssub(unit.currentPosition, currentPosition))
+        //console.log(unit.id, distance / deltaTime)
+        //console.log(unit.id, distancePassed / deltaTime * 1000)
+        unit.currentPosition = currentPosition
+
+        const movementData = new PKT.MovementDataNormal()
+        movementData.syncID = 0
+        movementData.waypoints = [
+            fromSingleToInt(currentPosition),
+            ...unit.waypoints.slice(1, 2),
+            //...unit.waypoints.slice(1),
+        ]
+        //movementData.pathSpeedOverride = unit.movementSpeed
+        movementData.teleportID = (unit.teleportID & 0xFF)
+        movementData.teleportNetID = unit.id
+        movementData.hasTeleportID = true
+        movements.push(movementData)
+    }
+
+    if(movements.length > 0){
+        const message = new PKT.WaypointGroup()
+        message.syncID = Math.floor(os.uptime() * 1000)
+        message.movements = movements
+        send(message)
+    }
+}

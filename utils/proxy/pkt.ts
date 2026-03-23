@@ -1,7 +1,7 @@
 import { getBitFlagLE, getX, getXi, getZ, getZi, ivec2, setBitFlagLE, uInt32Tofloat32, vec2, Vector2, Vector2Int, Vector3 } from "./math";
 import type { AIState, Orders, Teams } from "./enums";
 import { Reader, Writer } from "./enet";
-import { replacer, type bool, type float, type int } from "./utils";
+import { replacer, type bool, type float, type int, type uint } from "./utils";
 
 const SByte_MaxValue = +127
 const SByte_MinValue = -128
@@ -1178,11 +1178,16 @@ export class MovementDataNone extends MovementData {
     public override _write(){}
 }
 export class MovementDataNormal extends MovementData {
+    public override _type(){ return MovementDataType.Normal }
+
     teleportNetID: number = 0
     hasTeleportID: boolean = false
     teleportID: number = 0
     waypoints: Vector2Int[] = []
-    public override _type(){ return MovementDataType.Normal }
+    
+    protected _readSpeedParams(reader: Reader){}
+    protected _writeSpeedParams(writer: Writer){}
+
     public override _read(reader: Reader){
         this.hasTeleportID = (reader.readUInt16("flags") & 1) != 0
         let size = reader.readUInt16("size")
@@ -1190,6 +1195,8 @@ export class MovementDataNormal extends MovementData {
             this.teleportNetID = reader.readUInt32("teleportNetID")
             if(this.hasTeleportID)
                 this.teleportID = reader.readByte("teleportID")
+
+            this._readSpeedParams(reader)
 
             const flags = size > 1 ?
                 reader.readBytes(Math.floor((size - 2) / 4 + 1), "flags") :
@@ -1222,6 +1229,8 @@ export class MovementDataNormal extends MovementData {
             writer.writeUInt32(this.teleportNetID, 'teleportNetID')
             if(this.hasTeleportID)
                 writer.writeByte(this.teleportID, 'teleportID')
+
+            this._writeSpeedParams(writer)
 
             const size = this.waypoints.length
             const count = Math.floor((size - 2) / 4 + 1)
@@ -1266,9 +1275,11 @@ export class MovementDataNormal extends MovementData {
     }
 }
 export class MovementDataStop extends MovementData {
+    public override _type(){ return MovementDataType.Stop }
+
     position: Vector2 = Vector2.Zero
     forward: Vector2 = Vector2.Zero
-    public override _type(){ return MovementDataType.Stop }
+    
     public override _write(writer: Writer){
         Vector2.write(writer, this.position)
         Vector2.write(writer, this.forward)
@@ -1450,8 +1461,10 @@ export class S2C_AnimatedBuildingSetCurrentSkin extends GamePacket {
     //uchar team;
     //uint skinID;
 }
+
 export class WaypointGroupWithSpeed extends GamePacket {
     public _type(){ return Type.WaypointGroupWithSpeed }
+
     //undefined field5_0x5;
     //undefined field6_0x6;
     //undefined field7_0x7;
@@ -1459,7 +1472,63 @@ export class WaypointGroupWithSpeed extends GamePacket {
     //undefined field9_0x9;
     //undefined field10_0xa;
     //uchar data[0];
+
+    syncID: number = 0
+    movements: MovementDataWithSpeed[] = []
+
+    public override _read(reader: Reader){
+        this.syncID = reader.readUInt32('syncID')
+        const count = reader.readUInt16('count')
+        for(let i = 0; i < count; i++){
+            const mdws = new MovementDataWithSpeed()
+                  mdws._read(reader)
+            this.movements.push(mdws)
+        }
+    }
+    public override _write(writer: Writer){
+        writer.writeUInt32(this.syncID, 'syncID')
+        writer.writeUInt16(this.movements.length, 'count')
+        for(const movement of this.movements){
+            movement._write(writer)
+        }
+    }
 }
+
+export class MovementDataWithSpeed extends MovementDataNormal {
+    public override _type(){ return MovementDataType.WithSpeed }
+
+    public pathSpeedOverride: float = 0
+    public parabolicGravity: float = 0
+    public parabolicStartPoint: Vector2 = Vector2.Zero
+    public facing: bool = false
+    public followNetID: uint = 0
+    public followDistance: float = 0
+    public followBackDistance: float = 0
+    public followTravelTime: float = 0
+
+    protected override _readSpeedParams(reader: Reader){
+        this.pathSpeedOverride = reader.readFloat('pathSpeedOverride')
+        this.parabolicGravity = reader.readFloat('parabolicGravity')
+        this.parabolicStartPoint = Vector2.read(reader, /*'parabolicStartPoint'*/)
+        this.facing = reader.readBool('facing')
+        this.followNetID = reader.readUInt32('followNetID')
+        this.followDistance = reader.readFloat('followDistance')
+        this.followBackDistance = reader.readFloat('followBackDistance')
+        this.followTravelTime = reader.readFloat('followTravelTime')
+    }
+
+    protected override _writeSpeedParams(writer: Writer){
+        writer.writeFloat(this.pathSpeedOverride, 'pathSpeedOverride')
+        writer.writeFloat(this.parabolicGravity, 'parabolicGravity')
+        Vector2.write(writer, this.parabolicStartPoint, /*'parabolicStartPoint'*/)
+        writer.writeBool(this.facing, 'facing')
+        writer.writeUInt32(this.followNetID, 'followNetID')
+        writer.writeFloat(this.followDistance, 'followDistance')
+        writer.writeFloat(this.followBackDistance, 'followBackDistance')
+        writer.writeFloat(this.followTravelTime, 'followTravelTime')    
+    }
+}
+
 export class NPC_SetAutocast extends GamePacket {
     public _type(){ return Type.NPC_SetAutocast }
     //schar slot;

@@ -3,15 +3,18 @@ import { Reader, Writer } from "./enet"
 const arraybuffer1 = new ArrayBuffer(2*4)
 const int16array1 = new Int16Array(arraybuffer1)
 const float16array1 = new Float16Array(arraybuffer1)
+const float32array1 = new Float32Array(arraybuffer1)
 const bigint64array1 = new BigUint64Array(arraybuffer1)
 
 const arraybuffer2 = new ArrayBuffer(2*4)
 const int16array2 = new Int16Array(arraybuffer2)
 const float16array2 = new Float16Array(arraybuffer2)
+const float32array2 = new Float32Array(arraybuffer2)
 const bigint64array2 = new BigUint64Array(arraybuffer2)
 
-export type Vector2 = bigint & { readonly brand: unique symbol }
+export type Vector2 = bigint & { readonly brand: unique symbol } // Vector2Half
 export type Vector2Int = bigint & { readonly brand: unique symbol }
+export type Vector2Single = bigint & { readonly brand: unique symbol }
 export type Vector3 = bigint & { readonly brand: unique symbol }
 export type Vector4 = bigint & { readonly brand: unique symbol }
 export type Vector = Vector2 | Vector3 | Vector4
@@ -98,6 +101,11 @@ export namespace Vector2Int {
     }
 }
 
+export namespace Vector2Single {
+    export const One = svec2(1, 1)
+    export const Zero = svec2(0, 0)
+}
+
 export function vec2(x: number, z: number): Vector2 {
     float16array1[0] = x
     float16array1[2] = 0
@@ -115,6 +123,12 @@ export function ivec2(x: number, z: number): Vector2Int {
     int16array1[1] = z
     int16array1[3] = 0
     return bigint64array1[0] as Vector2Int
+}
+
+export function svec2(x: number, z: number): Vector2Single {
+    float32array1[0] = x
+    float32array2[1] = z
+    return bigint64array1[0] as Vector2Single
 }
 
 export function vec3(x: number, y: number, z: number): Vector3 {
@@ -187,6 +201,14 @@ export function add(v1: Vector, v2: Vector): Vector {
     return bigint64array1[0] as Vector
 }
 
+export function sadd(v1: Vector2Single, v2: Vector2Single): Vector2Single {
+    bigint64array1[0] = v1
+    bigint64array2[0] = v2
+    float32array1[0]! += float32array2[0]!
+    float32array1[1]! += float32array2[1]!
+    return bigint64array1[0] as Vector2Single
+}
+
 export function sub(v1: Vector2, v2: Vector2): Vector2
 export function sub(v1: Vector2, v2: Vector3): Vector3
 export function sub(v1: Vector3, v2: Vector2): Vector3
@@ -201,7 +223,7 @@ export function sub(v1: Vector, v2: Vector): Vector {
     return bigint64array1[0] as Vector
 }
 
-export function subi(v1: VectorInt, v2: VectorInt): VectorInt {
+export function isub(v1: VectorInt, v2: VectorInt): VectorInt {
     bigint64array1[0] = v1
     bigint64array2[0] = v2
     int16array1[0]! -= int16array2[0]!
@@ -209,6 +231,14 @@ export function subi(v1: VectorInt, v2: VectorInt): VectorInt {
     int16array1[2]! -= int16array2[2]!
     int16array1[3]! -= int16array2[3]!
     return bigint64array1[0] as VectorInt
+}
+
+export function ssub(v1: Vector2Single, v2: Vector2Single): Vector2Single {
+    bigint64array1[0] = v1
+    bigint64array2[0] = v2
+    float32array1[0]! -= float32array2[0]!
+    float32array1[1]! -= float32array2[1]!
+    return bigint64array1[0] as Vector2Single
 }
 
 export function mul(v: Vector2, s: number): Vector2
@@ -223,6 +253,13 @@ export function mul(v: Vector, s: number): Vector {
     return bigint64array1[0] as Vector
 }
 
+export function smul(v: Vector2Single, s: number): Vector2Single {
+    bigint64array1[0] = v
+    float32array1[0]! *= s
+    float32array1[1]! *= s
+    return bigint64array1[0] as Vector2Single
+}
+
 export function div(v: Vector2, s: number): Vector2
 export function div(v: Vector3, s: number): Vector3
 export function div(v: Vector4, s: number): Vector4
@@ -235,6 +272,13 @@ export function div(v: Vector, s: number): Vector {
     return bigint64array1[0] as Vector
 }
 
+export function sdiv(v: Vector2Single, s: number): Vector2Single {
+    bigint64array1[0] = v
+    float32array1[0]! /= s
+    float32array1[1]! /= s
+    return bigint64array1[0] as Vector2Single
+}
+
 export function getBitFlagLE(buffer: Buffer, index: number){
     return ((buffer[Math.floor(index / 8)]! >> (index % 8)) & 1) != 0
 }
@@ -245,18 +289,18 @@ export function setBitFlagLE(buffer: Buffer, index: number, value: number | bool
     buffer[i]! = buffer[i]! & ~(1 << j) | (+value << j)
 }
 
-export function makeWanderPoint(point: Vector3, distance: number) {
+export function makeWanderPoint(point: Vector3, distance: number): Vector3 {
     return Vector3.Zero //TODO:
 }
 
 const arraybuffer3 = new ArrayBuffer(4)
 const float32array3 = new Float32Array(arraybuffer3)
 const uint32array3 = new Uint32Array(arraybuffer3)
-export function float32ToUInt32(value: number){
+export function float32ToUInt32(value: number): number {
     float32array3[0] = value
     return uint32array3[0]!
 }
-export function uInt32Tofloat32(value: number){
+export function uInt32Tofloat32(value: number): number {
     uint32array3[0] = value
     return float32array3[0]!
 }
@@ -274,7 +318,7 @@ export function toArray(v: Vector){
         float16array1[2]!,
         float16array1[1]!,
         float16array1[3]!,
-    ]
+    ] as const
 }
 
 export function toObject(v: Vector){
@@ -287,7 +331,7 @@ export function toObject(v: Vector){
     }
 }
 
-export function len(v: Vector){
+export function len(v: Vector): number {
     bigint64array1[0] = v
     return Math.sqrt( 
         + (float16array1[0]! ** 2)
@@ -297,7 +341,7 @@ export function len(v: Vector){
     )
 }
 
-export function leni(v: VectorInt){
+export function ilen(v: VectorInt): number {
     bigint64array1[0] = v
     return Math.sqrt( 
         + (int16array1[0]! ** 2)
@@ -305,4 +349,28 @@ export function leni(v: VectorInt){
         + (int16array1[1]! ** 2)
         + (int16array1[3]! ** 2)
     )
+}
+
+export function slen(v: Vector2Single): number {
+    bigint64array1[0] = v
+    return Math.sqrt( 
+        + (float32array1[0]! ** 2)
+        + (float32array1[1]! ** 2)
+    )
+}
+
+export function fromIntToSingle(v: Vector2Int): Vector2Single {
+    bigint64array1[0] = v
+    float32array2[0] = int16array1[0]!
+    float32array2[1] = int16array1[1]!
+    return bigint64array2[0] as Vector2Single
+}
+
+export function fromSingleToInt(v: Vector2Single): Vector2Int {
+    bigint64array1[0] = v
+    int16array2[0] = Math.round(float32array1[0]!)
+    int16array2[1] = Math.round(float32array1[1]!)
+    int16array2[2] = 0
+    int16array2[3] = 0
+    return bigint64array2[0] as Vector2Int
 }
