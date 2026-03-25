@@ -1,5 +1,7 @@
 import { Acknowledge, Connect, Protocol, ProtocolFlag, ProtocolHeader, Reader, Send, SendFragment, SendReliable, SendUnreliable, VerifyConnect, Version, Writer } from "./enet"
 
+const HEARTBEAT_INTERVAL = 1000 / 15
+
 const version = Version.Season12
 
 class Channel {
@@ -75,6 +77,31 @@ export class Peer {
         const buffer = this.writePackets(packets)
         //console.log('send', packets, this.readPackets(buffer))
         return this.onsend(buffer)
+    }
+
+    private trackedPackets: Protocol[] = []
+    private trackPackets(packets: Protocol[]){
+        this.trackedPackets.push(...packets)
+        if(!this.trackerInterval)
+            this.trackerInterval = setInterval(this.trackerHeartbeat, HEARTBEAT_INTERVAL)
+    }
+    private untrackPacket(reliableSequenceNumber: number){
+        const index = this.trackedPackets.findIndex(packet => {
+            return packet.reliableSequenceNumber == reliableSequenceNumber
+        })
+        if(index >= 0)
+            this.trackedPackets.splice(index, 1)
+    }
+    private trackerInterval?: ReturnType<typeof setInterval>
+    private trackerHeartbeat = () => {
+        if(this.trackedPackets.length > 0){
+            console.log('Resending', this.trackedPackets.length, 'packets')
+            this.send(this.trackedPackets) //TODO: Don't re-encode.
+            //this.trackedPackets.length = 0
+        } else {
+            clearInterval(this.trackerInterval)
+            this.trackerInterval = undefined
+        }
     }
 
     public connect(){
@@ -169,10 +196,15 @@ export class Peer {
             })
             return response
         }
-
+        else
         if(request instanceof VerifyConnect){
             this.sessionId = request_header.sessionID //TODO:
             this.outgoingId = request.outgoingPeerID
+        }
+        else
+        if(request instanceof Acknowledge){
+            //console.log('Received Ack for', request.receivedReliableSequenceNumber)
+            this.untrackPacket(request.receivedReliableSequenceNumber)
         }
 
         if((request.flags & ProtocolFlag.ACKNOWLEDGE) != 0){
@@ -202,32 +234,52 @@ export class Peer {
             const packet = this.unwrapUnreliablePacket(wrappedPacket)
             packets.push(packet)
         }
-        const buffer = this.writePackets(packets)
-        return this.onsend(buffer)
+        return this.send(packets)
     }
 
-    private unwrapUnreliablePacket(wrappedPacket: WrappedPacket): Protocol {
+    public sendReliable(wrappedPackets: WrappedPacket[]){
+        const packets: Protocol[] = []
+        console.assert(wrappedPackets.length > 0, 'Assertion failed: wrappedPackets.length == 0')
+        for(const wrappedPacket of wrappedPackets){
+            const packet = this.unwrapReliablePacket(wrappedPacket)
+            packets.push(packet)
+        }
+        this.trackPackets(packets)
+        return this.send(packets)
+    }
+
+    private unwrapFragmentedPacket(wrappedPacket: WrappedPacket){
         const { channelID, data } = wrappedPacket
 
         const channel = this.channels_get(channelID)
 
-        const fragment = wrappedPacket.fragment
-        if(fragment){
-            const { fragmentCount, fragmentNumber, fragmentOffset, totalLength } = fragment
-            const reliableSequenceNumber = (++channel.reliableSequenceNumber) % (2 ** 16)
-            const startSequenceNumber = channel.fragmentStartSequenceNumbers_get(
-                fragment.startSequenceNumber, reliableSequenceNumber
-            )
-            const packet = assign(new SendFragment(), {
-                channelID, flags: 0, //ProtocolFlag.ACKNOWLEDGE,
-                reliableSequenceNumber, startSequenceNumber,
-                fragmentCount, fragmentNumber, fragmentOffset,
-                data, totalLength,
-                //command: 8,
-                //size: 24,
-            })
-            return packet
-        }
+        const fragment = wrappedPacket.fragment!
+
+        console.assert(!!fragment, 'Assertion failed: !!fragment')
+
+        const { fragmentCount, fragmentNumber, fragmentOffset, totalLength } = fragment
+        const reliableSequenceNumber = (++channel.reliableSequenceNumber) % (2 ** 16)
+        const startSequenceNumber = channel.fragmentStartSequenceNumbers_get(
+            fragment.startSequenceNumber, reliableSequenceNumber
+        )
+        const packet = assign(new SendFragment(), {
+            channelID, flags: 0, //ProtocolFlag.ACKNOWLEDGE,
+            reliableSequenceNumber, startSequenceNumber,
+            fragmentCount, fragmentNumber, fragmentOffset,
+            data, totalLength,
+            //command: 8,
+            //size: 24,
+        })
+        return packet
+    }
+
+    private unwrapUnreliablePacket(wrappedPacket: WrappedPacket): Protocol {
+        
+        if(wrappedPacket.fragment)
+            return this.unwrapFragmentedPacket(wrappedPacket)
+        
+        const { channelID, data } = wrappedPacket
+        const channel = this.channels_get(channelID)
 
         const reliableSequenceNumber = channel.reliableSequenceNumber
         const unreliableSequenceNumber = (++channel.unreliableSequenceNumber) % (2 ** 16)
@@ -244,9 +296,13 @@ export class Peer {
     }
 
     private unwrapReliablePacket(wrappedPacket: WrappedPacket): Protocol {
-        const { channelID, data } = wrappedPacket
 
+        if(wrappedPacket.fragment)
+            return this.unwrapFragmentedPacket(wrappedPacket)
+
+        const { channelID, data } = wrappedPacket
         const channel = this.channels_get(channelID)
+
         const reliableSequenceNumber = (++channel.reliableSequenceNumber) % (2 ** 16)
         const packet = assign(new SendReliable(), {
             flags: ProtocolFlag.ACKNOWLEDGE,

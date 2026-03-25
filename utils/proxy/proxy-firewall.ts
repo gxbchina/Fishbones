@@ -5,7 +5,7 @@ import { Role, type RemoteStreamIndex } from './shared'
 import { decrypt, encrypt } from './blowfish'
 import * as PKT from './pkt'
 import { Vector2Int, Vector2Single, sadd, sdiv, fromIntToSingle, fromSingleToInt, ilen, slen, smul, isub, ssub, toStringInt } from './math'
-import { type bool, type float, type int } from './utils'
+import { assign, type bool, type float, type int } from './utils'
 import type { ClientPreloaderCallbacks } from '../process/client-preloader'
 import os from 'node:os'
 
@@ -14,6 +14,7 @@ const DEFAULT_STREAM_IDX = 0 as RemoteStreamIndex
 const WAYPOINT_STREAM_IDX = 1 as RemoteStreamIndex
 const STATS_REPLICATION_STREAM_IDX = 2 as RemoteStreamIndex
 const MISSILE_REPLICATION_STREAM_IDX = 3 as RemoteStreamIndex
+const HEARTBEAT_INTERVAL = 1000 / 15
 const CELL_SIZE = 50
 
 class Entity {
@@ -27,44 +28,64 @@ class ChainMissile extends Missile {
 }
 
 class Unit extends Entity {
+    
     public teleportID: number = 0
     public waypoints: Vector2Int[] = []
-    public isAttacking: boolean = false
-    public isMoving: boolean = false
-    public movementSpeed: number = 319.29998779296875
-    //public movementSpeed: number = 310
-    public waypointsSynced: Vector2Int[] = []
-    public currentPosition?: Vector2Single
-    public stats?: Stats
-    public targetID: number = 0
+    public waypointsSyncID: number = 0
+    public waypointsSynced: boolean = true
     public repeats: number = 0
+
+    public targetID: number = 0
+    public isAttacking: boolean = false
+
+    public movementSpeed: number = 310
+    public currentPosition?: Vector2Single
+
+    public stats?: Stats
+
     public turnOnAA(targetID: number){
         console.assert(targetID != 0, 'Assertion failed: targetID != 0')
         //console.log('unit', unit.id, 'turnOnAA', targetID)
-        this.targetID = targetID
         this.isAttacking = true
-        this.waypoints = []
-        this.repeats = 0
+        this.targetID = targetID
+        //this.setWaypoints([])
     }
     public turnOffAA(){
         //console.log('unit', unit.id, 'turnOffAA')
         this.isAttacking = false
-        this.waypoints = []
         this.targetID = 0
-        this.repeats = 0
+        //this.setWaypoints([])
         //setTimeout(() => {
         //    if(unit.waypoints.length < 2)
         //        console.log('unit', unit.id, 'stuck')
         //}, 30)
     }
+    public setWaypoints(waypoints: Vector2Int[], syncID: number, hasTeleportID?: boolean, teleportID?: number){
+        this.waypoints = waypoints
+        this.waypointsSynced = false
+        this.waypointsSyncID = syncID
+        if(waypoints.length > 0)
+            this.currentPosition = fromIntToSingle(waypoints[0]!)
+        if(hasTeleportID && teleportID != undefined && teleportID != this.teleportID)
+            this.teleportID = teleportID
+        this.repeats = 0
+    }
 }
 
 class Hero extends Unit {
     stats = new HeroStats()
+    constructor(id: number){
+        super(id)
+        this.movementSpeed = 319.3
+    }
 }
 
 class Minion extends Unit {
     stats = new MinionStats()
+    constructor(id: number){
+        super(id)
+        this.movementSpeed = 350
+    }
 }
 
 type RDObj = Record<string, int | float | bool>
@@ -258,6 +279,8 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
                 
                 //console.log(Role[this['role']], 'sends', PKT.Type[packet_type], /*'on', PKT.ENetChannels[packet.channelID]*/)
                 
+                filterInOutPackets(packet_type, units, getUnit, decryptedData)
+
                 if(autoRespond && packet_type == PKT.Type.World_SendCamera_Server){
                     const message = messageReceived = new PKT.World_SendCamera_Server().read(decryptedData)
                     messageAccepted = false
@@ -268,48 +291,6 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
                 }
                 if(autoRespond && packet_type == PKT.Type.World_SendCamera_Server_Acknologment){
                     messageAccepted = false
-                }
-
-                if(packet_type == PKT.Type.S2C_CreateHero){
-                    const message = messageReceived = new PKT.S2C_CreateHero().read(decryptedData)
-                    const existingUnit = units.get(message.netObjID)
-                    console.assert(
-                        !existingUnit || existingUnit instanceof Hero,
-                        'Assertion failed: !existingUnit || existingUnit instanceof Hero'
-                    )
-                    if(!existingUnit){
-                        const hero = new Hero(message.netObjID)
-                        units.set(hero.id, hero)
-                    }
-                }
-
-                if(packet_type == PKT.Type.Barrack_SpawnUnit){
-                    const message = messageReceived = new PKT.Barrack_SpawnUnit().read(decryptedData)
-                    const existingUnit = units.get(message.netObjID)
-                    console.assert(
-                        !existingUnit || existingUnit instanceof Minion,
-                        'Assertion failed: !existingUnit || existingUnit instanceof Minion'
-                    )
-                    if(!existingUnit){
-                        const minion = new Minion(message.netObjID)
-                        units.set(minion.id, minion)
-                    }
-                }
-
-                {
-                    let message: PKT.Building_Die | PKT.NPC_Hero_Die | PKT.NPC_Die | undefined
-                    if(packet_type == PKT.Type.Building_Die) message = messageReceived = new PKT.Building_Die().read(decryptedData)
-                    if(packet_type == PKT.Type.NPC_Hero_Die) message = messageReceived = new PKT.NPC_Hero_Die().read(decryptedData)
-                    if(packet_type == PKT.Type.NPC_Die     ) message = messageReceived = new PKT.NPC_Die     ().read(decryptedData)
-                    if(message){
-                        const targetID = message.senderNetID
-                        for(const unit of units.values())
-                            if(unit.isAttacking && unit.targetID == targetID)
-                                unit.turnOffAA()
-                        const unit = units.get(targetID)
-                        if(unit instanceof Minion)
-                            units.delete(unit.id)
-                    }
                 }
 
                 if(autoRespond && packet_type == PKT.Type.OnReplication){
@@ -330,31 +311,6 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
                 }
                 if(autoRespond && packet_type == PKT.Type.OnReplication_Acc){
                     messageAccepted = false
-                }
-                
-                if(packet_type == PKT.Type.Basic_Attack){
-                   const message = messageReceived = new PKT.Basic_Attack().read(decryptedData)
-                   const { unit, unitCreated } = getUnit(message.senderNetID)
-                   unit.turnOnAA(message.targetNetID)
-                }
-                if(packet_type == PKT.Type.Basic_Attack_Pos){
-                   const message = messageReceived = new PKT.Basic_Attack_Pos().read(decryptedData)
-                   const { unit, unitCreated } = getUnit(message.senderNetID)
-                   unit.turnOnAA(message.targetNetID)
-                }
-                if(packet_type == PKT.Type.NPC_InstantStop_Attack){
-                    const message = messageReceived = new PKT.NPC_InstantStop_Attack().read(decryptedData)
-                    const { unit, unitCreated } = getUnit(message.senderNetID)
-                    unit.turnOffAA()
-                }
-                if(packet_type == PKT.Type.AI_TargetS2C){
-                    const message = messageReceived = new PKT.AI_TargetS2C().read(decryptedData)
-                    const { unit, unitCreated } = getUnit(message.senderNetID)
-                    //console.assert(unit.isAttacking, 'Assertion failed: unit.isAttacking')
-
-                    unit.targetID = message.targetID
-                    if(unit.isAttacking && unit.targetID == 0)
-                        unit.turnOffAA()
                 }
 
                 if(packet_type == PKT.Type.S2C_ChainMissileSync){
@@ -420,7 +376,7 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
                             //        '', unit.id, 'attacking', 'vs\n',
                             //            unit.id, movement.teleportID, `[${movement.waypoints.map(wp => `(${toStringInt(wp)})`).join(', ')}]`, '\n',
                             //    )
-                            return false
+                            //return false
                         }
 
                         //if(movement.waypoints.length > 1)
@@ -438,6 +394,7 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
                         })
                         //const waypointsChanged = unitCreated
                         //|| (movement.waypoints.length <= 1 && unit.waypoints.length > 1)
+                        //|| (movement.waypoints.length > 1 && unit.waypoints.length <= 1)
                         //|| (movement.waypoints.length > unit.waypoints.length)
                         //|| !movement.waypoints.every((newWaypoint, i) => {
                         //    if(i == 0) return true // Current position.
@@ -460,10 +417,7 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
                             //    teleportIDChanged, waypointsChanged, teleportIDChanged || waypointsChanged,
                             //)
 
-                            if(movement.hasTeleportID)
-                            unit.teleportID = movement.teleportID
-                            unit.waypoints = movement.waypoints
-                            unit.repeats = 0
+                            unit.setWaypoints(movement.waypoints, message.syncID, movement.hasTeleportID, movement.teleportID)
                             return true
                         }
                         //else if(unit.waypoints.length > 1 && unit.repeats++ < 3){
@@ -482,14 +436,39 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
                         syncID: message.syncID,
                         teleportCount, //TODO:
                     })
+
+                    //messageChanged = true
+                    //messageReceived = Object.assign(
+                    //    new PKT.WaypointGroupWithSpeed(),
+                    //    message,
+                    //    {
+                    //        movements: message.movements.map(movement => {
+                    //            const { unit, unitCreated } = getUnit(movement.teleportNetID)
+                    //            return Object.assign(
+                    //                new PKT.MovementDataWithSpeed(),
+                    //                movement,
+                    //                {
+                    //                    pathSpeedOverride: unit.movementSpeed,
+                    //                },
+                    //            )
+                    //        }),
+                    //    },
+                    //)
                 }
-                if(autoRespond && packet_type == PKT.Type.Waypoint_Acc){
-                    messageAccepted = false
+                if(packet_type == PKT.Type.Waypoint_Acc){
+                    const message = messageReceived = new PKT.Waypoint_Acc().read(decryptedData)
+                    
+                    if(autoRespond)
+                        messageAccepted = false
+                    
+                    for(const unit of units.values())
+                        if(unit.waypointsSyncID <= message.syncID)
+                            unit.waypointsSynced = true
                 }
 
-                if(packet_type == PKT.Type.S2C_DestroyClientMissile){
-                    messageAccepted = false
-                }
+                //if(packet_type == PKT.Type.S2C_DestroyClientMissile){
+                //    messageAccepted = false
+                //}
                 
                 if(messageAccepted){
                     //console.log('accepted', PKT.Type[packet_type], 'from', Role[this['role']], /*'on', PKT.ENetChannels[packet.channelID]*/)
@@ -568,39 +547,72 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
             //for(const packet of packets)
             //    console.log(Date.now(), Role[this['role']], 'receives packet on', `Stream[${streamIdx}]`, /*PKT.ENetChannels[packet.channelID]*/)
             
-            /*
+            const packetsUnreliable: WrappedPacket[] = []
+
             if(autoFilter)
             packets = packets.filter((packet) => {
 
+                let messageReceived: PKT.BasePacket | undefined
                 let messageAccepted = true
+                //let messageChanged = false
 
                 const decryptedData = decrypt(packet.data)
                 const packet_type = decryptedData[0] as PKT.Type
 
+                filterInOutPackets(packet_type, units, getUnit, decryptedData)
+
                 if(packet_type == PKT.Type.WaypointGroup){
-                    const message = new PKT.WaypointGroup().read(decryptedData)
-                    
-                    messageAccepted = false
+
+                    const message = messageReceived = new PKT.WaypointGroup().read(decryptedData)
 
                     for(const movement of message.movements){
                         const { unit, unitCreated } = getUnit(movement.teleportNetID)
-                        if(movement.hasTeleportID)
-                        unit.teleportID = movement.teleportID
-                        //unit.currentPosition = fromIntToSingle(movement.waypoints[0]!)
-                        unit.waypoints = movement.waypoints
-                        unit.repeats = 0
+                        unit.setWaypoints(movement.waypoints, message.syncID, movement.hasTeleportID, movement.teleportID)
+                        //unit.waypointsSyncID = message.syncID
+                        unit.waypointsSyncID = Date.now() & 0xFFFFFFFF
+                        unit.waypointsSynced = false
                     }
+
+                    //messageChanged = true
+                    messageAccepted = false
+                    /*
+                    const teleportCount = message.movements.length
+                    message.movements = getUnsyncedMovements()
+                    
+                    if(message.movements.length > 0){
+                        packet.data = encrypt(message.write())
+                        packetsUnreliable.push(packet)
+                    }
+
+                    const n = message.movements.length - teleportCount
+                    if(n != 0)
+                        console.log('Sending', n, 'more movement datas')
+                    */
                 }
+                else
+                if(packet_type == PKT.Type.OnReplication){
+
+                    messageAccepted = false
+                    packetsUnreliable.push(packet)
+
+                }
+
+                //if(messageReceived != undefined && messageAccepted && messageChanged){
+                //    packet.data = encrypt(messageReceived.write())
+                //    console.assert(packet.fragment == undefined)
+                //}
 
                 return messageAccepted
             })
-            */
 
             if(autoFilter && callbacks && this['role'] == Role.Client)
                 packets = callbacks.filterIncoming(packets)
 
             if(packets.length > 0)
-                peerToProgram.sendUnreliable(packets)
+                peerToProgram.sendReliable(packets)
+
+            if(packetsUnreliable.length > 0)
+                peerToProgram.sendUnreliable(packetsUnreliable)
 
             return true
         }
@@ -626,18 +638,64 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
         }
         */
 
+        if(this['role'] == Role.Client){
+
+            setInterval(() => {
+
+                const movements = getUnsyncedMovements()
+                if(movements.length > 0){
+
+                    const n = movements.length
+                    console.log('Sending', n, 'movement datas')
+
+                    const message = new PKT.WaypointGroup()
+                    //message.syncID = Math.floor(os.uptime() * 1000)
+                    message.syncID = Date.now() & 0xFFFFFFFF
+                    message.movements = movements
+                    peerToProgram.sendUnreliable([{
+                        fragment: undefined,
+                        data: encrypt(message.write()),
+                        channelID: PKT.ENetChannels.GENERIC_APP_BROADCAST,
+                    }])
+                }
+
+            }, HEARTBEAT_INTERVAL)
+        }
+
+        function getUnsyncedMovements(){
+            const movements: PKT.MovementDataNormal[] = []
+            for(const unit of units.values()){
+                if(unit.waypoints.length > 0 && !unit.waypointsSynced){
+                    unit.currentPosition ??= fromIntToSingle(unit.waypoints[0]!)
+                    const mdn = assign(new PKT.MovementDataNormal(), {
+                        teleportNetID: unit.id,
+                        //waypoints: unit.waypoints,
+                        waypoints: [
+                            fromSingleToInt(unit.currentPosition),
+                            ...unit.waypoints.slice(1),
+                        ],
+                        teleportID: unit.teleportID,
+                        hasTeleportID: true,
+                        syncID: 0,
+                    })
+                    movements.push(mdn)
+                }
+            }
+            return movements
+        }
+        
         return socketToProgram
     }
 
     return proxy
 }
 
-const deltaTime = 1000 / 30
+const deltaTime = 1000 / 4
 const k = 0.00001
 
 function fixedUpdate(units: Map<number, Unit>, send: (packet: PKT.BasePacket, channel?: PKT.ENetChannels) => void){
 
-    const movements: PKT.MovementDataNormal[] = []
+    //const movements: PKT.MovementDataNormal[] = []
     for(const unit of units.values()){
 
         if(unit.waypoints.length == 0) continue
@@ -675,6 +733,7 @@ function fixedUpdate(units: Map<number, Unit>, send: (packet: PKT.BasePacket, ch
         //console.log(unit.id, distancePassed / deltaTime * 1000)
         unit.currentPosition = currentPosition
 
+        /*
         const movementData = new PKT.MovementDataNormal()
         movementData.syncID = 0
         movementData.waypoints = [
@@ -687,12 +746,87 @@ function fixedUpdate(units: Map<number, Unit>, send: (packet: PKT.BasePacket, ch
         movementData.teleportNetID = unit.id
         movementData.hasTeleportID = true
         movements.push(movementData)
+        */
     }
 
+    /*
     if(movements.length > 0){
         const message = new PKT.WaypointGroup()
         message.syncID = Math.floor(os.uptime() * 1000)
         message.movements = movements
         send(message)
+    }
+    */
+}
+
+function filterInOutPackets(packet_type: PKT.Type, units: Map<number, Unit>, getUnit: (id: number) => { unit: Unit, unitCreated: boolean }, decryptedData: Buffer){
+
+    let messageReceived
+
+    if(packet_type == PKT.Type.S2C_CreateHero){
+        const message = messageReceived = new PKT.S2C_CreateHero().read(decryptedData)
+        const existingUnit = units.get(message.netObjID)
+        console.assert(
+            !existingUnit || existingUnit instanceof Hero,
+            'Assertion failed: !existingUnit || existingUnit instanceof Hero'
+        )
+        if(!existingUnit){
+            const hero = new Hero(message.netObjID)
+            units.set(hero.id, hero)
+        }
+    }
+
+    if(packet_type == PKT.Type.Barrack_SpawnUnit){
+        const message = messageReceived = new PKT.Barrack_SpawnUnit().read(decryptedData)
+        const existingUnit = units.get(message.netObjID)
+        console.assert(
+            !existingUnit || existingUnit instanceof Minion,
+            'Assertion failed: !existingUnit || existingUnit instanceof Minion'
+        )
+        if(!existingUnit){
+            const minion = new Minion(message.netObjID)
+            units.set(minion.id, minion)
+        }
+    }
+
+    {
+        let message: PKT.Building_Die | PKT.NPC_Hero_Die | PKT.NPC_Die | undefined
+        if(packet_type == PKT.Type.Building_Die) message = messageReceived = new PKT.Building_Die().read(decryptedData)
+        if(packet_type == PKT.Type.NPC_Hero_Die) message = messageReceived = new PKT.NPC_Hero_Die().read(decryptedData)
+        if(packet_type == PKT.Type.NPC_Die     ) message = messageReceived = new PKT.NPC_Die     ().read(decryptedData)
+        if(message){
+            const targetID = message.senderNetID
+            for(const unit of units.values())
+                if(unit.isAttacking && unit.targetID == targetID)
+                    unit.turnOffAA()
+            const unit = units.get(targetID)
+            if(unit instanceof Minion)
+                units.delete(unit.id)
+        }
+    }
+    
+    if(packet_type == PKT.Type.Basic_Attack){
+        const message = messageReceived = new PKT.Basic_Attack().read(decryptedData)
+        const { unit, unitCreated } = getUnit(message.senderNetID)
+        unit.turnOnAA(message.targetNetID)
+    }
+    if(packet_type == PKT.Type.Basic_Attack_Pos){
+        const message = messageReceived = new PKT.Basic_Attack_Pos().read(decryptedData)
+        const { unit, unitCreated } = getUnit(message.senderNetID)
+        unit.turnOnAA(message.targetNetID)
+    }
+    if(packet_type == PKT.Type.NPC_InstantStop_Attack){
+        const message = messageReceived = new PKT.NPC_InstantStop_Attack().read(decryptedData)
+        const { unit, unitCreated } = getUnit(message.senderNetID)
+        unit.turnOffAA()
+    }
+    if(packet_type == PKT.Type.AI_TargetS2C){
+        const message = messageReceived = new PKT.AI_TargetS2C().read(decryptedData)
+        const { unit, unitCreated } = getUnit(message.senderNetID)
+        //console.assert(unit.isAttacking, 'Assertion failed: unit.isAttacking')
+
+        unit.targetID = message.targetID
+        if(unit.isAttacking && unit.targetID == 0)
+            unit.turnOffAA()
     }
 }

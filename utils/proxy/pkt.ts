@@ -1473,8 +1473,8 @@ export class WaypointGroupWithSpeed extends GamePacket {
     //undefined field10_0xa;
     //uchar data[0];
 
-    syncID: number = 0
-    movements: MovementDataWithSpeed[] = []
+    public syncID: number = 0
+    public movements: MovementDataWithSpeed[] = []
 
     public override _read(reader: Reader){
         this.syncID = reader.readUInt32('syncID')
