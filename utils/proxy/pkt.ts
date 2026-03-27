@@ -2113,6 +2113,39 @@ export class ReplicationData extends BasePacket {
         }
     }
 
+    public override _write(writer: Writer){
+        let primaryIDs = 0
+        console.assert(this.data.length <= 8, 'Assertion failed: this.data.length <= 8')
+        for(let primaryID = 0; primaryID < this.data.length; primaryID++){
+            const values = this.data[primaryID]
+            if(values && values.length > 0){
+                primaryIDs |= 1 << primaryID
+            }
+        }
+        writer.writeByte(primaryIDs, 'primaryIDs')
+        writer.writeUInt32(this.unitNetID, 'unitNetID')
+        for(let primaryID = 0; primaryID < this.data.length; primaryID++){
+            const values = this.data[primaryID]
+            if(values && values.length > 0){
+                let secondaryIDs = 0
+                console.assert(values.length <= 32, 'Assertion failed: values.length <= 32')
+                for(let secondaryID = 0; secondaryID < values.length; secondaryID++){
+                    const value = values[secondaryID]
+                    if(value != undefined){
+                        secondaryIDs |= 1 << secondaryID
+                    }
+                }
+                writer.writeUInt32(secondaryIDs, 'secondaryIDs')
+                for(let secondaryID = 0; secondaryID < values.length; secondaryID++){
+                    const value = values[secondaryID]
+                    if(value != undefined){
+                        writer.writeUInt32(value, `data[${primaryID}][${secondaryID}]`)
+                    }
+                }
+            }
+        }
+    }
+
     public hasPrimaryID(primaryId: number){
         return this.data[primaryId] != undefined
     }
