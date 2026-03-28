@@ -72,10 +72,10 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
     public readonly ownerId: PeerId
     
     public readonly name = new Name(tr(`Game`))
-    public readonly map = new GameMap(1, () => this.server.maps)
+    public readonly map = new GameMap(4, () => this.server.maps) //HACK: Twisted Treeline.
     public readonly mode = new GameMode(0, () => this.server.modes)
     public readonly type = new GameType(0)
-    public readonly playersMax = new PlayerCount(5)
+    public readonly playersMax = new PlayerCount(6)
     public readonly password = new Password()
     public readonly features = new FeaturesEnabled()
     public readonly commit = new HexStringValue()

@@ -15,7 +15,9 @@ const nugetConfigContent = `
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <packageSources>
-    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+    <!--To inherit the global NuGet package sources remove the <clear/> line below -->
+    <clear />
+    <add key="nuget" value="https://api.nuget.org/v3/index.json" />
   </packageSources>
 </configuration>
 `.trimStart()
@@ -77,7 +79,7 @@ export async function build(pkg: PkgInfoCSProj, opts: Required<AbortOptions>){
     //console_log(`Building ${pkg.dllName}...`)
     const bar = createBar(tr('Building'), pkg.dllName)
     
-    const nugetConfig = path.join(pkg.dir, 'NuGet.Config')
+    const nugetConfig = path.join(pkg.dir, 'nuget.config')
 
     try {
 
@@ -123,6 +125,7 @@ export async function build(pkg: PkgInfoCSProj, opts: Required<AbortOptions>){
         sdkSubprocess = spawn(sdkPkg.exe, [
             'build',
             ...'--nologo -v q /p:WarningLevel=0 /clp:ErrorsOnly'.split(' '),
+            '--configfile', nugetConfig,
             '.' /*pkg.csProj*/
         ], {
             env: Object.assign(process.env, { 'DOTNET_CLI_TELEMETRY_OPTOUT': '1' }),

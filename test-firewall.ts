@@ -1,5 +1,5 @@
 import { ProxyClient } from "./utils/proxy/proxy-client";
-import { firewall } from "./utils/proxy/proxy-firewall";
+import { firewall, packetsTransmittedByType } from "./utils/proxy/proxy-firewall";
 import type { LibP2PNode } from "./node/node";
 import { ProxyServer } from "./utils/proxy/proxy-server";
 import { launchServer } from "./utils/process/server";
@@ -9,6 +9,7 @@ import { launchClient } from "./utils/process/client";
 import { blowfishKey, LOCALHOST } from "./utils/constants";
 import { proxy } from "./utils/proxy/strategy-libp2p";
 import { Proxy } from "./utils/proxy/proxy"
+import * as PKT from "./utils/proxy/pkt";
 
 import { createLibp2p } from "libp2p";
 import { webRTCDirect } from "@libp2p/webrtc";
@@ -71,9 +72,13 @@ const client = await launchClient(LOCALHOST, proxyClient.getPort()!, blowfishKey
 setInterval(() => {
     let dataTransmitted = proxyClient.dataTransmitted + proxyServer.dataTransmitted
     console.log(`data transmitted ${dataTransmitted / 1024} kbps`)
-    if((dataTransmitted / 1024) >= 8){
-        console.log('HIGH LOAD DETECTED')
+    if((dataTransmitted / 1024) >= 4){
+        console.log('----------------------------------')
+        for(const [ packet_type, packetsOfType ] of packetsTransmittedByType.entries())
+            console.log(PKT.Type[packet_type], packetsOfType.size, packetsOfType.count, packetsOfType.size / packetsOfType.count)
+        console.log('----------------------------------')
     }
+    packetsTransmittedByType.clear()
     proxyClient.dataTransmitted = 0
     proxyServer.dataTransmitted = 0
     dataTransmitted = 0

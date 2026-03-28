@@ -95,7 +95,7 @@ export class Peer {
     private trackerInterval?: ReturnType<typeof setInterval>
     private trackerHeartbeat = () => {
         if(this.trackedPackets.length > 0){
-            console.log('Resending', this.trackedPackets.length, 'packets')
+            //console.log('Resending', this.trackedPackets.length, 'packets')
             this.send(this.trackedPackets) //TODO: Don't re-encode.
             //this.trackedPackets.length = 0
         } else {

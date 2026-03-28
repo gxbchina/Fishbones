@@ -7,17 +7,29 @@ import * as PKT from './pkt'
 import { Vector2Int, Vector2Single, sadd, sdiv, fromIntToSingle, fromSingleToInt, ilen, slen, smul, isub, ssub, toStringInt } from './math'
 import { assign, type bool, type float, type int } from './utils'
 import type { ClientPreloaderCallbacks } from '../process/client-preloader'
-import os from 'node:os'
+//import os from 'node:os'
 
 const STREAMS_COUNT = 4
 const DEFAULT_STREAM_IDX = 0 as RemoteStreamIndex
 const WAYPOINT_STREAM_IDX = 1 as RemoteStreamIndex
 const STATS_REPLICATION_STREAM_IDX = 2 as RemoteStreamIndex
 const MISSILE_REPLICATION_STREAM_IDX = 3 as RemoteStreamIndex
-//const HEARTBEAT_INTERVAL = 1000 / 30
+const HEARTBEAT_INTERVAL = 1000 / 30
 const deltaTime = 1000 / 30
 //const CELL_SIZE = 50
 const k = 0.00001
+
+//TODO: Disable.
+export const packetsTransmittedByType = new Map<number, { count: number, size: number }>()
+function countTransmittedPacket(packet_type: PKT.Type, packet: WrappedPacket){
+    let packetsOfType = packetsTransmittedByType.get(packet_type)
+    if(!packetsOfType){
+        packetsOfType = { count: 0, size: 0 }
+        packetsTransmittedByType.set(packet_type, packetsOfType)
+    }
+    packetsOfType.size += packet.data.length
+    packetsOfType.count++
+}
 
 class Entity {
     constructor(public id: number){}
@@ -90,8 +102,9 @@ class Unit extends Entity {
             }
         }
     }
-    public setReplicationDataSynced(to: true){
+    public setReplicationDataSynced(to: boolean){
         this.replicationDataSynced = to
+        if(!to) return
         for(let primaryID = 0; primaryID < this.replicationDataUnsynced.length; primaryID++){
             const values = this.replicationDataUnsynced[primaryID]
             if(values){
@@ -220,7 +233,7 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
 
     proxy.streamsCount = STREAMS_COUNT
 
-    //let syncID = 1
+    let latestSyncID = 0
 
     const missiles = new Map<number, Missile>()
     const units = new Map<number, Unit>()
@@ -324,9 +337,11 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
                     messageAccepted = false
                 }
 
-                if(autoRespond && packet_type == PKT.Type.OnReplication){
+                if(packet_type == PKT.Type.OnReplication){
                     const message = messageReceived = new PKT.OnReplication().read(decryptedData)
                     
+                    latestSyncID = message.syncID
+
                     messageStreamIdx = STATS_REPLICATION_STREAM_IDX
 
                     //for(const data of message.data){
@@ -335,6 +350,7 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
                     //    console.log('OnReplicationData', unit.id, JSON.stringify(obj, null, 4))
                     //}
 
+                    if(autoRespond)
                     respond(packet, new PKT.OnReplication_Acc(), {
                         senderNetID: message.senderNetID,
                         syncID: message.syncID,
@@ -393,6 +409,8 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
                     const message = messageReceived = new PKT.WaypointGroup().read(decryptedData)
                     //message.write(undefined, true)
 
+                    latestSyncID = message.syncID
+
                     messageStreamIdx = WAYPOINT_STREAM_IDX
 
                     //console.log('received', JSON.stringify(message, replacer, 4), 'on', packet.channelID)
@@ -441,12 +459,18 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
                         //    console.assert(prevWaypoint != undefined, 'Assertion failed: prevWaypoint != undefined')
                         //    return newWaypoint == prevWaypoint
                         //})
+                        const chasesMovingUnit = !!message.movements.find(otherMovement => {
+                            // Targeting the position of the moving unit
+                            return otherMovement != movement
+                                && otherMovement.waypoints.length > 1
+                                && otherMovement.waypoints.at(0) == movement.waypoints.at(-1)
+                        })
 
                         //if(unit.waypoints.length > 0)
                         //    console.log(unit.id, leni(subi(unit.waypoints[0]!, movement.waypoints[0]!)))
                         //unit.waypoints[0] = movement.waypoints[0]!
                         
-                        if(teleportIDChanged || waypointsChanged){
+                        if(teleportIDChanged || waypointsChanged && !chasesMovingUnit){
 
                             //console.log(
                             // '', message.syncID, movement.syncID, '\n',
@@ -464,9 +488,11 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
                         return false
                     })
 
-                    messageAccepted = message.movements.length > 0
-                    messageChanged = message.movements.length != teleportCount
+                    //messageAccepted = message.movements.length > 0
+                    //messageChanged = message.movements.length != teleportCount
                     //messageChanged = true
+                    messageAccepted = false
+                    messageChanged = false
 
                     if(autoRespond)
                     respond(packet, new PKT.Waypoint_Acc(), {
@@ -523,6 +549,9 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
                 }
 
                 //console.assert(packet.data.length <= 962, `packet.data.length = ${packet.data.length}`)
+
+                if(messageAccepted)
+                    countTransmittedPacket(packet_type, packet)
 
                 return messageAccepted
             })
@@ -615,7 +644,7 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
                     //messageChanged = true
                     messageAccepted = false
                     
-                    const teleportCount = message.movements.length
+                    //const teleportCount = message.movements.length
                     message.movements = getUnsyncedMovements()
                     
                     if(message.movements.length > 0){
@@ -640,7 +669,7 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
 
                     messageAccepted = false
 
-                    const initialCount = message.data.length
+                    //const initialCount = message.data.length
                     message.data = getUnsyncedReplicationDatas()
                     if(message.data.length > 0){
                         packet.data = encrypt(message.write())
@@ -680,12 +709,25 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
         if(callbacks && this['role'] == Role.Client)
             callbacks.setSocketToProgram(socketToProgram)
 
-        function send(packet: PKT.BasePacket, channel = PKT.ENetChannels.GENERIC_APP_BROADCAST){
+        function sendToProgram(packet: PKT.BasePacket, channel = PKT.ENetChannels.GENERIC_APP_BROADCAST){
             peerToProgram.sendUnreliable([{
                 fragment: undefined,
                 data: encrypt(packet.write()),
                 channelID: channel,
             }])
+        }
+
+        function sendToRemote(message: PKT.GamePacket, streamIdx: RemoteStreamIndex){
+            const packet: WrappedPacket = {
+                fragment: undefined,
+                data: encrypt(message.write()),
+                channelID: PKT.ENetChannels.GENERIC_APP_BROADCAST,
+            }
+            const packets = [ packet ]
+            const programHostPort = 'undefined: undefined'
+            const wrapped = Buffer.from(Wrapped.encode({ packets }))
+            countTransmittedPacket(message._type(), packet)
+            onData(wrapped, streamIdx, programHostPort)
         }
 
         /*
@@ -717,10 +759,33 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
         }
         */
 
-        function getUnsyncedMovements(){
+        if(this['role'] == Role.Server){
+            setInterval(() => {
+
+                const movements = getUnsyncedMovements(true)
+                if(movements.length > 0){
+                    const message = new PKT.WaypointGroup()
+                    message.syncID = latestSyncID
+                    message.movements = movements
+                    sendToRemote(message, WAYPOINT_STREAM_IDX)
+                }
+
+                const data = getUnsyncedReplicationDatas(true)
+                if(data.length > 0){
+                    const message = new PKT.OnReplication()
+                    message.syncID = latestSyncID
+                    message.data = data
+                    sendToRemote(message, STATS_REPLICATION_STREAM_IDX)
+                }
+
+            }, HEARTBEAT_INTERVAL)
+        }
+
+        function getUnsyncedMovements(markAsSynced = false){
             const movements: PKT.MovementDataNormal[] = []
             for(const unit of units.values()){
-                if(unit.waypoints.length > 0 && !unit.waypointsSynced){
+                if(!unit.waypointsSynced && unit.waypoints.length > 0){
+                    unit.waypointsSynced = markAsSynced
                     //unit.currentPosition ??= fromIntToSingle(unit.waypoints[0]!)
                     const mdn = assign(new PKT.MovementDataNormal(), {
                         teleportNetID: unit.id,
@@ -739,10 +804,11 @@ export const firewall = <T extends Proxy>(proxy: T, enabled: boolean, callbacks?
             return movements
         }
 
-        function getUnsyncedReplicationDatas(){
+        function getUnsyncedReplicationDatas(markAsSynced = false){
             const datas: PKT.ReplicationData[] = []
             for(const unit of units.values()){
-                if(unit.replicationDataUnsynced.length > 0 && !unit.replicationDataSynced){
+                if(!unit.replicationDataSynced && unit.replicationDataUnsynced.length > 0){
+                    unit.setReplicationDataSynced(markAsSynced)
                     const rd = assign(new PKT.ReplicationData(), {
                         data: unit.replicationDataUnsynced,
                         unitNetID: unit.id,
