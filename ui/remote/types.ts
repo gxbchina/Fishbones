@@ -36,7 +36,7 @@ export interface Label extends Id {
 export interface LineEdit extends Id {
     $type: 'line'
     text?: string
-    disabled?: boolean
+    editable?: boolean
     $listeners?: {
         changed?: (text: string) => void
         submitted?: (text: string) => void
@@ -116,7 +116,7 @@ export const inq2gd = (choices: { value: number, name: string }[], enabled?: num
 export const form = (fields?: Record<string, Config>, props?: Omit<Tabs, '$type' | 'fields'>) => ({ $type: 'form' as const, fields })
 export const list = (items?: Record<string, Config>, placeholderText?: string) => ({ $type: 'list' as const, items, placeholderText })
 export const label = (text?: string) => ({ $type: 'label' as const, text })
-export const line = (text?: string, changed?: (text: string) => void) => ({ $type: 'line' as const, text, $listeners: { changed } })
+export const line = (text?: string, changed?: (text: string) => void, editable?: boolean) => ({ $type: 'line' as const, editable, text, $listeners: { changed } })
 export const text = (text?: string, changed?: (text: string) => void) => ({ $type: 'text' as const, text, $listeners: { changed } })
 export const checkbox = (button_pressed?: boolean, toggled?: (on: boolean) => void) => ({ $type: 'checkbox' as const, button_pressed, $listeners: { toggled } })
 export const button = (pressed?: () => void, disabled?: boolean) => ({ $type: 'button' as const, disabled, $listeners: { pressed } })

@@ -16,6 +16,10 @@ export class Args {
     //origin = new Parameter<string>('origin', false, '', tr('Set a repository origin'))
     installModPack = new Option('install-modpack', true, tr('Install the package with additional levels'))
     spaceCheck = new Option('space-check', true, tr('Perform a free disk space check'))
+    installS1Client = new Option('install-s1-client', true, '')
+    installS1Server = new Option('install-s1-server', true, '')
+    installS4Client = new Option('install-s4-client', false, '')
+    installS4Server = new Option('install-s4-server', false, '')
 
     repair = new Option('repair', true, tr('(Debug) Download+Unpack+Build missing files'))
     download = new Option('download', true, tr('(Debug) Download missing files'))

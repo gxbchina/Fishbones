@@ -1,4 +1,3 @@
-import { type PkgInfo } from './packages'
 import { logger } from '../log'
 import { createBar, extractFile } from '../../ui/remote/remote'
 import { killIfActive, spawn, successfulTermination, type ChildProcess } from '../process/process'
@@ -65,7 +64,20 @@ export function appendPartialUnpackFileExt(path: string){
 
 export class DataError extends Error {}
 export class SystemError extends Error {}
-export async function unpack(pkg: PkgInfo, opts: Required<AbortOptions>){
+
+interface UnpackablePkgInfo {
+    zipName: string
+    zipExt: string
+    zip: string
+    checkUnpackBy: string
+    zipRoot?: string[]
+    zipHasSingleRootEntry?: boolean
+    makeDir?: boolean
+    dirName?: string
+    dir: string
+}
+
+export async function unpack(pkg: UnpackablePkgInfo, opts: Required<AbortOptions>){
     
     if(!args.unpack.enabled){
         console.log(`Pretending to unpack ${pkg.zipName}...`)
@@ -79,16 +91,14 @@ export async function unpack(pkg: PkgInfo, opts: Required<AbortOptions>){
 
     try {
     
-        //let pkgDir = pkg.dir  // Resulting folder.
-        let outDir = pkg.dir    // Folder containing the final and intermediate folders.
-        let outFile = pkg.dir   // Unpacked root folder from the archive.
-        if(!pkg.makeDir){
-            outDir = path.dirname(pkg.dir)
-            outFile = path.join(outDir, pkg.dirName)
-            const fs_opts = { ...opts, recursive: true, force: true }
-            await fs_removeFile(outFile, fs_opts, false) //TODO: Be less destructive.
-        }
-        await fs_ensureDir(outDir, opts)
+        const pkgDir = pkg.dir
+        const zipRoot = pkg.zipRoot ?? ((pkg.dirName && !pkg.makeDir) ? [ pkg.dirName! ] : [])
+        //TODO: if(zipRoot.length == 1 && pkg.zipHasSingleRootEntry && path.basename(pkgDir) == zipRoot[0])
+        const tmpDir = path.join(path.dirname(pkgDir), path.basename(pkgDir) + '_temp')
+        const rootDir = path.join(tmpDir, ...zipRoot)
+        const opts_rf = { ...opts, recursive: true, force: true }
+        await fs_removeFile(pkgDir, opts_rf, false) //TODO: Be less destructive.
+        await fs_ensureDir(tmpDir, opts)
     
         const lockfile = appendPartialUnpackFileExt(pkg.zip)
         await fs_writeFile(lockfile, '', { ...opts, encoding: 'utf8' })
@@ -97,8 +107,7 @@ export async function unpack(pkg: PkgInfo, opts: Required<AbortOptions>){
         //const signal = AbortSignal.any([ controller.signal, opts.signal ])
         const { signal } = controller
 
-        const args = ['-aoa', `-o${outDir}`, '-bsp1']
-        //if(!pkg.makeDir) args.push('-spe')
+        const args = ['-aoa', `-o${tmpDir}`, '-bsp1']
         
         const spawnOpts = {
             cwd: downloads,
@@ -161,10 +170,8 @@ export async function unpack(pkg: PkgInfo, opts: Required<AbortOptions>){
             proc.logPrefix, proc, opts, [ 0, s7zExitCodes.Warning ]
         )))
 
-        if(outFile != pkg.dir){
-            await fs_moveFile(outFile, pkg.dir, opts)
-        }
-        
+        await fs_moveFile(rootDir, pkgDir, opts)
+        await fs_removeFile(tmpDir, opts_rf, false)
         await fs_removeFile(lockfile, opts)
     
     } finally {

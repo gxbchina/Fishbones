@@ -23,6 +23,7 @@ export class FBPkgInfo extends PkgInfo {
     readonly zipName: string
     readonly zip: string
     
+    size = 0 //TODO:
     zipSize!: number
     zipTorrent: string
     zipWebSeeds: string[] = []

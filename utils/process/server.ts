@@ -1,9 +1,10 @@
 import path from 'node:path'
-import { gsPkg, sdkPkg } from '../data/packages'
+import { sdkPkg } from '../data/packages'
 import { getFreePort, killSubprocess, spawn, startProcess, type ChildProcess } from './process'
 import { fs_writeFile } from '../data/fs'
 import type { GameInfo } from '../../game/game-info'
 import type { AbortOptions } from '@libp2p/interface'
+import { servers, type ServerVersion } from '../data/constants/servers'
 
 const LOG_PREFIX = 'SERVER'
 
@@ -13,7 +14,9 @@ export function getRunningServerPort(){
     return serverSubprocess?.port
 }
 
-export async function launchServer(info: GameInfo, opts: Required<AbortOptions>, port = 0){
+export async function launchServer(serverVersion: ServerVersion, info: GameInfo, opts: Required<AbortOptions>, port = 0){
+    const gsPkg = servers[serverVersion]!.pkg
+
     //info.gameInfo.CONTENT_PATH = path.relative(gsPkg.dllDir, gsPkg.gcDir)
 
     const gsInfo = path.join(gsPkg.infoDir, info.gameId ? `GameInfo.${info.gameId}.json` : `GameInfo.json`)

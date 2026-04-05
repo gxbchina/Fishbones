@@ -4,24 +4,27 @@ import { killSubprocess, spawn, startProcess, type ChildProcess, type SpawnOptio
 import type { AbortOptions } from "@libp2p/interface"
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { clients, type ClientVersion } from "../data/constants/clients"
 
 const LOG_PREFIX = 'CLIENT'
 
 let clientSubprocess: ChildProcess | undefined
 
-let launchArgs: [ ip: string, port: number, key: string, clientId: number ] | undefined
+let launchArgs: { version: ClientVersion, ip: string, port: number, key: string, clientId: number } | undefined
 export function getLastLaunchCmd(){
-    return 'start ' + ['', gcPkg.exeName, '', '', '', launchArgs!.map(arg => arg.toString()).join(' ')].map(arg => `"${arg}"`).join(' ')
+    const { ip, port, key, clientId } = launchArgs!
+    return 'start ' + ['', gcPkg.exeName, '', '', '', [ip, port, key, clientId].map(arg => arg.toString()).join(' ')].map(arg => `"${arg}"`).join(' ')
 }
-export async function launchClient(ip: string, port: number, key: string, clientId: number, opts: Required<AbortOptions>){
-    launchArgs = [ip, port, key, clientId]
+export async function launchClient(version: ClientVersion, ip: string, port: number, key: string, clientId: number, opts: Required<AbortOptions>){
+    launchArgs = { version, ip, port, key, clientId }
     return await relaunchClient(opts)
 }
 export async function relaunchClient(opts: Required<AbortOptions>){
-    const [ip, port, key, clientId] = launchArgs!
+    const { version, ip, port, key, clientId } = launchArgs!
+    const gcPkg = clients[version]!.pkg
 
     const gcArgs = ['8394', 'LoLLauncher.exe', 'unknown', ([ip, port.toString(), sanitize_bfkey(key), clientId.toString()]).join(' ')]
-    const gcArgsStr = gcArgs.map(a => `"${a}"`).join(' ')
+    //const gcArgsStr = gcArgs.map(a => `"${a}"`).join(' ')
     //console.log('%s %s', gcPkg.exe, gcArgsStr)
     //logger.log('%s %s', gcPkg.exe, gcArgsStr)
 

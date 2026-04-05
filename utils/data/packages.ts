@@ -3,7 +3,9 @@ import type { AbortOptions } from '@libp2p/interface'
 import { console_log_fs_err, downloads, fs_exists, fs_moveFile } from './fs'
 import { extractFile } from '../../ui/remote/remote'
 import { gsPkg } from './packages/game-server'
+import { gs420Pkg } from "./packages/game-server-420"
 import { gcPkg } from './packages/game-client'
+import { gc420Pkg } from './packages/game-client-420'
 import { sdkPkg } from './packages/sdk'
 import { gitPkg } from './packages/git'
 import { modPck1 } from './packages/modpack-levels'
@@ -11,7 +13,7 @@ import { winePkg } from './packages/wine'
 import { tr } from '../translation'
 
 export type { PkgInfo, PkgInfoCSProj, PkgInfoGit } from './packages/shared'
-export { gsPkg, gcPkg, sdkPkg, gitPkg, modPck1, winePkg }
+export { gsPkg, gs420Pkg, gcPkg, gc420Pkg, sdkPkg, gitPkg, modPck1, winePkg }
 
 export const packages = [ gsPkg, gcPkg, sdkPkg, gitPkg, modPck1 ]
 

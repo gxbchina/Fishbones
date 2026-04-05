@@ -1,5 +1,6 @@
 import type { AbortOptions } from "@libp2p/interface";
-import { isSpellCrashDetected, type Game } from "../game/game";
+import { isSpellCrashDetected } from "../game/game";
+import type { LocalGame } from "../game/game-local";
 import type { LocalServer } from "../game/server";
 import { render } from "../ui/remote/view";
 import { Features, GameType, PlayerCount, TickRate } from "../utils/constants";
@@ -7,8 +8,9 @@ import { GameMode } from "../utils/data/constants/modes";
 import { GameMap, mapsById, mapsEnabled } from "../utils/data/constants/maps";
 import { button, checkbox, form, inq2gd, line, option } from "../ui/remote/types";
 import { AbortPromptError } from "@inquirer/core";
+import { KnownServers, servers, type ServerVersion } from "../utils/data/constants/servers";
 
-export async function setup(game: Game, server: LocalServer, opts: Required<AbortOptions>){
+export async function setup(game: LocalGame, server: LocalServer, opts: Required<AbortOptions>){
     
     game.features.set(Features.SPELLS_DISABLED, isSpellCrashDetected())
 
@@ -54,6 +56,17 @@ export async function setup(game: Game, server: LocalServer, opts: Required<Abor
         Champions: button(() => { server.champions.uinput(opts).catch(() => { /* Ignore */ }) }),
         //SpellsEnabled: checkbox(server.spells.value.length > 0, value => { server.spells.value = value ? [] : [] })
         SummonerSpells: button(() => { server.spells.uinput(opts).catch(() => { /* Ignore */ }) }, !game.features.isSpellsEnabled),
+
+
+        ServerToUse: option(
+            servers.filter(info => !!info).map(({ id, name }) => ({ id, text: name })),
+            game.serverVersion,
+            (index) => {
+                game.serverVersion = index as ServerVersion
+                const isDefaultVersion = index != KnownServers.Default
+                view.get('PublishGame').update(button(undefined, isDefaultVersion)) //HACK:
+            },
+        ),
 
         PlayAlone: button(() => { game.isPrivate = true; view.resolve() }),
         PublishGame: button(() => { game.isPrivate = false; view.resolve() }),

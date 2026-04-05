@@ -1,6 +1,6 @@
 import { build } from "./build"
 import { download, appendPartialDownloadFileExt, repairAria2, seed } from "./download/download"
-import { gcPkg, gitPkg, gsPkg, modPck1, type PkgInfo, repairTorrents, sdkPkg } from "./packages"
+import { gcPkg, gc420Pkg, gitPkg, gsPkg, gs420Pkg, modPck1, type PkgInfo, repairTorrents, sdkPkg, type PkgInfoCSProj } from "./packages"
 import { console_log, createBar, currentExe, extractFile } from "../../ui/remote/remote"
 import { console_log_fs_err, cwd, downloads, fs_chmod, fs_copyFile, fs_ensureDir, fs_exists, fs_exists_and_size_eq, fs_moveFile, fs_overwrite, fs_removeFile, fs_rmdir, fs_stat, fs_statfs, fs_truncate, fs_writeFile, rwx_rx_rx } from './fs'
 import { readTrackersTxt } from "./download/trackers"
@@ -22,6 +22,8 @@ import { DeferredView, render } from "../../ui/remote/view"
 import { button, form, label } from "../../ui/remote/types"
 import { VERSION } from "../constants-build"
 import type { StatsFs } from "node:fs"
+import { KnownServers, servers } from "./constants/servers"
+import { clients, KnownClients } from "./constants/clients"
 
 const DOTNET_INSTALL_CORRUPT_EXIT_CODES = [ 130, 131, 142, ]
 
@@ -79,10 +81,13 @@ const checkDriveSizeAndGetErrorMsg = (fsStats: StatsFs | undefined, root: string
     }
 }
 
+let repairArchived_sdkPkg_opts: Promise<void> | null = null
 async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>){
     //console.log('Running data check and repair...')
 
     await fs_ensureDir(downloads, opts)
+
+    args.installModPack.enabled &&= args.installS1Client.enabled //HACK?
 
     while(args.spaceCheck.enabled){
 
@@ -112,13 +117,24 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
                 checkFileSize(path.join(downloads, 'aria2.dht6.dat'), 9240, opts),
                 checkFileSize(path.join(downloads, 'aria2.dht.dat'), 10080, opts),
                 
-                ...((args.update.enabled) ? [
-                    checkDirSize(gsPkg.checkUnpackBy, gsPkg.zip, gsPkg.size, opts),
-                ] : [
-                    checkDirSize(gsPkg.checkUnpackBy, gsPkg.zip, gsPkg.size, opts),
-                    checkFileSize(gsPkg.zip, gsPkg.zipSize, opts),
-                    checkFileSize(gcPkg.zipTorrent, 14564, opts),
-                ]),
+                ...(
+                    (args.installS1Server.enabled) ? (
+                        (args.update.enabled) ? [
+                            checkDirSize(gsPkg.checkUnpackBy, gsPkg.zip, gsPkg.size, opts),
+                        ] : [
+                            checkDirSize(gsPkg.checkUnpackBy, gsPkg.zip, gsPkg.size, opts),
+                            checkFileSize(gsPkg.zip, gsPkg.zipSize, opts),
+                            checkFileSize(gsPkg.zipTorrent, 14564, opts),
+                        ]
+                    ) : []
+                ),
+                ...(
+                    (args.installS4Server.enabled) ? [
+                        checkDirSize(gs420Pkg.checkUnpackBy, gs420Pkg.zip, gs420Pkg.size, opts),
+                        checkFileSize(gs420Pkg.zip, gs420Pkg.zipSize, opts),
+                        checkFileSize(gc420Pkg.zipTorrent, 20022, opts),
+                    ] : []
+                ),
                 
                 checkFileSize(path.join(downloads, 'config.json'), 64, opts),
                 checkFileSize(path.join(downloads, path.basename(embedded.d3dx9_39_dll)), 3851784, opts),
@@ -158,10 +174,15 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
             .then(results => results.reduce((a, v) => a + v, 0)),
 
             Promise.all([
-                checkDirSize(gcPkg.checkUnpackBy, gcPkg.zip, gcPkg.size, opts),
+                ...((args.installS1Client.enabled) ? [
+                    checkDirSize(gcPkg.checkUnpackBy, gcPkg.zip, gcPkg.size, opts),
+                ] :[]),
                 ...((args.installModPack.enabled) ? [
-                    checkDirSize(modPck1.lockFile, modPck1.zip, modPck1.size, opts)
-                ] :[])
+                    checkDirSize(modPck1.lockFile, modPck1.zip, modPck1.size, opts),
+                ] :[]),
+                ...((args.installS4Client.enabled) ? [
+                    checkDirSize(gc420Pkg.checkUnpackBy, gc420Pkg.zip, gc420Pkg.size, opts),
+                ] :[]),
             ])
             .then(results => results.reduce((a, v) => a + v, 0)),
         ])
@@ -240,18 +261,22 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
     }
 
     let updated = false
-    const gsExeIsMissing = !await fs_exists(gsPkg.dll, opts)
+    let gsExeIsMissing = !await fs_exists(gsPkg.dll, opts)
+    let gs420ExeIsMissing = !await fs_exists(gs420Pkg.dll, opts)
     let modFileIsMissing = !await fs_exists(modPck1.lockFile, opts, false)
+    repairArchived_sdkPkg_opts ??=
+        repairArchived(sdkPkg, opts)
+            .then(() => { repairArchived_sdkPkg_opts = null })
     results = await Promise.allSettled([
-        (async () => {
-            if(args.torrentDownload.enabled) try {
-                await repairSelfPackage(opts)
-            } catch(err){
-                console_log(tr(`Restoring launcher package failed:`), Bun.inspect(err))
-            }
-        })(),
+
+        !(args.torrentDownload.enabled) ? Promise.resolve() :
+        repairSelfPackage(opts).catch(err => {
+            console_log(tr(`Restoring launcher package failed:`), Bun.inspect(err))
+        }),
+
+        !(args.installS1Server.enabled) ? Promise.resolve() :
         Promise.allSettled([
-            repairArchived(sdkPkg, opts),
+            repairArchived_sdkPkg_opts,
             (async () => {
                 if(args.update.enabled || args.mr.enabled){
                     if(os.platform() === 'win32'){
@@ -265,48 +290,36 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
                 }
             })(),
         ]).then(async (results) => {
-
             throwAnyRejection(results)
 
             // Allow packages to contain already built exe.
             //gsExeIsMissing = !await fs_exists(gsPkg.dll, opts)
 
             if(gsExeIsMissing || updated){
-                try {
-                    await build(gsPkg, opts)
-                } catch(err) {
-                    let tryToRepairSDK = true
-                    if(err instanceof Error){
-                        const exception = err as ErrnoException
-                        if(exception.code == 'ENOENT'){ //TODO: Investigate.
-                            const desc1 = tr('SDK installation is probably corrupted')
-                            const desc2 = tr('File not found')
-                            console_log(`${desc1}. ${desc2}:\n`, exception.path ?? '')
-                            tryToRepairSDK = true
-                        }
-                    }
-                    if(err instanceof TerminationError){
-                        const exitCode = err.cause?.code ?? 0
-                        if(DOTNET_INSTALL_CORRUPT_EXIT_CODES.includes(exitCode)){
-                            const desc1 = tr('SDK installation is probably corrupted')
-                            const desc2 = tr(`exit code is {exitCode}`, { exitCode })
-                            console_log(`${desc1} (${desc2})`)
-                            tryToRepairSDK = true
-                        }
-                    }
-                    if(tryToRepairSDK){
-                        await repairArchived(sdkPkg, { ...opts, ignoreUnpacked: true })
-                        await build(gsPkg, opts)
-                    } else
-                        throw err
-                }
+                await tryBuild(gsPkg, opts)
+                gsExeIsMissing = false
             }
             await fs_ensureDir(gsPkg.infoDir, opts)
         }),
+
+        !(args.installS4Server.enabled) ? Promise.resolve() :
         Promise.allSettled([
+            repairArchived_sdkPkg_opts,
+            repairArchived(gs420Pkg, opts),
+        ]).then(async (results) => {
+            throwAnyRejection(results)
+            if(gs420ExeIsMissing){
+                await tryBuild(gs420Pkg, opts)
+                gs420ExeIsMissing = false
+            }
+            await fs_ensureDir(gs420Pkg.infoDir, opts)
+        }),
+
+        !(args.installS1Client.enabled) ? Promise.resolve() :
+        Promise.allSettled([
+            
             repairArchived(gcPkg, opts).then(async () => {
                 //await fs_ensureDir(gcPkg.exeDir, opts)
-
                 const d3dx9_39_dll_name = 'd3dx9_39.dll'
                 const d3dx9_39_dll_src = path.join(downloads, d3dx9_39_dll_name)
                 const d3dx9_39_dll_dst = path.join(gcPkg.exeDir, d3dx9_39_dll_name)
@@ -314,14 +327,12 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
                     await extractFile(embedded.d3dx9_39_dll, d3dx9_39_dll_src, opts)
                     await fs_copyFile(d3dx9_39_dll_src, d3dx9_39_dll_dst, opts) //HACK: To bypass "Access denied" error.
                 }
-
                 //await ensureSymlink()
             }),
-            (async () => {
-                if(args.installModPack.enabled && modFileIsMissing){
-                    await repairArchived(modPck1, { ...opts, ignoreUnpacked: true })
-                }
-            })(),
+            
+            !(args.installModPack.enabled && modFileIsMissing) ? Promise.resolve() :
+            repairArchived(modPck1, { ...opts, ignoreUnpacked: true }),
+
         ]).then(async (results) => {
 
             throwAnyRejection(results)
@@ -340,6 +351,9 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
                 modFileIsMissing = false
             }
         }),
+
+        !(args.installS4Client.enabled) ? Promise.resolve() :
+        repairArchived(gc420Pkg, opts),
     ])
     throwAnyRejection(results)
 
@@ -347,6 +361,16 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
         maps.hardcodedMaps.push(...modPck1.hardcodedMaps)
         maps.init()
     }
+
+    if(!gsExeIsMissing)
+        servers[KnownServers.BrokenWings] = { id: KnownServers.BrokenWings, pkg: gsPkg, name: tr('BrokenWings (Season 1)') }
+    if(!gs420ExeIsMissing)
+        servers[KnownServers.ChronoBreak] = { id: KnownServers.ChronoBreak, pkg: gs420Pkg, name: tr('Chronobreak (Season 4)') }
+
+    if(args.installS1Client.enabled) // It is assumed that the installation was successful.
+        clients[KnownClients.v126] = { id: KnownClients.v126, pkg: gcPkg, name: 'v1.0.0.126 (Season 1)' }
+    if(args.installS4Client.enabled)
+        clients[KnownClients.v420] = { id: KnownClients.v420, pkg: gc420Pkg, name: 'v4.20 (Season 4)' }
 
     //TODO: await fs.cp(gsPkg.gcDir, gcPkg.exeDir, { recursive: true })
 
@@ -366,6 +390,40 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
                 }
             }
         })
+    }
+}
+
+async function tryBuild(pkg: PkgInfoCSProj, opts: Required<AbortOptions>){
+    try {
+        await build(pkg, opts)
+    } catch(err) {
+        let tryToRepairSDK = true
+        if(err instanceof Error){
+            const exception = err as ErrnoException
+            if(exception.code == 'ENOENT'){ //TODO: Investigate.
+                const desc1 = tr('SDK installation is probably corrupted')
+                const desc2 = tr('File not found')
+                console_log(`${desc1}. ${desc2}:\n`, exception.path ?? '')
+                tryToRepairSDK = true
+            }
+        }
+        if(err instanceof TerminationError){
+            const exitCode = err.cause?.code ?? 0
+            if(DOTNET_INSTALL_CORRUPT_EXIT_CODES.includes(exitCode)){
+                const desc1 = tr('SDK installation is probably corrupted')
+                const desc2 = tr(`exit code is {exitCode}`, { exitCode })
+                console_log(`${desc1} (${desc2})`)
+                tryToRepairSDK = true
+            }
+        }
+        if(tryToRepairSDK){
+            repairArchived_sdkPkg_opts ??=
+                repairArchived(sdkPkg, { ...opts, ignoreUnpacked: true })
+                    .then(() => { repairArchived_sdkPkg_opts = null })
+            await repairArchived_sdkPkg_opts
+            await build(pkg, opts)
+        } else
+            throw err
     }
 }
 

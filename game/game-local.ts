@@ -77,6 +77,7 @@ export class LocalGame extends Game {
                         team: bot.team.encode(),
                         champion: bot.champion.encode(),
                         difficulty: bot.difficulty.encode(),
+                        talents: undefined!
                     }
                 })
             }

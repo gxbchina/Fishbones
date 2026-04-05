@@ -15,7 +15,7 @@ type HasBehaviourTree = boolean
 
 type SkinInfo = { i: number, image: string }
 
-export const championsTable: [InternalName, ExternalName, MainlineStatus, HasBehaviourTree ][] = [
+const championsTable: [InternalName, ExternalName, MainlineStatus, HasBehaviourTree ][] = [
     ["Alistar", tr("Alistar"), "Working", true],
     ["Annie", tr("Annie"), "Working", true],
     ["Ashe", tr("Ashe"), "Playable", true],

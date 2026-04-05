@@ -8,7 +8,7 @@ import type { Peer as PBPeer } from '../message/peer'
 import type { Server } from './server'
 import { KickReason, LobbyNotificationMessage, PickRequest, State, type LobbyRequestMessage } from '../message/lobby'
 import { arr2text, text2arr } from 'uint8-util'
-import type { GameInfo } from '../game/game-info'
+import type { GameInfo, GameInfo420 } from '../game/game-info'
 import { ProxyClient } from '../utils/proxy/proxy-client'
 import { ProxyServer } from '../utils/proxy/proxy-server'
 import { ClientServerProxy } from '../utils/proxy/proxy-client-server'
@@ -22,7 +22,9 @@ import { getBotName, getName } from '../utils/namegen/namegen'
 import { GameMap } from '../utils/data/constants/maps'
 import { GameMode } from '../utils/data/constants/modes'
 import { runes } from '../utils/data/constants/runes'
-import { VERSION, versionFromString } from '../utils/constants-build'
+import { KnownServers, type ServerVersion } from '../utils/data/constants/servers'
+import { KnownClients, type ClientVersion } from '../utils/data/constants/clients'
+import { VERSION, versionFromString, versionToString } from '../utils/constants-build'
 import { console_log } from '../ui/remote/remote'
 import { tr } from '../utils/translation'
 import { firewall } from '../utils/proxy/proxy-firewall'
@@ -81,6 +83,8 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
     public readonly commit = new HexStringValue()
 
     public isPrivate: boolean = false
+    public serverVersion: ServerVersion = KnownServers.Default
+    public clientVersion: ClientVersion = KnownClients.Default
 
     protected player?: GamePlayer
     public getPlayer(id?: PlayerId){
@@ -378,7 +382,7 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
         if(this.features.isHalfPingEnabled) return
 
         try {
-            const proc = await launchServer(this.getGameInfo(), opts)
+            const proc = await launchServer(this.serverVersion, this.getGameInfo(), opts)
             proc.once('exit', this.onServerExit)
             
             this.proxyServer = firewall(new ProxyServer(this.node), this.features.isFirewallEnabled)
@@ -478,7 +482,7 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
                         await this.proxyClientServer.start(peerIds, opts)
 
                         //let proc: Awaited<ReturnType<typeof launchServer>>
-                        const proc = await launchServer(gameInfo, opts)
+                        const proc = await launchServer(this.serverVersion, gameInfo, opts)
                         proc.once('exit', this.onServerExit)
 
                         this.proxyClientServer.afterStart(proc.port)
@@ -539,7 +543,7 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
         }
 
         try {
-            const proc = await launchClient(ip, port, key, clientId, opts)
+            const proc = await launchClient(this.clientVersion, ip, port, key, clientId, opts)
             proc.once('exit', this.onClientExit)
             return true
         } catch(err) {
@@ -862,44 +866,64 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
         return {
             gameId: 0,
             game: {
+                
                 map: this.map.value ?? 4,
                 gameMode: this.mode.toString(),
                 mutators: Array<string>(8).fill(''),
-                dataPackage: 'AvCsharp-Scripts',
+
+                ...((this.serverVersion == KnownServers.BrokenWings) ? {
+                    dataPackage: 'AvCsharp-Scripts',
+                } : {}),
             },
             gameInfo: {
+
                 TICK_RATE: this.server.tickRate.value ?? 30,
-                CLIENT_VERSION: '1.0.0.126',
                 FORCE_START_TIMER: 180, //TODO: Unhardcode
-                KEEP_ALIVE_WHEN_EMPTY: false,
                 IS_DAMAGE_TEXT_GLOBAL: false,
                 SUPRESS_SCRIPT_NOT_FOUND_LOGS: true,
+                CONTENT_PATH: "../../../../Content",
+                ENDGAME_HTTP_POST_ADDRESS: "",
                 CHEATS_ENABLED: this.features.isCheatsEnabled,
                 MANACOSTS_ENABLED: this.features.isManacostsEnabled,
                 COOLDOWNS_ENABLED: this.features.isCooldownsEnabled,
                 MINION_SPAWNS_ENABLED: this.features.isMinionsEnabled,
-                CONTENT_PATH: "../../../../Content",
-                DEPLOY_FOLDER: '',
-                ENDGAME_HTTP_POST_ADDRESS: "",
-                APIKEYDROPBOX: "",
-                USERNAMEOFREPLAYMAN: "",
-                PASSWORDOFREPLAYMAN: "",
-                ENABLE_LAUNCHER: false,
-                LAUNCHER_ADRESS_AND_PORT: "",
-                AB_CLIENT: false,
-                ENABLE_LOG_AND_CONSOLEWRITELINE: false,
-                ENABLE_LOG_BehaviourTree: false,
-                ENABLE_LOG_PKT: false,
-                ENABLE_REPLAY: false,
-                ENABLE_ALLOCATION_TRACKER: false,
-                SCRIPT_ASSEMBLIES: [
-                    "AvLua-Converted",
-                    "AvCsharp-Scripts",
-                ],
+
+                ...((this.serverVersion == KnownServers.ChronoBreak) ? {
+                    USE_CACHE: true,
+                    ENABLE_CONTENT_LOADING_LOGS: false,
+                    LOG_IN_PACKETS: false,
+                    LOG_OUT_PACKETS: false,
+                    scriptAssemblies: [
+                        "ScriptsCore",
+                        "CBProject-Converted",
+                        "Chronobreak-Scripts"
+                    ],
+                } : {}),
+                
+                ...((this.serverVersion == KnownServers.BrokenWings) ? {
+                    CLIENT_VERSION: versionToString(this.clientVersion),
+                    KEEP_ALIVE_WHEN_EMPTY: false,
+                    DEPLOY_FOLDER: '',
+                    APIKEYDROPBOX: "",
+                    USERNAMEOFREPLAYMAN: "",
+                    PASSWORDOFREPLAYMAN: "",
+                    ENABLE_LAUNCHER: false,
+                    LAUNCHER_ADRESS_AND_PORT: "",
+                    AB_CLIENT: false,
+                    ENABLE_LOG_AND_CONSOLEWRITELINE: false,
+                    ENABLE_LOG_BehaviourTree: false,
+                    ENABLE_LOG_PKT: false,
+                    ENABLE_REPLAY: false,
+                    ENABLE_ALLOCATION_TRACKER: false,
+                    SCRIPT_ASSEMBLIES: [
+                        "AvLua-Converted",
+                        "AvCsharp-Scripts",
+                    ],
+                } : {}),
             },
             players: this.getPlayers().map((player, i) => ({
+
                 playerId: player.isBot ? -1 : (i + 1),
-                AIDifficulty: player.isBot ? (player.difficulty.value ?? 0) : undefined,
                 blowfishKey, //TODO: Unhardcode. Security
                 rank: /*Rank.random() ??*/ "DIAMOND",
                 name: player.isBot ? getBotName(player.champion.toString()) : getName(player, false, true),
@@ -909,11 +933,16 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
                 summoner1: (player.spell1.value !== undefined) ? `Summoner${player.spell1.toString()}` : '',
                 summoner2: (player.spell1.value !== undefined) ? `Summoner${player.spell2.toString()}` : '',
                 ribbon: 2, // Unused
-                useDoomSpells: false,
                 icon: 0, //Math.floor(Math.random() * 29),
                 talents: Object.fromEntries(player.talents.value.entries()),
                 runes,
+
+                ...((this.serverVersion == KnownServers.BrokenWings) ? {
+                    AIDifficulty: player.isBot ? (player.difficulty.value ?? 0) : undefined,
+                    useDoomSpells: false,
+                } : {}),
+
             }))
-        }
+        } as GameInfo
     }
 }

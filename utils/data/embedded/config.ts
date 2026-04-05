@@ -19,8 +19,8 @@ export const config = {
     //    windows: './node_modules/7z-bin/bin/win/x64/7z.dll',
     //},
 
-    gc420ZipTorrent: '', //'./torrents/League of Legends_UNPACKED.7z.torrent',
-    gs420PkgZipTorrent: '', //'./torrents/Chronobreak.GameServer.7z.torrent',
+    gc420ZipTorrent: './torrents/League of Legends_UNPACKED.7z.torrent',
+    gs420PkgZipTorrent: './torrents/Chronobreak.GameServer.7z.torrent',
 
     gcZipTorrent: './torrents/playable_client_126.7z.torrent',
     gsPkgZipTorrent: './torrents/ChildrenOfTheGrave-Gameserver.7z.torrent',
