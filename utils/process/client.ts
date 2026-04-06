@@ -1,10 +1,10 @@
 import { gcPkg, winePkg } from "../data/packages"
 import { sanitize_bfkey } from "../constants"
 import { killSubprocess, spawn, startProcess, type ChildProcess, type SpawnOptions } from "../process/process"
+import { clients, type ClientVersion } from "../data/constants/client-server-combinations"
 import type { AbortOptions } from "@libp2p/interface"
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import { clients, type ClientVersion } from "../data/constants/clients"
 
 const LOG_PREFIX = 'CLIENT'
 

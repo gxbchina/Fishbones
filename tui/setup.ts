@@ -5,10 +5,10 @@ import type { LocalServer } from "../game/server";
 import { render } from "../ui/remote/view";
 import { Features, GameType, PlayerCount, TickRate } from "../utils/constants";
 import { GameMode } from "../utils/data/constants/modes";
-import { GameMap, mapsById, mapsEnabled } from "../utils/data/constants/maps";
+import { GameMap } from "../utils/data/constants/maps";
 import { button, checkbox, form, inq2gd, line, option } from "../ui/remote/types";
 import { AbortPromptError } from "@inquirer/core";
-import { KnownServers, servers, type ServerVersion } from "../utils/data/constants/servers";
+import { combinations, combinations_findIndex as combinations_findIndex, KnownClients, KnownServers } from "../utils/data/constants/client-server-combinations";
 
 export async function setup(game: LocalGame, server: LocalServer, opts: Required<AbortOptions>){
     
@@ -16,15 +16,20 @@ export async function setup(game: LocalGame, server: LocalServer, opts: Required
 
     server.loadSettings()
     
-    const gameMode = () => {
-        const info = mapsById.get(game.map.value!)!
-        return option(
-            inq2gd(GameMode.choices, info.modes),
-            game.mode.value,
-            value => game.mode.value = value,
-        )
+    let index = combinations_findIndex(game.clientVersion, game.serverVersion)
+    let combo = combinations[index]!
+
+    const gameMap = (cb?: (index: number) => void) => {
+        const options = [...combo.maps.values()].map(({ i, name }) => ({ id: i, text: name }))
+        return option(options, game.map.value, cb)
     }
-    
+
+    const gameMode = (cb?: (index: number) => void) => {
+        const map = combo.maps.get(game.map.value!)!
+        const options = [...map.modes.values()].map(({ i, name }) => ({ id: i, text: name }))
+        return option(options, game.mode.value, cb)
+    }
+
     const view = render('CustomGameSetup', form({
         GameName: line(game.name.value, value => game.name.value = value),
         Password: line(game.password.value ?? '', value => game.password.value = value),
@@ -32,14 +37,17 @@ export async function setup(game: LocalGame, server: LocalServer, opts: Required
         TickRate: option(inq2gd(TickRate.choices), server.tickRate.value, value => server.tickRate.value = value),
         TeamSize: option(inq2gd(PlayerCount.choices), game.playersMax.value, value => game.playersMax.value = value),
         
-        GameMode: gameMode(),
-        GameMap: option(inq2gd(GameMap.choices, mapsEnabled), game.map.value, value => {
-            const info = mapsById.get(value)!
-            game.map.value = value
-            game.mode.value = info.modes[0]
-            view.get('GameMode').update(gameMode())
+        //GameType: option(inq2gd(GameType.choices), game.type.value, value => game.type.value = value),
+        GameMode: gameMode(value => game.mode.value = value),
+        GameMap: gameMap(value => {
+            const map = combo.maps.get(value)!
+            const mode = [...map.modes.values()][0]!
+            game.map.value = map.i
+            game.mode.value = mode.i
+            view.update(form({
+                GameMode: gameMode(),
+            }))
         }),
-        GameType: option(inq2gd(GameType.choices), game.type.value, value => game.type.value = value),
 
         Manacosts: checkbox(game.features.isManacostsEnabled, value => game.features.set(Features.MANACOSTS_DISABLED, !value)),
         Cooldowns: checkbox(game.features.isCooldownsEnabled, value => game.features.set(Features.COOLDOWNS_DISABLED, !value)),
@@ -53,18 +61,29 @@ export async function setup(game: LocalGame, server: LocalServer, opts: Required
             view.get('SummonerSpells').update(button(undefined, !value))
         }),
         
-        Champions: button(() => { server.champions.uinput(opts).catch(() => { /* Ignore */ }) }),
+        //Champions: button(() => { server.champions.uinput(opts).catch(() => { /* Ignore */ }) }),
         //SpellsEnabled: checkbox(server.spells.value.length > 0, value => { server.spells.value = value ? [] : [] })
-        SummonerSpells: button(() => { server.spells.uinput(opts).catch(() => { /* Ignore */ }) }, !game.features.isSpellsEnabled),
+        //SummonerSpells: button(() => { server.spells.uinput(opts).catch(() => { /* Ignore */ }) }, !game.features.isSpellsEnabled),
 
-
-        ServerToUse: option(
-            servers.filter(info => !!info).map(({ id, name }) => ({ id, text: name })),
-            game.serverVersion,
+        ClientServerCombinationToUse: option(
+            combinations.map(({ client, server }, id) => ({ id, text: `${client.name} + ${server.name}` })),
+            (index),
             (index) => {
-                game.serverVersion = index as ServerVersion
-                const isDefaultVersion = index != KnownServers.Default
-                view.get('PublishGame').update(button(undefined, isDefaultVersion)) //HACK:
+                combo = combinations[index]!
+                game.serverVersion = combo.server.version
+                game.clientVersion = combo.client.version
+                const isDefaultVersion =
+                    game.serverVersion != KnownServers.Default ||
+                    game.clientVersion != KnownClients.Default
+                const map = [...combo.maps.values()][0]!
+                const mode = [...map.modes.values()][0]!
+                game.map.value = map.i
+                game.mode.value = mode.i
+                view.update(form({
+                    GameMap: gameMap(),
+                    GameMode: gameMode(),
+                    PublishGame: button(undefined, isDefaultVersion) //HACK:
+                }))
             },
         ),
 

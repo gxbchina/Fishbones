@@ -1,146 +1,35 @@
 import { PickableValue } from "./values/pickable"
-import { champions } from "./champions"
-import { modes } from "./modes"
 import { enabled } from "./values/enabled"
 import { tr } from "../../translation"
 
-export type MapInfo = {
-    i: number
-    id: number
-    name: string
-    existsOnClient: boolean
-    existsOnServer: boolean
-    enabled: boolean
-    modes: number[]
-    bots: number[]
-}
-
-export type HardcodedMapInfo = {
-    id: number
-    client: boolean
-    server: boolean
-    modes: string[]
-    bots: string[]
-}
-
-// short, name, enabled by default
-const mapsTable: [number, string, boolean][] = [
-    [0, tr(`Test`), false],
-    [1, tr(`Old Summoner's Rift`), true],
-    [2, tr(`Old Summoner's Rift Autumn`), true],
-    [3, tr(`Proving Grounds`), false],
-    [4, tr(`Twisted Treeline`), true],
-    [5, tr(`Unknown (5)`), false],
-    [6, tr(`Summoner's Rift Winter (2011)`), false],
-    [7, tr(`Summoner's Rift Winter (2009)`), false],
-    [8, tr(`Crystal Scar`), true],
-    [9, tr(`Dominion Test`), false],
-    [10, tr(`New Twisted Treeline`), false],
-    [11, tr(`New Summoner's Rift`), false],
-    [12, tr(`Howling Abyss`), false],
-    [13, tr(`Magma Chamber`), false],
-    [14, tr(`Butcher's Bridge`), false],
-    [15, tr(`Unknown (15)`), false],
-    [16, tr(`Cosmic Ruins`), false],
-    [17, tr(`Unknown (17)`), false],
-    [18, tr(`Valoran City Park`), false],
-    [19, tr(`Substructure 43`), false],
-    [20, tr(`Crash Site`), false],
-    [21, tr(`Temple of Lily and Lotus`), false],
-    //[22, tr(`Magma Chamber (recreated in Minecraft)`), false],
-    //[30, tr(`Arena: Rings of Wrath`), false],
-    [30, tr(`New Proving Grounds`), false],
-    [35, tr(`The Bandlewood`), false],
+export const maps = [
+    { i: 0, id: 0, short: 'Map0', name: tr(`Test`) },
+    { i: 1, id: 1, short: 'Map1', name: tr(`Old Summoner's Rift`) },
+    { i: 2, id: 2, short: 'Map2', name: tr(`Old Summoner's Rift Autumn`) },
+    { i: 3, id: 3, short: 'Map3', name: tr(`Proving Grounds`) },
+    { i: 4, id: 4, short: 'Map4', name: tr(`Twisted Treeline`) },
+    { i: 5, id: 5, short: 'Map5', name: tr(`Unknown (5)`) },
+    { i: 6, id: 6, short: 'Map6', name: tr(`Summoner's Rift Winter (2011)`) },
+    { i: 7, id: 7, short: 'Map7', name: tr(`Summoner's Rift Winter (2009)`) },
+    { i: 8, id: 8, short: 'Map8', name: tr(`Crystal Scar`) },
+    { i: 9, id: 9, short: 'Map9', name: tr(`Dominion Test`) },
+    { i: 10, id: 10, short: 'Map10', name: tr(`New Twisted Treeline`) },
+    { i: 11, id: 11, short: 'Map11', name: tr(`New Summoner's Rift`) },
+    { i: 12, id: 12, short: 'Map12', name: tr(`Howling Abyss`) },
+    { i: 13, id: 13, short: 'Map13', name: tr(`Magma Chamber`) },
+    { i: 14, id: 14, short: 'Map14', name: tr(`Butcher's Bridge`) },
+    { i: 15, id: 15, short: 'Map15', name: tr(`Unknown (15)`) },
+    { i: 16, id: 16, short: 'Map16', name: tr(`Cosmic Ruins`) },
+    { i: 17, id: 17, short: 'Map17', name: tr(`Unknown (17)`) },
+    { i: 18, id: 18, short: 'Map18', name: tr(`Valoran City Park`) },
+    { i: 19, id: 19, short: 'Map19', name: tr(`Substructure 43`) },
+    { i: 20, id: 20, short: 'Map20', name: tr(`Crash Site`) },
+    { i: 21, id: 21, short: 'Map21', name: tr(`Temple of Lily and Lotus`) },
+    //{ i: 24, id: 22, short: 'Map22', name: tr(`Magma Chamber (recreated in Minecraft)`) },
+    //{ i: 25, id: 30, short: 'Map30', name: tr(`Arena: Rings of Wrath`) },
+    { i: 22, id: 30, short: 'Map30', name: tr(`New Proving Grounds`) },
+    { i: 23, id: 35, short: 'Map35', name: tr(`The Bandlewood`) },
 ]
-
-export const hardcodedMaps: HardcodedMapInfo[] = [
-    {
-        id: 1,
-        client: true,
-        server: true,
-        modes: [ 'CLASSIC' ],
-        bots: [
-            'Soraka',
-            'Sivir',
-            'Shen',
-            'Ryze',
-            'Nasus',
-            'MasterYi',
-            'Malphite',
-            'Garen',
-            'Annie',
-            'Alistar',
-        ],
-    },
-    {
-        id: 2,
-        client: true,
-        server: true,
-        modes: [ 'CLASSIC' ],
-        bots: [
-            'Soraka',
-            'Sivir',
-            'Shen',
-            'Ryze',
-            'Nasus',
-            'MasterYi',
-            'Malphite',
-            'Garen',
-            'Annie',
-            'Alistar',
-        ],
-    },
-    //{
-    //    id: 3,
-    //    client: true,
-    //    server: true,
-    //    modes: [ 'TUTORIAL' ],
-    //    bots: [],
-    //},
-    {
-        id: 4,
-        client: true,
-        server: true,
-        modes: [ 'CLASSIC' ],
-        bots: [
-            'Soraka',
-            'Sivir',
-            'Shen',
-            'Ryze',
-            'Nasus',
-            'MasterYi',
-            'Malphite',
-            'Garen',
-            'Annie',
-            'Alistar',
-        ],
-    },
-    {
-        id: 8,
-        client: true,
-        server: true,
-        modes: [ 'ODIN' ],
-        bots: [],
-    },
-]
-
-export let maps: MapInfo[]
-const unhardcode = (map: HardcodedMapInfo) => {
-    const [, name, ] = mapsTable.find(([ i ]) => i === map.id)!
-    return {
-        i: map.id,
-        id: map.id,
-        name: name,
-        existsOnClient: map.client,
-        existsOnServer: map.server,
-        enabled: map.client && map.server,
-        modes: map.modes.map(short => modes.find(mode => mode.short == short)!.i),
-        bots: map.bots.map(short => champions.find(champion => champion.short === short)!.i),
-    }
-}
-
-export let mapsById: Map<number, MapInfo>
-export let mapsEnabled: number[]
 
 export class GameMap extends PickableValue {
     public static readonly name = 'Game Map'
@@ -148,13 +37,3 @@ export class GameMap extends PickableValue {
     public static choices: { value: number, name: string }[]
 }
 export const GameMapsEnabled = enabled(GameMap)
-
-export function init(){
-    maps = hardcodedMaps.map(unhardcode)
-    mapsById = new Map(maps.map(map => [ map.id, map ]))
-    mapsEnabled = maps.filter(map => map.enabled).map(map => map.id)
-    GameMap.values = Object.fromEntries(maps.map(({ i, name }) => ([i, name])))
-    GameMap.choices = PickableValue.normalize(GameMap.values)
-}
-
-init()

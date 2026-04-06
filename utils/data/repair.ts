@@ -22,8 +22,7 @@ import { DeferredView, render } from "../../ui/remote/view"
 import { button, form, label } from "../../ui/remote/types"
 import { VERSION } from "../constants-build"
 import type { StatsFs } from "node:fs"
-import { KnownServers, servers } from "./constants/servers"
-import { clients, KnownClients } from "./constants/clients"
+import { clients_push, combinations_merge, combinations_push, KnownClients, KnownServers, servers_push } from "./constants/client-server-combinations"
 
 const DOTNET_INSTALL_CORRUPT_EXIT_CODES = [ 130, 131, 142, ]
 
@@ -357,20 +356,22 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
     ])
     throwAnyRejection(results)
 
-    if(!modFileIsMissing){
-        maps.hardcodedMaps.push(...modPck1.hardcodedMaps)
-        maps.init()
+    // It is assumed that the installation was successful.
+    if(!gsExeIsMissing && args.installS1Client.enabled){
+        const client = clients_push({ pkg: gcPkg, version: KnownClients.v126, name: 'v1.0.0.126 (Season 1)' })
+        const server = servers_push({ pkg: gsPkg, version: KnownServers.BrokenWings, name: tr('BrokenWings (Season 1)') })
+        combinations_push(client, server)
+        if(!modFileIsMissing)
+            Object.assign(client.pkg.maps, modPck1.maps)
     }
-
-    if(!gsExeIsMissing)
-        servers[KnownServers.BrokenWings] = { id: KnownServers.BrokenWings, pkg: gsPkg, name: tr('BrokenWings (Season 1)') }
-    if(!gs420ExeIsMissing)
-        servers[KnownServers.ChronoBreak] = { id: KnownServers.ChronoBreak, pkg: gs420Pkg, name: tr('Chronobreak (Season 4)') }
-
-    if(args.installS1Client.enabled) // It is assumed that the installation was successful.
-        clients[KnownClients.v126] = { id: KnownClients.v126, pkg: gcPkg, name: 'v1.0.0.126 (Season 1)' }
-    if(args.installS4Client.enabled)
-        clients[KnownClients.v420] = { id: KnownClients.v420, pkg: gc420Pkg, name: 'v4.20 (Season 4)' }
+    /*
+    if(!gs420ExeIsMissing && args.installS4Client.enabled){
+        const client = clients_push({ pkg: gc420Pkg, version: KnownClients.v420, name: 'v4.20 (Season 4)' })
+        const server = servers_push({ pkg: gs420Pkg, version: KnownServers.ChronoBreak, name: tr('Chronobreak (Season 4)') })
+        combinations_push(client, server)
+    }
+    */
+   combinations_merge()
 
     //TODO: await fs.cp(gsPkg.gcDir, gcPkg.exeDir, { recursive: true })
 

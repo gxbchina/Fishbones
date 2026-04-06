@@ -10,7 +10,7 @@ import type { Server } from './server'
 import type { GamePlayer, PlayerId, PPP } from './game-player'
 import { PeerMap } from '@libp2p/peer-collections'
 import { pbStream } from '../utils/pb-stream'
-import { mapsById } from '../utils/data/constants/maps'
+import { combinations_find } from '../utils/data/constants/client-server-combinations'
 import { gsPkg } from '../utils/data/packages'
 //import { logger as myLogger } from '../utils/log'
 import { tr } from '../utils/translation'
@@ -47,8 +47,10 @@ export class LocalGame extends Game {
             .filter(player => player.isBot && player.champion.value !== undefined)
             .map(player => player.champion.value!)
 
-        const info = mapsById.get(this.map.value!)!
-        const bots: number[] = [...(new Set(info.bots).difference(new Set(existingBots))).values()]
+
+        const combo = combinations_find(this.clientVersion, this.serverVersion)!
+        const map = combo.maps.get(this.map.value!)!
+        const bots: number[] = [...(new Set(map.bots.keys()).difference(new Set(existingBots))).values()]
         const peersRequests: LobbyNotificationMessage.PeerRequests[] = []
 
         counts.forEach((count, team) => {
@@ -57,7 +59,7 @@ export class LocalGame extends Game {
                 const bot = this.players_add(playerId, undefined)
                 
                 if(bots.length === 0)
-                    bots.push(...info.bots)
+                    bots.push(...map.bots.keys())
                 const champion = (bots.length > 0) ?
                     bots.splice(Math.floor(Math.random() * bots.length), 1)[0] :
                     undefined

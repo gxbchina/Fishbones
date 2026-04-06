@@ -1520,7 +1520,7 @@ disabled = true
 button_pressed = true
 text = "Select a server to use"
 
-[node name="#ServerToUse" type="OptionButton" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/VBoxContainer/HBoxContainer" unique_id=1447021121]
+[node name="#ClientServerCombinationToUse" type="OptionButton" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/VBoxContainer/HBoxContainer" unique_id=1447021121]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 selected = 0

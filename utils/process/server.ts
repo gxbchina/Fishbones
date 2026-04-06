@@ -1,10 +1,10 @@
 import path from 'node:path'
 import { sdkPkg } from '../data/packages'
 import { getFreePort, killSubprocess, spawn, startProcess, type ChildProcess } from './process'
+import { servers, type ServerVersion } from '../data/constants/client-server-combinations'
 import { fs_writeFile } from '../data/fs'
 import type { GameInfo } from '../../game/game-info'
 import type { AbortOptions } from '@libp2p/interface'
-import { servers, type ServerVersion } from '../data/constants/servers'
 
 const LOG_PREFIX = 'SERVER'
 

@@ -9,7 +9,6 @@ import { cleanup } from './utils/data/cleanup'
 //import * as umplex from './network/umplex'
 import type { AbortOptions } from '@libp2p/interface'
 import { args } from './utils/args'
-import { loadSkins } from './utils/data/constants/champions'
 import * as pages from './tui/masteries/pages'
 import { loadConfig } from './utils/config'
 import { startup } from './tui/startup'
@@ -69,7 +68,6 @@ async function index(opts: Required<AbortOptions>){
     })
 
     await Promise.all([
-        loadSkins(opts),
         pages.load(opts),
     ])
     

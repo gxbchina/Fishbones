@@ -4,10 +4,10 @@ import { SwitchViewError } from "../tui";
 import { BOTS, players, PLAYERS, Team, type Context } from "./lobby";
 import { bar, button, checkbox, form, icon, inq2gd, label, option, type Form } from "../../ui/remote/types";
 import { render } from "../../ui/remote/view";
-import { champions, AIChampion, AIDifficulty } from "../../utils/data/constants/champions";
+import { combinations_find } from "../../utils/data/constants/client-server-combinations";
+import { AIChampion, AIDifficulty } from "../../utils/data/constants/champions";
 import { getName } from "../../utils/namegen/namegen";
 import { popup } from "../../ui/remote/remote";
-import { mapsById } from "../../utils/data/constants/maps";
 import { tr } from "../../utils/translation";
 
 const ms = 1
@@ -21,13 +21,15 @@ export async function lobby_gather(ctx: Context){
     const { game } = ctx
     const localGame = game instanceof LocalGame ? game : undefined!
 
-    const mapInfo = mapsById.get(game.map.value!)!
+    const combo = combinations_find(game.clientVersion, game.serverVersion)!
+    const mapInfo = combo.maps.get(game.map.value!)!
+    const mapInfo_bots = [...mapInfo.bots.keys()]
 
     const makePlayerForm = (player: GamePlayer): Form => {
 
         const { name: championName, icon: iconPath } =
             (player.champion.value !== undefined) ?
-                champions[player.champion.value]! : {}
+                combo.champions.get(player.champion.value!)! : {}
 
         if(!player.isBot){
             const isMe = game.getPlayer() === player
@@ -41,7 +43,7 @@ export async function lobby_gather(ctx: Context){
         } else {
             return form({
                 Icon: icon(iconPath, championName),
-                Champion: option(inq2gd(AIChampion.choices, mapInfo.bots), player.champion.value, undefined, !localGame),
+                Champion: option(inq2gd(AIChampion.choices, mapInfo_bots), player.champion.value, undefined, !localGame),
                 Difficulty: option(inq2gd(AIDifficulty.choices), player.difficulty.value, undefined, !localGame),
                 Kick: button(undefined, !localGame),
             })
@@ -50,7 +52,7 @@ export async function lobby_gather(ctx: Context){
 
     const team = (team: Team) => form({
         Join: button(() => game.set('team', team), game.getPlayer()?.team.value == team),
-        AddBot: button(() => localGame.addBot(team), !localGame || mapInfo.bots.length === 0),
+        AddBot: button(() => localGame.addBot(team), !localGame || mapInfo_bots.length === 0),
         //Players: list(players(game, team, PLAYERS, makePlayerForm)),
         //Bots: list(players(game, team, BOTS, makePlayerForm)),
     })
@@ -64,7 +66,7 @@ export async function lobby_gather(ctx: Context){
             !localGame || !game.areAllPlayersFullyConnected() || gatheringTimeout > 0,
         ),
         Explanation: { $type: 'base', visible: false },
-        Autofill: button(autofill, !localGame || mapInfo.bots.length === 0),
+        Autofill: button(autofill, !localGame || mapInfo_bots.length === 0),
         GatheringProgress: bar(0, 0, 100, gatheringTimeout <= 0),
         Team1: team(0),
         Team2: team(1),
