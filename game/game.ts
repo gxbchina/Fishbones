@@ -880,7 +880,14 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
                 FORCE_START_TIMER: 180, //TODO: Unhardcode
                 IS_DAMAGE_TEXT_GLOBAL: false,
                 SUPRESS_SCRIPT_NOT_FOUND_LOGS: true,
-                CONTENT_PATH: "../../../../Content",
+
+                CONTENT_PATH: 
+                    (this.serverVersion == KnownServers.ChronoBreak) ?
+                        "../../../../Content/GameClient" :
+                    (this.serverVersion == KnownServers.BrokenWings) ?
+                        "../../../../Content" :
+                    undefined!,
+                
                 ENDGAME_HTTP_POST_ADDRESS: "",
                 CHEATS_ENABLED: this.features.isCheatsEnabled,
                 MANACOSTS_ENABLED: this.features.isManacostsEnabled,
@@ -929,8 +936,8 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
                 champion: player.champion.toString(), //TODO: Fix
                 team: player.team.toString().toUpperCase(),
                 skin: player.skin.value ?? 0,
-                summoner1: (player.spell1.value !== undefined) ? `Summoner${player.spell1.toString()}` : '',
-                summoner2: (player.spell1.value !== undefined) ? `Summoner${player.spell2.toString()}` : '',
+                summoner1: (player.spell1.value !== undefined) ? player.spell1.toString() : '',
+                summoner2: (player.spell1.value !== undefined) ? player.spell2.toString() : '',
                 ribbon: 2, // Unused
                 icon: 0, //Math.floor(Math.random() * 29),
                 talents: Object.fromEntries(player.talents.value.entries()),

@@ -23,6 +23,9 @@ import { button, form, label } from "../../ui/remote/types"
 import { VERSION } from "../constants-build"
 import type { StatsFs } from "node:fs"
 import { clients_push, combinations_merge, combinations_push, KnownClients, KnownServers, servers_push } from "./constants/client-server-combinations"
+import { ClientDataInfoV126 } from "./packages/game-client"
+import { ServerDataInfoV126 } from "./packages/game-server"
+import { ClientDataInfoV420 } from "./packages/game-client-420"
 
 const DOTNET_INSTALL_CORRUPT_EXIT_CODES = [ 130, 131, 142, ]
 
@@ -260,7 +263,9 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
     }
 
     let updated = false
+    let gcExeIsMissing = !await fs_exists(gcPkg.exe, opts)
     let gsExeIsMissing = !await fs_exists(gsPkg.dll, opts)
+    let gc420ExeIsMissing = !await fs_exists(gc420Pkg.exe, opts)
     let gs420ExeIsMissing = !await fs_exists(gs420Pkg.dll, opts)
     let modFileIsMissing = !await fs_exists(modPck1.lockFile, opts, false)
     repairArchived_sdkPkg_opts ??=
@@ -356,21 +361,18 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
     ])
     throwAnyRejection(results)
 
-    // It is assumed that the installation was successful.
-    if(!gsExeIsMissing && args.installS1Client.enabled){
-        const client = clients_push({ pkg: gcPkg, version: KnownClients.v126, name: 'v1.0.0.126 (Season 1)' })
-        const server = servers_push({ pkg: gsPkg, version: KnownServers.BrokenWings, name: tr('BrokenWings (Season 1)') })
+    if(!gsExeIsMissing && !gcExeIsMissing){
+        const client = clients_push(gcPkg, new ClientDataInfoV126(gcPkg.dir), KnownClients.v126, 'v1.0.0.126 (Season 1)')
+        const server = servers_push(gsPkg, new ServerDataInfoV126(gsPkg.dir), KnownServers.BrokenWings, tr('BrokenWings (Season 1)'))
         combinations_push(client, server)
         if(!modFileIsMissing)
-            Object.assign(client.pkg.maps, modPck1.maps)
+            Object.assign(client.maps, modPck1.maps)
     }
-    /*
-    if(!gs420ExeIsMissing && args.installS4Client.enabled){
-        const client = clients_push({ pkg: gc420Pkg, version: KnownClients.v420, name: 'v4.20 (Season 4)' })
-        const server = servers_push({ pkg: gs420Pkg, version: KnownServers.ChronoBreak, name: tr('Chronobreak (Season 4)') })
+    if(!gs420ExeIsMissing && !gc420ExeIsMissing){
+        const client = clients_push(gc420Pkg, new ClientDataInfoV420(gc420Pkg.dir), KnownClients.v420, 'v4.20 (Season 4)')
+        const server = servers_push(gs420Pkg, new ServerDataInfoV126(gs420Pkg.dir), KnownServers.ChronoBreak, tr('Chronobreak (Season 1)'))
         combinations_push(client, server)
     }
-    */
    combinations_merge()
 
     //TODO: await fs.cp(gsPkg.gcDir, gcPkg.exeDir, { recursive: true })

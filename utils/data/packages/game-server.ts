@@ -1,6 +1,7 @@
 import path from 'node:path'
 import { downloads } from '../fs'
 import embedded from '../embedded/embedded'
+import type { ServerDataInfo } from '../constants/client-server-combinations'
 import { gdrive, magnet, PkgInfoCSProj, type PkgInfoGit } from './shared'
 import { HARDCODED_HTTP_SERVER_URL } from '../../constants-build'
 import { withProperty } from '../../config'
@@ -128,6 +129,13 @@ export const gsPkg = new class extends PkgInfoCSProj implements PkgInfoGit {
             this.gitBranchName = remote.gitBranchName
         }
     }
+}
+
+export class ServerDataInfoV126 implements ServerDataInfo {
+
+    constructor(
+        public dir: string
+    ){}
 
     maps = {
         1: {
@@ -201,22 +209,28 @@ export const gsPkg = new class extends PkgInfoCSProj implements PkgInfoGit {
     }
 
     spells = {
-        "SummonerHeal": {},
+        "SummonerBattleCry": {},
+        //"SummonerBattleCryBuff": {},
+        "SummonerBoost": {},
+        //"SummonerBoostSpellShield": {},
+        "SummonerClairvoyance": {},
+        "SummonerDot": {},
         "SummonerExhaust": {},
         "SummonerFlash": {},
-        "SummonerTeleport": {},
-        "SummonerSmite": {},
-        "SummonerCleanse": {},
-        "SummonerIgnite": {},
-        "SummonerBoost": {},
-        "SummonerClairvoyance": {},
         "SummonerFortify": {},
         "SummonerHaste": {},
+        "SummonerHeal": {},
+        //"SummonerHealCheck": {},
         "SummonerMana": {},
+        //"SummonerOdinGarrison": {},
+        //"SummonerOdinGarrisonDebuff": {},
+        //"SummonerPromoteSR": {},
         "SummonerRally": {},
         "SummonerRevive": {},
-        "SummonerPromote": {},
-        "SummonerObserver": {},
+        //"SummonerReviveSpeedBoost": {},
+        "SummonerSmite": {},
+        "SummonerTeleport": {},
+        //"SummonerTestForceSpell": {},
     }
 
     champions = {
@@ -312,4 +326,4 @@ export const gsPkg = new class extends PkgInfoCSProj implements PkgInfoGit {
         "Viktor": {},
         "Sejuani": {},
     }
-}()
+}

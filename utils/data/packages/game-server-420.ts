@@ -78,4 +78,4 @@ export const gs420Pkg = new class extends PkgInfoCSProj {
         'LICENSE',
         'GameServer.sln.DotSettings',
     ]
-}()
+}

@@ -2,10 +2,10 @@ import type { PeerId } from "@libp2p/interface"
 import { logger } from "@libp2p/logger"
 import type { Libp2p } from "libp2p"
 import { Name, TickRate } from "../utils/constants"
-import { GameMapsEnabled, maps } from "../utils/data/constants/maps"
-import { GameModesEnabled, modes } from "../utils/data/constants/modes"
-import { champions, ChampionsEnabled } from "../utils/data/constants/champions"
-import { spells, SummonerSpellsEnabled } from "../utils/data/constants/spells"
+import { GameMapsEnabled } from "../utils/data/constants/maps"
+import { GameModesEnabled } from "../utils/data/constants/modes"
+import { ChampionsEnabled } from "../utils/data/constants/champions"
+import { SummonerSpellsEnabled } from "../utils/data/constants/spells"
 import type { Peer } from "../message/peer"
 import { tr } from "../utils/translation"
 
@@ -70,11 +70,4 @@ export class LocalServer extends Server {
     public constructor(node: Libp2p){
         super(node, node.peerId)
     }
-    public loadSettings(){
-        this.maps.value = maps.filter(info => info.enabled).map(info => info.i)
-        this.modes.value = modes.filter(info => info.enabled).map(info => info.i)
-        this.champions.value = champions.filter(info => info.enabled).map(info => info.i)
-        this.spells.value = spells.filter(info => info.enabled).map(info => info.i)
-    }
-    public saveSettings(){}
 }

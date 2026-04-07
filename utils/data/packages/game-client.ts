@@ -5,6 +5,7 @@ import { gdrive, magnet, PkgInfoExe } from './shared'
 import { HARDCODED_HTTP_SERVER_URL } from '../../constants-build'
 import { withProperty } from '../../config'
 import { tr } from '../../translation'
+import type { ClientExeInfo, ClientDataInfo } from '../constants/client-server-combinations'
 
 export const GC_LOCATION = 'game-client-location'
 export const GC_LOCATION_AUTO = 'auto'
@@ -22,7 +23,7 @@ export const gcLocationFromStringToIndex = Object.fromEntries(
     gcLocationFromIndexToString.map((v, i) => [ v, i ])
 )
 
-export abstract class GCPkgCommon extends PkgInfoExe {
+export abstract class GCPkgCommon extends PkgInfoExe implements ClientExeInfo {
 
     abstract dirName: string
     abstract release: string
@@ -106,6 +107,31 @@ export const gcPkg = new class extends GCPkgCommon {
         super()
         this.setDirLocation(GC_LOCATION_AUTO)
     }
+}
+
+export class ClientDataInfoCommon {
+    protected appyDir(this_dir: string){
+        const info = this as unknown as ClientDataInfo
+        for(const spell of Object.values(info.spells)){
+            const spell_dir = path.join(this_dir, 'DATA', 'Spells', 'Icons2D')
+            spell.icon = path.join(spell_dir, ...spell.icon.split('/'))
+        }
+        for(const [short, champion] of Object.entries(info.champions)){
+            const champion_dir = path.join(this_dir, 'DATA', 'Characters', short)
+            champion.icon = path.join(champion_dir, ...champion.icon.split('/'))
+            for(const skin of Object.values(champion.skins)){
+                skin.image = path.join(champion_dir, ...skin.image.split('/'))
+            }
+        }
+    }
+}
+
+export class ClientDataInfoV126 extends ClientDataInfoCommon implements ClientDataInfo {
+
+    constructor(dir: string){
+        super()
+        this.appyDir(dir)
+    }
 
     maps = {
         1: {},
@@ -120,17 +146,20 @@ export const gcPkg = new class extends GCPkgCommon {
         "SummonerFlash": { icon: "Summoner_flash.dds" },
         "SummonerTeleport": { icon: "Summoner_teleport.dds" },
         "SummonerSmite": { icon: "Summoner_smite.dds" },
-        "SummonerCleanse": { icon: "SummonerCleanse.dds" },
-        "SummonerIgnite": { icon: "SummonerIgnite.dds" },
+        //"SummonerCleanse": { icon: "SummonerCleanse.dds" },
+        //"SummonerIgnite": { icon: "SummonerIgnite.dds" },
+        "SummonerDot": { icon: "SummonerIgnite.dds" },
         "SummonerBoost": { icon: "Summoner_Boost.dds" },
         "SummonerClairvoyance": { icon: "Summoner_Clairvoyance.dds" },
         "SummonerFortify": { icon: "Summoner_fortify.dds" },
         "SummonerHaste": { icon: "Summoner_haste.dds" },
         "SummonerMana": { icon: "SummonerMana.dds" },
+        //"SummonerOdinGarrison": {},
+        //"SummonerOdinPromote": {},
         "SummonerRally": { icon: "Summoner_rally.dds" },
         "SummonerRevive": { icon: "Summoner_revive.dds" },
-        "SummonerPromote": { icon: "Summoner_promote.dds" },
-        "SummonerObserver": { icon: "SummonerObserver.dds" },
+        //"SummonerPromote": { icon: "Summoner_promote.dds" },
+        //"SummonerObserver": { icon: "SummonerObserver.dds" },
     }
 
     champions = {
@@ -952,4 +981,4 @@ export const gcPkg = new class extends GCPkgCommon {
             }
         },
     }
-}()
+}

@@ -29,34 +29,38 @@ interface Combination {
     spells: Map<number, SpellInfo>
     champions: Map<number, ChampionInfo>
 }
-interface ClientInfo {
+interface ClientInfo extends ClientExeInfo, ClientDataInfo {
     name: string
     version: ClientVersion
-    pkg: {
-        exeDir: string
-        exe: string
-        maps: Record<number, {}>
-        spells: Record<string, { icon: string }>
-        champions: Record<string, {
-            icon: string,
-            skins: Record<number, { image: string }>
-        }>
-    }
 }
-interface ServerInfo {
+export interface ClientExeInfo {
+    exeDir: string
+    exe: string
+}
+export interface ClientDataInfo {
+    maps: Record<number, {}>
+    spells: Record<string, { icon: string }>
+    champions: Record<string, {
+        icon: string,
+        skins: Record<number, { image: string }>
+    }>
+}
+interface ServerInfo extends ServerExeInfo, ServerDataInfo {
     name: string
     version: ServerVersion
-    pkg: {
-        infoDir: string
-        dllDir: string
-        dll: string
-        maps: Record<number, {
-            modes: string[],
-            bots: string[],
-        }>
-        spells: Record<string, {}>
-        champions: Record<string, {}>
-    }
+}
+export interface ServerExeInfo {
+    infoDir: string
+    dllDir: string
+    dll: string
+}
+export interface ServerDataInfo {
+    maps: Record<number, {
+        modes: string[],
+        bots: string[],
+    }>
+    spells: Record<string, {}>
+    champions: Record<string, {}>
 }
 interface MapInfo {
     i: number
@@ -84,10 +88,12 @@ interface SkinInfo {
 }
 
 export const clients: Record<ClientVersion, ClientInfo> = {}
-export function clients_push(client: ClientInfo){
-    const { version, pkg: { exeDir, exe, maps, spells, champions } } = client
-    client.pkg = {
+export function clients_push(exeInfo: ClientExeInfo, dataInfo: ClientDataInfo, version: ClientVersion, name: string){
+    const { exe, exeDir } = exeInfo
+    const { maps, spells, champions } = dataInfo
+    const client: ClientInfo = {
         exe, exeDir,
+        name, version,
         maps: Object.assign({}, maps),
         spells: Object.assign({}, spells),
         champions: Object.assign({}, champions),
@@ -97,9 +103,11 @@ export function clients_push(client: ClientInfo){
 }
 
 export const servers: Record<ServerVersion, ServerInfo> = {}
-export function servers_push(server: ServerInfo){
-    const { version, pkg: { dll, dllDir, infoDir, maps, spells, champions } } = server
-    server.pkg = {
+export function servers_push(exeInfo: ServerExeInfo, dataInfo: ServerDataInfo, version: ServerVersion, name: string){
+    const { dll, dllDir, infoDir } = exeInfo
+    const { maps, spells, champions } = dataInfo
+    const server: ServerInfo = {
+        name, version,
         dll, dllDir, infoDir,
         maps: Object.assign({}, maps),
         spells: Object.assign({}, spells),
@@ -129,11 +137,11 @@ export function combinations_merge(){
         const { client, server } = combo
 
         combo.champions = new Map(
-            Object.entries(server.pkg.champions)
-            .filter(([ k, v ]) => k in client.pkg.champions)
+            Object.entries(server.champions)
+            .filter(([ k, v ]) => k in client.champions)
             .map(([ k, v ]) => {
                 const champ = champions.find(champ => champ.short == k)!
-                const champion = client.pkg.champions[k]!
+                const champion = client.champions[k]!
                 const r = {
                     i: champ.i,
                     name: champ.name,
@@ -155,23 +163,24 @@ export function combinations_merge(){
         )
 
         combo.spells = new Map(
-            Object.entries(server.pkg.spells)
-            .filter(([ k, v ]) => k in client.pkg.maps)
+            Object.entries(server.spells)
+            .filter(([ k, v ]) => k in client.spells)
             .map(([ k, v ]) => {
                 const spell = spells.find(spell => spell.short == k)!
+                const spe11 = client.spells[k]!
                 const r = {
                     i: spell.i,
                     name: spell.name,
                     short: spell.short,
-                    icon: client.pkg.spells[k]!.icon,
+                    icon: spe11.icon,
                 }
                 return [ r.i, r ]
             })
         )
 
         combo.maps = new Map(
-            Object.entries(server.pkg.maps)
-            .filter(([ k, v ]) => k in client.pkg.maps)
+            Object.entries(server.maps)
+            .filter(([ k, v ]) => k in client.maps)
             .map(([ k, v ]) => {
                 const map = maps.find(map => map.id == Number(k))!
                 const champions = [...combo.champions.values()]

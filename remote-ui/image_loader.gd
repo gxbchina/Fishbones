@@ -33,11 +33,9 @@ static func get_texture(path: String) -> ImageTexture:
             elif unk_texture is Texture2D:
                 image = (unk_texture as Texture2D).get_image()
         else:
-            var path_to_load: String
-            if path.begins_with('%DATA%'):
-                path_to_load = path.replace('%DATA%', client_data_absolute_path)
-            else:
-                path_to_load = downloads.path_join(path)
+            var path_to_load: String = path
+            #if path.begins_with('%DATA%'): path_to_load = path.replace('%DATA%', client_data_absolute_path)
+            #else: path_to_load = downloads.path_join(path)
 
             var bytes := FileAccess.get_file_as_bytes(path_to_load)
             image = Image.new()

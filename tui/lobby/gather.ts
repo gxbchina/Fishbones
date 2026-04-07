@@ -67,7 +67,7 @@ export async function lobby_gather(ctx: Context){
         ),
         Explanation: { $type: 'base', visible: false },
         Autofill: button(autofill, !localGame || mapInfo_bots.length === 0),
-        GatheringProgress: bar(0, 0, 100, gatheringTimeout <= 0),
+        GatheringProgress: bar(0, 0, 100, gatheringTimeout > 0),
         Team1: team(0),
         Team2: team(1),
     }), ctx, [
@@ -137,7 +137,7 @@ export async function lobby_gather(ctx: Context){
                 gatheringTimeout = 0
                 clearInterval(gatheringTickInterval)
                 view.update(form({
-                    GatheringProgress: { $type: 'progress-bar', value: 0, disabled: true },
+                    GatheringProgress: { $type: 'progress-bar', value: 0, visible: false },
                     Start: { $type: 'button', disabled: false },
                 }))
             }

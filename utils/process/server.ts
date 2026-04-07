@@ -15,7 +15,7 @@ export function getRunningServerPort(){
 }
 
 export async function launchServer(serverVersion: ServerVersion, info: GameInfo, opts: Required<AbortOptions>, port = 0){
-    const gsPkg = servers[serverVersion]!.pkg
+    const gsPkg = servers[serverVersion]!
 
     //info.gameInfo.CONTENT_PATH = path.relative(gsPkg.dllDir, gsPkg.gcDir)
 
@@ -37,8 +37,9 @@ export async function launchServer(serverVersion: ServerVersion, info: GameInfo,
     })
     
     await startProcess(LOG_PREFIX, serverSubprocess, 'stdout', (chunk) => {
-        return chunk.includes("Server is ready, clients can now connect")
-        //return /\b(?:Game)?Server (?:is )?ready\b/.test(chunk)
+        return /\b(?:Game)?Server (?:is )?ready\b/.test(chunk)
+        //return chunk.includes("Server is ready, clients can now connect")
+        //    || chunk.includes("GameServer ready for clients to connect on Port")
         /*
         const match = chunk.match(/GameServer ready for clients to connect on Port: (?<port>\d+)/)
         if(match){

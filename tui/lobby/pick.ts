@@ -2,8 +2,7 @@ import type { GamePlayer } from "../../game/game-player";
 import { PLAYERS, BOTS, Team, type Context, players } from "./lobby";
 import { button, form, icon, label, list, texture, type Button, type Form } from "../../ui/remote/types";
 import { render } from "../../ui/remote/view";
-import { Champion, champions } from "../../utils/data/constants/champions";
-import { spells, SummonerSpell } from "../../utils/data/constants/spells";
+import { combinations_find } from "../../utils/data/constants/client-server-combinations";
 import { getBotName, getName } from "../../utils/namegen/namegen";
 import { option_pages } from "../masteries";
 import { page, pages } from "../masteries/pages";
@@ -11,17 +10,19 @@ import type { Game } from "../../game/game";
 import { SwitchViewError } from "../tui";
 
 function makePlayerForm(player: GamePlayer, game: Game): Form {
-        
-    const championInfo = (player.champion.value !== undefined) ? champions[player.champion.value]! : undefined
-    const relativeChampionIconPath = championInfo?.icon ?? ''
+    
+    const { champions, spells } = combinations_find(game.clientVersion, game.serverVersion)!
+
+    const championInfo = (player.champion.value !== undefined) ? champions.get(player.champion.value) : undefined
+    const championIcon = championInfo?.icon ?? ''
     const championName = championInfo?.name ?? ''
 
-    const spellInfo1 = (player.spell1.value !== undefined) ? spells[player.spell1.value] : undefined
-    const relativeSpellIconPath1 = spellInfo1?.icon ?? ''
+    const spellInfo1 = (player.spell1.value !== undefined) ? spells.get(player.spell1.value) : undefined
+    const spellIcon1 = spellInfo1?.icon ?? ''
     const spellName1 = spellInfo1?.name ?? ''
     
-    const spellInfo2 = (player.spell2.value !== undefined) ? spells[player.spell2.value] : undefined
-    const relativeSpellIconPath2 = spellInfo2?.icon ?? ''
+    const spellInfo2 = (player.spell2.value !== undefined) ? spells.get(player.spell2.value) : undefined
+    const spellIcon2 = spellInfo2?.icon ?? ''
     const spellName2 = spellInfo2?.name ?? ''
     
     const isMe = game.getPlayer() === player
@@ -31,38 +32,30 @@ function makePlayerForm(player: GamePlayer, game: Game): Form {
     return form({
         Name: label(playerId),
         Status: label(championName),
-        Icon: icon(relativeChampionIconPath, championName),
-        SummonerSpell1: icon(relativeSpellIconPath1, spellName1),
-        SummonerSpell2: icon(relativeSpellIconPath2, spellName2),
+        Icon: icon(championIcon, championName),
+        SummonerSpell1: icon(spellIcon1, spellName1),
+        SummonerSpell2: icon(spellIcon2, spellName2),
     })
 }
 
 export async function lobby_pick(ctx: Context){
     const { game } = ctx
 
+    const { champions, spells } = combinations_find(game.clientVersion, game.serverVersion)!
+
     const championsItems = Object.fromEntries(
-        Champion.choices
-        .map(({ name, value }, i) => {
-            const relativeIconPath = champions[value]?.icon
+        champions.values()
+        .map(({ i, name, icon: icon_path }) => {
             const disabled = !game.server.champions.value.includes(i)
-            return { i, name, relativeIconPath, disabled }
-        })
-        .filter(info => info.relativeIconPath)
-        .map(({ i, name, relativeIconPath, disabled }) => {
-            return [ i, icon(relativeIconPath, name, disabled) ]
+            return [ i, icon(icon_path, name, disabled) ]
         })
     )
 
     const summonerSpellsItems = Object.fromEntries(
-        SummonerSpell.choices
-        .map(({ name, value }, i) => {
-            const relativeIconPath = spells[value]?.icon
+        spells.values()
+        .map(({ i, name, icon: iconPath }) => {
             const disabled = !game.server.spells.value.includes(i)
-            return { i, name, relativeIconPath, disabled }
-        })
-        .filter((info) => info.relativeIconPath)
-        .map(({ i, name, relativeIconPath, disabled }) => {
-            return [i, icon(relativeIconPath, name, disabled)]
+            return [i, icon(iconPath, name, disabled)]
         })
     )
 
@@ -105,7 +98,7 @@ export async function lobby_pick(ctx: Context){
 
                 view.get('TabContainer/Skins').setItems(
                     Object.fromEntries(
-                        champions[championIndex]!.skins
+                        champions.get(championIndex)!.skins.values()
                         .map(({ i, image }) => {
                             const skinForm = form({
                                 Texture: texture(image)

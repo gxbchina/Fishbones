@@ -1418,6 +1418,7 @@ text = "Champions"
 [node name="#Champions" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer3" unique_id=10329385]
 layout_mode = 2
 size_flags_horizontal = 3
+disabled = true
 text = "Click to select"
 alignment = 0
 
@@ -1439,6 +1440,7 @@ text = "Summoner Spells"
 
 [node name="#SummonerSpells" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer4" unique_id=2142818061]
 layout_mode = 2
+disabled = true
 text = "Click to select"
 alignment = 0
 
@@ -1492,6 +1494,26 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Experiments"
 
+[node name="HBoxContainer" type="HBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/VBoxContainer" unique_id=1118272239]
+layout_mode = 2
+
+[node name="CheckBox" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/VBoxContainer/HBoxContainer" unique_id=790355682]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+disabled = true
+button_pressed = true
+text = "Select the [server + client] combination to use"
+
+[node name="#ClientServerCombinationToUse" type="OptionButton" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/VBoxContainer/HBoxContainer" unique_id=1447021121]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+selected = 0
+item_count = 2
+popup/item_0/text = "Broken Wings (Season 1) + v1.0.0.126 (Season 1)"
+popup/item_0/id = 0
+popup/item_1/text = "Chronobreak (Season 1) + v4.20 (Season 4)"
+popup/item_1/id = 1
+
 [node name="#HalfPing" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/VBoxContainer" unique_id=301106331]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -1509,26 +1531,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
 text = "BYPASS: Connect the client to the local server directly."
-
-[node name="HBoxContainer" type="HBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/VBoxContainer" unique_id=1118272239]
-layout_mode = 2
-
-[node name="CheckBox" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/VBoxContainer/HBoxContainer" unique_id=790355682]
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-disabled = true
-button_pressed = true
-text = "Select a server to use"
-
-[node name="#ClientServerCombinationToUse" type="OptionButton" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/VBoxContainer/HBoxContainer" unique_id=1447021121]
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-selected = 0
-item_count = 2
-popup/item_0/text = "Broken Wings (Season 1)"
-popup/item_0/id = 0
-popup/item_1/text = "Chronobreak (Season 4)"
-popup/item_1/id = 1
 
 [node name="Control2" type="Control" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1" unique_id=47378758]
 custom_minimum_size = Vector2(58, 0)

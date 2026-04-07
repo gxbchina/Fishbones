@@ -21,7 +21,7 @@ export async function launchClient(version: ClientVersion, ip: string, port: num
 }
 export async function relaunchClient(opts: Required<AbortOptions>){
     const { version, ip, port, key, clientId } = launchArgs!
-    const gcPkg = clients[version]!.pkg
+    const gcPkg = clients[version]!
 
     const gcArgs = ['8394', 'LoLLauncher.exe', 'unknown', ([ip, port.toString(), sanitize_bfkey(key), clientId.toString()]).join(' ')]
     //const gcArgsStr = gcArgs.map(a => `"${a}"`).join(' ')

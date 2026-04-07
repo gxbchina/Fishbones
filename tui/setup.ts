@@ -3,9 +3,7 @@ import { isSpellCrashDetected } from "../game/game";
 import type { LocalGame } from "../game/game-local";
 import type { LocalServer } from "../game/server";
 import { render } from "../ui/remote/view";
-import { Features, GameType, PlayerCount, TickRate } from "../utils/constants";
-import { GameMode } from "../utils/data/constants/modes";
-import { GameMap } from "../utils/data/constants/maps";
+import { Features, PlayerCount, TickRate } from "../utils/constants";
 import { button, checkbox, form, inq2gd, line, option } from "../ui/remote/types";
 import { AbortPromptError } from "@inquirer/core";
 import { combinations, combinations_findIndex as combinations_findIndex, KnownClients, KnownServers } from "../utils/data/constants/client-server-combinations";
@@ -14,10 +12,16 @@ export async function setup(game: LocalGame, server: LocalServer, opts: Required
     
     game.features.set(Features.SPELLS_DISABLED, isSpellCrashDetected())
 
-    server.loadSettings()
-    
     let index = combinations_findIndex(game.clientVersion, game.serverVersion)
     let combo = combinations[index]!
+
+    resetMapAndMode()
+    function resetMapAndMode(){
+        const map = [...combo.maps.values()][0]!
+        const mode = [...map.modes.values()][0]!
+        game.map.value = map.i
+        game.mode.value = mode.i
+    }
 
     const gameMap = (cb?: (index: number) => void) => {
         const options = [...combo.maps.values()].map(({ i, name }) => ({ id: i, text: name }))
@@ -58,7 +62,7 @@ export async function setup(game: LocalGame, server: LocalServer, opts: Required
         Bypass: checkbox(game.features.isBypassEnabled, value => game.features.set(Features.BYPASS_ENABLED, value)),
         Spells: checkbox(game.features.isSpellsEnabled, value => {
             game.features.set(Features.SPELLS_DISABLED, !value)
-            view.get('SummonerSpells').update(button(undefined, !value))
+            //view.get('SummonerSpells').update(button(undefined, !value))
         }),
         
         //Champions: button(() => { server.champions.uinput(opts).catch(() => { /* Ignore */ }) }),
@@ -66,7 +70,7 @@ export async function setup(game: LocalGame, server: LocalServer, opts: Required
         //SummonerSpells: button(() => { server.spells.uinput(opts).catch(() => { /* Ignore */ }) }, !game.features.isSpellsEnabled),
 
         ClientServerCombinationToUse: option(
-            combinations.map(({ client, server }, id) => ({ id, text: `${client.name} + ${server.name}` })),
+            combinations.map(({ client, server }, id) => ({ id, text: `${server.name} + ${client.name}` })),
             (index),
             (index) => {
                 combo = combinations[index]!
@@ -75,10 +79,9 @@ export async function setup(game: LocalGame, server: LocalServer, opts: Required
                 const isDefaultVersion =
                     game.serverVersion != KnownServers.Default ||
                     game.clientVersion != KnownClients.Default
-                const map = [...combo.maps.values()][0]!
-                const mode = [...map.modes.values()][0]!
-                game.map.value = map.i
-                game.mode.value = mode.i
+                
+                resetMapAndMode()
+
                 view.update(form({
                     GameMap: gameMap(),
                     GameMode: gameMode(),
@@ -87,14 +90,17 @@ export async function setup(game: LocalGame, server: LocalServer, opts: Required
             },
         ),
 
-        PlayAlone: button(() => { game.isPrivate = true; view.resolve() }),
-        PublishGame: button(() => { game.isPrivate = false; view.resolve() }),
+        PlayAlone: button(() => { game.isPrivate = true; view.resolve() }, false),
+        PublishGame: button(() => { game.isPrivate = false; view.resolve() }, false),
         Quit: button(() => view.reject(new AbortPromptError()))
     }), opts)
 
     await view.promise
 
-    server.saveSettings()
+    server.maps.value = [] //TODO: Deprecate.
+    server.modes.value = [] //TODO: Deprecate.
+    server.spells.value = combo.spells.keys().toArray()
+    server.champions.value = combo.champions.keys().toArray()
 
     if(!game.features.isSpellsEnabled)
         server.spells.value = []
