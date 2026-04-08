@@ -36,6 +36,8 @@ export abstract class PkgInfo {
     abstract topLevelEntriesOptional: string[]
     pathsToCheck?: string[]
     
+    zipRoot?: string[]
+    zipHasSingleRootEntry?: boolean
     zipWebSeeds?: string[]
     zipEmbded?: string
     zipMega?: string

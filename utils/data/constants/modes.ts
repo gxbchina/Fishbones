@@ -12,6 +12,8 @@ export const modes = [
     { i: 1, short: 'ARAM', name: tr('ARAM') },
     { i: 2, short: 'ODIN', name: tr('ODIN') },
     { i: 3, short: 'TUTORIAL', name: tr('Tutorial') },
+    { i: 4, short: 'FIRSTBLOOD', name: tr('First Blood') },
+    { i: 5, short: 'ASCENSION', name: tr('Ascension') },
 ]
 export class GameMode extends PickableValue {
     public static readonly name = tr('Game Mode')

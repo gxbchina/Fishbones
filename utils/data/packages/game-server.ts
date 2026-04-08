@@ -131,7 +131,7 @@ export const gsPkg = new class extends PkgInfoCSProj implements PkgInfoGit {
     }
 }
 
-export class ServerDataInfoV126 implements ServerDataInfo {
+export class BrokenWingsDataInfo implements ServerDataInfo {
 
     constructor(
         public dir: string

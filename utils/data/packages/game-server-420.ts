@@ -5,10 +5,13 @@ import { gdrive, magnet, PkgInfoCSProj } from './shared'
 import { tr } from '../../translation'
 import { sdkPkg } from './sdk'
 import { HARDCODED_HTTP_SERVER_URL } from '../../constants-build'
+import type { ServerDataInfo } from '../constants/client-server-combinations'
 
 export const gs420Pkg = new class extends PkgInfoCSProj {
     name = tr('Game Server')
-    dirName = 'GameServer'
+    dirName = 'Chronobreak-GameServer'
+    zipRoot = [ 'GameServer' ]
+    zipHasSingleRootEntry = true
     makeDir = false
     zipExt = '7z'
     zipName = `Chronobreak.GameServer.${this.zipExt}`
@@ -79,3 +82,139 @@ export const gs420Pkg = new class extends PkgInfoCSProj {
         'GameServer.sln.DotSettings',
     ]
 }
+
+export class ChronobreakDataInfo implements ServerDataInfo {
+
+    constructor(
+        public dir: string
+    ){}
+
+    maps = {
+        1 : { bots: [], modes: [ 'CLASSIC' ] },
+        4 : { bots: [], modes: [ 'CLASSIC' ] },
+        8 : { bots: [], modes: [ 'ODIN', /*'ASCENSION'*/ ] },
+        10: { bots: [], modes: [ 'CLASSIC' ] },
+        11: { bots: [], modes: [ 'CLASSIC' ] },
+        12: { bots: [], modes: [ 'ARAM', /*'TUTORIAL',*/ 'FIRSTBLOOD' ] },
+    }
+
+    spells = {
+        "SummonerBattleCry": {},
+        //"SummonerBattleCryBuff": {},
+        "SummonerBoost": {},
+        //"SummonerBoostSpellShield": {},
+        "SummonerClairvoyance": {},
+        "SummonerDot": {},
+        "SummonerExhaust": {},
+        "SummonerFlash": {},
+        "SummonerFortify": {},
+        "SummonerHaste": {},
+        "SummonerHeal": {},
+        //"SummonerHealCheck": {},
+        "SummonerMana": {},
+        //"SummonerOdinGarrison": {},
+        //"SummonerOdinGarrisonDebuff": {},
+        //"SummonerPromoteSR": {},
+        "SummonerRally": {},
+        "SummonerRevive": {},
+        //"SummonerReviveSpeedBoost": {},
+        "SummonerSmite": {},
+        "SummonerTeleport": {},
+        //"SummonerTestForceSpell": {},
+    }
+
+    champions = {
+        "Alistar": {},
+        "Annie": {},
+        "Ashe": {},
+        "FiddleSticks": {},
+        "Jax": {},
+        "Kayle": {},
+        "MasterYi": {},
+        "Morgana": {},
+        "Nunu": {},
+        "Ryze": {},
+        "Sion": {},
+        "Sivir": {},
+        "Soraka": {},
+        "Teemo": {},
+        "Tristana": {},
+        "TwistedFate": {},
+        "Warwick": {},
+        "Singed": {},
+        "Zilean": {},
+        "Evelynn": {},
+        "Tryndamere": {},
+        "Twitch": {},
+        "Karthus": {},
+        "Amumu": {},
+        "Chogath": {},
+        "Anivia": {},
+        "Rammus": {},
+        "Veigar": {},
+        "Kassadin": {},
+        "Gangplank": {},
+        "Taric": {},
+        "Blitzcrank": {},
+        "DrMundo": {},
+        "Janna": {},
+        "Malphite": {},
+        "Corki": {},
+        "Katarina": {},
+        "Nasus": {},
+        "Heimerdinger": {},
+        "Shaco": {},
+        "Udyr": {},
+        "Nidalee": {},
+        "Poppy": {},
+        "Gragas": {},
+        "Pantheon": {},
+        "Mordekaiser": {},
+        "Ezreal": {},
+        "Shen": {},
+        "Kennen": {},
+        "Garen": {},
+        "Akali": {},
+        "Malzahar": {},
+        "Olaf": {},
+        "KogMaw": {},
+        "XinZhao": {},
+        "Vladimir": {},
+        "Galio": {},
+        "Urgot": {},
+        "MissFortune": {},
+        "Sona": {},
+        "Swain": {},
+        "Lux": {},
+        "Leblanc": {},
+        "Irelia": {},
+        "Trundle": {},
+        "Cassiopeia": {},
+        "Caitlyn": {},
+        "Renekton": {},
+        "Karma": {},
+        "Maokai": {},
+        "JarvanIV": {},
+        "Nocturne": {},
+        "LeeSin": {},
+        "Brand": {},
+        "Rumble": {},
+        "Vayne": {},
+        "Orianna": {},
+        "Yorick": {},
+        "Leona": {},
+        "MonkeyKing": {},
+        "Skarner": {},
+        "Talon": {},
+        "Riven": {},
+        "Xerath": {},
+        "Graves": {},
+        "Shyvana": {},
+        "Fizz": {},
+        "Volibear": {},
+        "Ahri": {},
+        "Viktor": {},
+        "Sejuani": {},
+    }
+}
+

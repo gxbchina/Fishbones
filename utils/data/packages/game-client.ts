@@ -114,13 +114,16 @@ export class ClientDataInfoCommon {
         const info = this as unknown as ClientDataInfo
         for(const spell of Object.values(info.spells)){
             const spell_dir = path.join(this_dir, 'DATA', 'Spells', 'Icons2D')
-            spell.icon = path.join(spell_dir, ...spell.icon.split('/'))
+            if(!spell.icon.startsWith('res://'))
+                spell.icon = path.join(spell_dir, ...spell.icon.split('/'))
         }
         for(const [short, champion] of Object.entries(info.champions)){
             const champion_dir = path.join(this_dir, 'DATA', 'Characters', short)
-            champion.icon = path.join(champion_dir, ...champion.icon.split('/'))
+            if(!champion.icon.startsWith('res://'))
+                champion.icon = path.join(champion_dir, ...champion.icon.split('/'))
             for(const skin of Object.values(champion.skins)){
-                skin.image = path.join(champion_dir, ...skin.image.split('/'))
+                if(!skin.image.startsWith('res://'))
+                    skin.image = path.join(champion_dir, ...skin.image.split('/'))
             }
         }
     }

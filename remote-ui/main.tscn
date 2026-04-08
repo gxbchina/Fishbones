@@ -260,12 +260,11 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxEmpty_efxa6")
 tab_alignment = 1
-current_tab = 4
+current_tab = 0
 tabs_visible = false
 deselect_enabled = true
 
 [node name="#Loading" type="CenterContainer" parent="Container/TabContainer" unique_id=1229734443]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -379,10 +378,12 @@ text = "Force the use of English, ignoring the system settings"
 [node name="FoldableContainer" type="FoldableContainer" parent="Container/TabContainer/#Startup/VBoxContainer" unique_id=2113114891]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
+folded = true
 title = "Advanced Settings"
 title_position = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Container/TabContainer/#Startup/VBoxContainer/FoldableContainer" unique_id=1380492971]
+visible = false
 layout_mode = 2
 theme_override_constants/separation = 0
 
@@ -742,6 +743,7 @@ disabled = true
 text = "Connect"
 
 [node name="MarginContainer1" type="MarginContainer" parent="Container/TabContainer" unique_id=356379136]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 4
 
@@ -763,7 +765,6 @@ theme_override_constants/margin_bottom = 0
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxEmpty_efxa6")
 tab_alignment = 1
-current_tab = 1
 tabs_visible = false
 deselect_enabled = true
 
@@ -1144,48 +1145,49 @@ size_flags_stretch_ratio = 0.25
 text = "Host Game"
 
 [node name="#CustomGameSetup" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer" unique_id=962409957]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 8.0
 script = ExtResource("13_2cqfq")
 metadata/_tab_index = 1
 
-[node name="Control1" type="Control" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup" unique_id=758330078]
-custom_minimum_size = Vector2(0, 58)
-layout_mode = 2
-
-[node name="HBoxContainer1" type="HBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup" unique_id=64212092]
+[node name="CenterContainer" type="CenterContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup" unique_id=1467634943]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Control1" type="Control" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1" unique_id=1979699701]
+[node name="HBoxContainer1" type="HBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer" unique_id=64212092]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Control1" type="Control" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1" unique_id=1979699701]
 custom_minimum_size = Vector2(58, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1" unique_id=165053419]
+[node name="VBoxContainer" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1" unique_id=165053419]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 8.0
 theme_override_constants/separation = 16
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer" unique_id=497482237]
+[node name="HBoxContainer2" type="HBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer" unique_id=497482237]
 layout_mode = 2
 size_flags_stretch_ratio = 1.5
 theme_override_constants/separation = 16
 
-[node name="VBoxContainer1" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer2" unique_id=2125785347]
+[node name="VBoxContainer1" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer2" unique_id=2125785347]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.62
 
-[node name="Button1" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer1" unique_id=1504474550]
+[node name="Button1" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer1" unique_id=1504474550]
 layout_mode = 2
 mouse_filter = 2
 text = "Game Map"
 flat = true
 
-[node name="#GameMap" type="OptionButton" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer1" unique_id=1676175991]
+[node name="#GameMap" type="OptionButton" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer1" unique_id=1676175991]
 layout_mode = 2
 selected = 0
 fit_to_longest_item = false
@@ -1193,17 +1195,17 @@ item_count = 1
 popup/item_0/text = "Summoner's Rift"
 popup/item_0/id = 0
 
-[node name="ScrollContainer" type="ScrollContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer1" unique_id=1022945067]
+[node name="ScrollContainer" type="ScrollContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer1" unique_id=1022945067]
 visible = false
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="GameMap" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer1/ScrollContainer" unique_id=1918000468]
+[node name="GameMap" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer1/ScrollContainer" unique_id=1918000468]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("14_yaehf")
 
-[node name="Button1" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer1/ScrollContainer/GameMap" unique_id=758183760]
+[node name="Button1" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer1/ScrollContainer/GameMap" unique_id=758183760]
 custom_minimum_size = Vector2(0, 58)
 layout_mode = 2
 size_flags_vertical = 3
@@ -1211,18 +1213,18 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_dg77c")
 text = "Summoner's Rift"
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer2" unique_id=1649496241]
+[node name="VBoxContainer2" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer2" unique_id=1649496241]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.38
 
-[node name="Button1" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer2" unique_id=474558692]
+[node name="Button1" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer2" unique_id=474558692]
 layout_mode = 2
 mouse_filter = 2
 text = "Game Mode"
 flat = true
 
-[node name="#GameMode" type="OptionButton" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer2" unique_id=2068814440]
+[node name="#GameMode" type="OptionButton" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer2" unique_id=2068814440]
 layout_mode = 2
 selected = 0
 fit_to_longest_item = false
@@ -1230,31 +1232,31 @@ item_count = 1
 popup/item_0/text = "Classic"
 popup/item_0/id = 0
 
-[node name="GameMode" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer2" unique_id=1691866179]
+[node name="GameMode" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer2" unique_id=1691866179]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("14_yaehf")
 
-[node name="Button1" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer2/GameMode" unique_id=26501807]
+[node name="Button1" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer2/GameMode" unique_id=26501807]
 layout_mode = 2
 size_flags_vertical = 3
 toggle_mode = true
 button_group = SubResource("ButtonGroup_efxa6")
 text = "Classic"
 
-[node name="VBoxContainer3" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer2" unique_id=17535689]
+[node name="VBoxContainer3" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer2" unique_id=17535689]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.24
 
-[node name="Button1" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer3" unique_id=368568122]
+[node name="Button1" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer3" unique_id=368568122]
 layout_mode = 2
 mouse_filter = 2
 text = "Game Type"
 flat = true
 
-[node name="#GameType" type="OptionButton" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer3" unique_id=911818279]
+[node name="#GameType" type="OptionButton" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer3" unique_id=911818279]
 layout_mode = 2
 disabled = true
 selected = 0
@@ -1263,75 +1265,75 @@ item_count = 1
 popup/item_0/text = "Blind Pick"
 popup/item_0/id = 0
 
-[node name="GameType" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer3" unique_id=2115576319]
+[node name="GameType" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer3" unique_id=2115576319]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("14_yaehf")
 
-[node name="Button1" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer3/GameType" unique_id=1189123648]
+[node name="Button1" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer2/VBoxContainer3/GameType" unique_id=1189123648]
 layout_mode = 2
 size_flags_vertical = 3
 toggle_mode = true
 button_group = SubResource("ButtonGroup_ycdy4")
 text = "Blind Pick"
 
-[node name="Control" type="Control" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer2" unique_id=2073783372]
+[node name="Control" type="Control" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer2" unique_id=2073783372]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="HSeparator" type="HSeparator" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer" unique_id=1195087665]
+[node name="HSeparator" type="HSeparator" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer" unique_id=1195087665]
 visible = false
 layout_mode = 2
 
-[node name="HBoxContainer1" type="HBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer" unique_id=289861666]
+[node name="HBoxContainer1" type="HBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer" unique_id=289861666]
 layout_mode = 2
 size_flags_vertical = 0
 theme_override_constants/separation = 16
 
-[node name="Control1" type="Control" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1" unique_id=248169494]
+[node name="Control1" type="Control" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1" unique_id=248169494]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.25
 
-[node name="VBoxContainer1" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1" unique_id=1274686546]
+[node name="VBoxContainer1" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1" unique_id=1274686546]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 size_flags_stretch_ratio = 0.62
 theme_override_constants/separation = 16
 
-[node name="VBoxContainer1" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1" unique_id=217400991]
+[node name="VBoxContainer1" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1" unique_id=217400991]
 layout_mode = 2
 size_flags_vertical = 6
 
-[node name="Label" type="Label" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/VBoxContainer1" unique_id=110334863]
+[node name="Label" type="Label" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/VBoxContainer1" unique_id=110334863]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Game Name"
 
-[node name="#GameName" type="LineEdit" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/VBoxContainer1" unique_id=2030536611]
+[node name="#GameName" type="LineEdit" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/VBoxContainer1" unique_id=2030536611]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Game Name"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1" unique_id=2091262641]
+[node name="HBoxContainer" type="HBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1" unique_id=2091262641]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/HBoxContainer" unique_id=882004906]
+[node name="VBoxContainer2" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/HBoxContainer" unique_id=882004906]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 
-[node name="Label" type="Label" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/HBoxContainer/VBoxContainer2" unique_id=1172571121]
+[node name="Label" type="Label" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/HBoxContainer/VBoxContainer2" unique_id=1172571121]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Tick Rate"
 
-[node name="#TickRate" type="OptionButton" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/HBoxContainer/VBoxContainer2" unique_id=965307869]
+[node name="#TickRate" type="OptionButton" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/HBoxContainer/VBoxContainer2" unique_id=965307869]
 layout_mode = 2
 size_flags_horizontal = 3
 disabled = true
@@ -1346,21 +1348,21 @@ popup/item_2/id = 2
 popup/item_3/text = "120"
 popup/item_3/id = 3
 
-[node name="VSeparator" type="VSeparator" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/HBoxContainer" unique_id=86585646]
+[node name="VSeparator" type="VSeparator" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/HBoxContainer" unique_id=86585646]
 visible = false
 layout_mode = 2
 
-[node name="VBoxContainer3" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/HBoxContainer" unique_id=1116389199]
+[node name="VBoxContainer3" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/HBoxContainer" unique_id=1116389199]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 
-[node name="Label" type="Label" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/HBoxContainer/VBoxContainer3" unique_id=35226972]
+[node name="Label" type="Label" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/HBoxContainer/VBoxContainer3" unique_id=35226972]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Team Size"
 
-[node name="#TeamSize" type="OptionButton" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/HBoxContainer/VBoxContainer3" unique_id=1627658548]
+[node name="#TeamSize" type="OptionButton" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/HBoxContainer/VBoxContainer3" unique_id=1627658548]
 layout_mode = 2
 size_flags_horizontal = 3
 selected = 4
@@ -1378,133 +1380,133 @@ popup/item_4/id = 4
 popup/item_5/text = "6"
 popup/item_5/id = 5
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1" unique_id=324949050]
+[node name="VBoxContainer2" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1" unique_id=324949050]
 layout_mode = 2
 size_flags_vertical = 6
 
-[node name="Label" type="Label" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/VBoxContainer2" unique_id=309488179]
+[node name="Label" type="Label" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/VBoxContainer2" unique_id=309488179]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Password (Optional)"
 
-[node name="#Password" type="LineEdit" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/VBoxContainer2" unique_id=491353617]
+[node name="#Password" type="LineEdit" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer1/VBoxContainer2" unique_id=491353617]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "password"
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1" unique_id=1463321053]
+[node name="VBoxContainer2" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1" unique_id=1463321053]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 size_flags_stretch_ratio = 0.38
 theme_override_constants/separation = 16
 
-[node name="VBoxContainer3" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2" unique_id=1208606435]
+[node name="VBoxContainer3" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2" unique_id=1208606435]
 layout_mode = 2
 size_flags_vertical = 6
 
-[node name="MarginContainer" type="MarginContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer3" unique_id=247006069]
+[node name="MarginContainer" type="MarginContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer3" unique_id=247006069]
 layout_mode = 2
 theme_override_constants/margin_left = -4
 theme_override_constants/margin_top = -4
 theme_override_constants/margin_bottom = -4
 
-[node name="Label" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer3/MarginContainer" unique_id=1992737607]
+[node name="Label" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer3/MarginContainer" unique_id=1992737607]
 layout_mode = 2
 disabled = true
 button_pressed = true
 text = "Champions"
 
-[node name="#Champions" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer3" unique_id=10329385]
+[node name="#Champions" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer3" unique_id=10329385]
 layout_mode = 2
 size_flags_horizontal = 3
 disabled = true
 text = "Click to select"
 alignment = 0
 
-[node name="VBoxContainer4" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2" unique_id=1251235974]
+[node name="VBoxContainer4" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2" unique_id=1251235974]
 layout_mode = 2
 size_flags_vertical = 6
 
-[node name="MarginContainer" type="MarginContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer4" unique_id=804811269]
+[node name="MarginContainer" type="MarginContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer4" unique_id=804811269]
 layout_mode = 2
 theme_override_constants/margin_left = -4
 theme_override_constants/margin_top = -4
 theme_override_constants/margin_bottom = -4
 
-[node name="#Spells" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer4/MarginContainer" unique_id=745062714]
+[node name="#Spells" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer4/MarginContainer" unique_id=745062714]
 layout_mode = 2
 size_flags_horizontal = 3
 button_pressed = true
 text = "Summoner Spells"
 
-[node name="#SummonerSpells" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer4" unique_id=2142818061]
+[node name="#SummonerSpells" type="Button" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer2/VBoxContainer4" unique_id=2142818061]
 layout_mode = 2
 disabled = true
 text = "Click to select"
 alignment = 0
 
-[node name="VBoxContainer5" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1" unique_id=1838541518]
+[node name="VBoxContainer5" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1" unique_id=1838541518]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 size_flags_stretch_ratio = 0.24
 
-[node name="Label" type="Label" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer5" unique_id=994907488]
+[node name="Label" type="Label" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer5" unique_id=994907488]
 layout_mode = 2
 text = "Features"
 
-[node name="GridContainer" type="GridContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer5" unique_id=107875189]
+[node name="GridContainer" type="GridContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer5" unique_id=107875189]
 layout_mode = 2
 
-[node name="#Manacosts" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer5/GridContainer" unique_id=1898871958]
+[node name="#Manacosts" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer5/GridContainer" unique_id=1898871958]
 layout_mode = 2
 size_flags_horizontal = 3
 button_pressed = true
 text = "Manacosts"
 
-[node name="#Cooldowns" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer5/GridContainer" unique_id=1436876674]
+[node name="#Cooldowns" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer5/GridContainer" unique_id=1436876674]
 layout_mode = 2
 size_flags_horizontal = 3
 button_pressed = true
 text = "Cooldowns"
 
-[node name="#Minions" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer5/GridContainer" unique_id=1850791801]
+[node name="#Minions" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer5/GridContainer" unique_id=1850791801]
 layout_mode = 2
 size_flags_horizontal = 3
 button_pressed = true
 text = "Minions"
 
-[node name="#Cheats" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer5/GridContainer" unique_id=2023576828]
+[node name="#Cheats" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1/VBoxContainer5/GridContainer" unique_id=2023576828]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Cheats"
 
-[node name="Control2" type="Control" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/HBoxContainer1" unique_id=824753524]
+[node name="Control2" type="Control" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/HBoxContainer1" unique_id=824753524]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.25
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer" unique_id=499536181]
+[node name="VBoxContainer" type="VBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer" unique_id=499536181]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/VBoxContainer" unique_id=126306237]
+[node name="Label" type="Label" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/VBoxContainer" unique_id=126306237]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Experiments"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/VBoxContainer" unique_id=1118272239]
+[node name="HBoxContainer" type="HBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/VBoxContainer" unique_id=1118272239]
 layout_mode = 2
 
-[node name="CheckBox" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/VBoxContainer/HBoxContainer" unique_id=790355682]
+[node name="CheckBox" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/VBoxContainer/HBoxContainer" unique_id=790355682]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 disabled = true
 button_pressed = true
 text = "Select the [server + client] combination to use"
 
-[node name="#ClientServerCombinationToUse" type="OptionButton" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/VBoxContainer/HBoxContainer" unique_id=1447021121]
+[node name="#ClientServerCombinationToUse" type="OptionButton" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/VBoxContainer/HBoxContainer" unique_id=1447021121]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 selected = 0
@@ -1514,32 +1516,28 @@ popup/item_0/id = 0
 popup/item_1/text = "Chronobreak (Season 1) + v4.20 (Season 4)"
 popup/item_1/id = 1
 
-[node name="#HalfPing" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/VBoxContainer" unique_id=301106331]
+[node name="#HalfPing" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/VBoxContainer" unique_id=301106331]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
 text = "HALF-PING: Trying to lower the ping and equalize it for everyone. Causes desynchronization!"
 
-[node name="#Firewall" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/VBoxContainer" unique_id=1772083801]
+[node name="#Firewall" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/VBoxContainer" unique_id=1772083801]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
 text = "FIREWALL: Reduces the amount of transmitted traffic. Causes crash and wired behaviours!"
 
-[node name="#Bypass" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1/VBoxContainer/VBoxContainer" unique_id=508160027]
+[node name="#Bypass" type="CheckBox" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1/VBoxContainer/VBoxContainer" unique_id=508160027]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
 text = "BYPASS: Connect the client to the local server directly."
 
-[node name="Control2" type="Control" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/HBoxContainer1" unique_id=47378758]
+[node name="Control2" type="Control" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup/CenterContainer/HBoxContainer1" unique_id=47378758]
 custom_minimum_size = Vector2(58, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-
-[node name="Control2" type="Control" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup" unique_id=2077086528]
-custom_minimum_size = Vector2(0, 58)
-layout_mode = 2
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="Container/TabContainer/MarginContainer1/HBoxContainer1/PanelContainer/MarginContainer/TabContainer/#CustomGameSetup" unique_id=969390058]
 layout_mode = 2

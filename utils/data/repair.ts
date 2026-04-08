@@ -16,7 +16,6 @@ import { runPostInstall, update } from "./update"
 import { args } from "../args"
 import { checkForUpdates, fbPkg, isNewVersionAvailable, prev_fbPkg, repairSelfPackage } from "./upgrade"
 import { spawn } from "node:child_process"
-import * as maps from './constants/maps'
 import { tr } from "../translation"
 import { DeferredView, render } from "../../ui/remote/view"
 import { button, form, label } from "../../ui/remote/types"
@@ -24,8 +23,9 @@ import { VERSION } from "../constants-build"
 import type { StatsFs } from "node:fs"
 import { clients_push, combinations_merge, combinations_push, KnownClients, KnownServers, servers_push } from "./constants/client-server-combinations"
 import { ClientDataInfoV126 } from "./packages/game-client"
-import { ServerDataInfoV126 } from "./packages/game-server"
+import { BrokenWingsDataInfo } from "./packages/game-server"
 import { ClientDataInfoV420 } from "./packages/game-client-420"
+import { ChronobreakDataInfo } from "./packages/game-server-420"
 
 const DOTNET_INSTALL_CORRUPT_EXIT_CODES = [ 130, 131, 142, ]
 
@@ -317,6 +317,9 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
                 gs420ExeIsMissing = false
             }
             await fs_ensureDir(gs420Pkg.infoDir, opts)
+
+            const levelsDir = path.join(gs420Pkg.dir, ...'Content/GameClient/LEVELS'.split('/'))
+            await fs_moveFile(path.join(levelsDir, 'map11'), path.join(levelsDir, 'Map11'), opts)
         }),
 
         !(args.installS1Client.enabled) ? Promise.resolve() :
@@ -363,14 +366,14 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
 
     if(!gsExeIsMissing && !gcExeIsMissing){
         const client = clients_push(gcPkg, new ClientDataInfoV126(gcPkg.dir), KnownClients.v126, 'v1.0.0.126 (Season 1)')
-        const server = servers_push(gsPkg, new ServerDataInfoV126(gsPkg.dir), KnownServers.BrokenWings, tr('BrokenWings (Season 1)'))
+        const server = servers_push(gsPkg, new BrokenWingsDataInfo(gsPkg.dir), KnownServers.BrokenWings, tr('BrokenWings (Season 1)'))
         combinations_push(client, server)
         if(!modFileIsMissing)
             Object.assign(client.maps, modPck1.maps)
     }
     if(!gs420ExeIsMissing && !gc420ExeIsMissing){
         const client = clients_push(gc420Pkg, new ClientDataInfoV420(gc420Pkg.dir), KnownClients.v420, 'v4.20 (Season 4)')
-        const server = servers_push(gs420Pkg, new ServerDataInfoV126(gs420Pkg.dir), KnownServers.ChronoBreak, tr('Chronobreak (Season 1)'))
+        const server = servers_push(gs420Pkg, new ChronobreakDataInfo(gs420Pkg.dir), KnownServers.ChronoBreak, tr('Chronobreak (Season 1)'))
         combinations_push(client, server)
     }
    combinations_merge()
