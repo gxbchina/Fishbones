@@ -319,13 +319,16 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
             await fs_ensureDir(gs420Pkg.infoDir, opts)
 
             const levelsDir = path.join(gs420Pkg.dir, ...'Content/GameClient/LEVELS'.split('/'))
-            await fs_moveFile(path.join(levelsDir, 'map11'), path.join(levelsDir, 'Map11'), opts)
+            await fs_moveFile(path.join(levelsDir, 'map11'), path.join(levelsDir, 'Map11'), opts, false)
         }),
 
         !(args.installS1Client.enabled) ? Promise.resolve() :
         Promise.allSettled([
             
             repairArchived(gcPkg, opts).then(async () => {
+
+                gcExeIsMissing = false
+
                 //await fs_ensureDir(gcPkg.exeDir, opts)
                 const d3dx9_39_dll_name = 'd3dx9_39.dll'
                 const d3dx9_39_dll_src = path.join(downloads, d3dx9_39_dll_name)
@@ -360,7 +363,9 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
         }),
 
         !(args.installS4Client.enabled) ? Promise.resolve() :
-        repairArchived(gc420Pkg, opts),
+        repairArchived(gc420Pkg, opts).then(() => {
+            gc420ExeIsMissing = false
+        }),
     ])
     throwAnyRejection(results)
 
@@ -376,7 +381,7 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
         const server = servers_push(gs420Pkg, new ChronobreakDataInfo(gs420Pkg.dir), KnownServers.ChronoBreak, tr('Chronobreak (Season 1)'))
         combinations_push(client, server)
     }
-   combinations_merge()
+    combinations_merge()
 
     //TODO: await fs.cp(gsPkg.gcDir, gcPkg.exeDir, { recursive: true })
 
@@ -631,6 +636,7 @@ export async function repairArchived(pkg: PkgInfo, opts: Required<AbortOptions> 
 
     if(!opts.doNotUnpack){
         await unpack(pkg, opts)
+        //TODO: Re-download.
     }
 }
 

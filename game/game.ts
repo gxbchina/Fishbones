@@ -82,8 +82,8 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
     public readonly commit = new HexStringValue()
 
     public isPrivate: boolean = false
-    public serverVersion: ServerVersion = KnownServers.Default
-    public clientVersion: ClientVersion = KnownClients.Default
+    public serverVersion: ServerVersion = KnownServers.Unknown
+    public clientVersion: ClientVersion = KnownClients.Unknown
 
     protected player?: GamePlayer
     public getPlayer(id?: PlayerId){

@@ -6,21 +6,25 @@ import { render } from "../ui/remote/view";
 import { Features, PlayerCount, TickRate } from "../utils/constants";
 import { button, checkbox, form, inq2gd, line, option } from "../ui/remote/types";
 import { AbortPromptError } from "@inquirer/core";
-import { combinations, combinations_findIndex as combinations_findIndex, KnownClients, KnownServers } from "../utils/data/constants/client-server-combinations";
+import { combinations, combinations_findIndex as combinations_findIndex, KnownClients, KnownServers, type Combination } from "../utils/data/constants/client-server-combinations";
 
 export async function setup(game: LocalGame, server: LocalServer, opts: Required<AbortOptions>){
     
     game.features.set(Features.SPELLS_DISABLED, isSpellCrashDetected())
 
-    let index = combinations_findIndex(game.clientVersion, game.serverVersion)
-    let combo = combinations[index]!
+    let index = 0
+    let combo: Combination = undefined!
 
-    resetMapAndMode()
-    function resetMapAndMode(){
+    setCombo(index)
+    function setCombo(index: number){
+        combo = combinations[index]!
         const map = [...combo.maps.values()][0]!
         const mode = [...map.modes.values()][0]!
         game.map.value = map.i
         game.mode.value = mode.i
+        game.serverVersion = combo.server.version
+        game.clientVersion = combo.client.version
+        return combo
     }
 
     const gameMap = (cb?: (index: number) => void) => {
@@ -70,18 +74,15 @@ export async function setup(game: LocalGame, server: LocalServer, opts: Required
         //SummonerSpells: button(() => { server.spells.uinput(opts).catch(() => { /* Ignore */ }) }, !game.features.isSpellsEnabled),
 
         ClientServerCombinationToUse: option(
-            combinations.map(({ client, server }, id) => ({ id, text: `${server.name} + ${client.name}` })),
+            combinations
+                .filter(({ server }) => server.version != KnownServers.Unknown)
+                .map(({ client, server }, id) => ({ id, text: `${server.name} + ${client.name}` })),
             (index),
             (index) => {
-                combo = combinations[index]!
-                game.serverVersion = combo.server.version
-                game.clientVersion = combo.client.version
+                setCombo(index)
                 const isDefaultVersion =
                     game.serverVersion != KnownServers.Default ||
                     game.clientVersion != KnownClients.Default
-                
-                resetMapAndMode()
-
                 view.update(form({
                     GameMap: gameMap(),
                     GameMode: gameMode(),

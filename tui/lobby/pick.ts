@@ -2,16 +2,20 @@ import type { GamePlayer } from "../../game/game-player";
 import { PLAYERS, BOTS, Team, type Context, players } from "./lobby";
 import { button, form, icon, label, list, texture, type Button, type Form } from "../../ui/remote/types";
 import { render } from "../../ui/remote/view";
-import { combinations_find } from "../../utils/data/constants/client-server-combinations";
+import { combinations_find, KnownServers } from "../../utils/data/constants/client-server-combinations";
 import { getBotName, getName } from "../../utils/namegen/namegen";
 import { option_pages } from "../masteries";
 import { page, pages } from "../masteries/pages";
 import type { Game } from "../../game/game";
 import { SwitchViewError } from "../tui";
+import { LocalGame } from "../../game/game-local";
 
 function makePlayerForm(player: GamePlayer, game: Game): Form {
     
-    const { champions, spells } = combinations_find(game.clientVersion, game.serverVersion)!
+    //const localGame = game instanceof LocalGame ? game : undefined!
+    //const game_serverVersion = localGame?.serverVersion ?? KnownServers.Unknown
+    const game_serverVersion = KnownServers.Unknown
+    const { champions, spells } = combinations_find(game.clientVersion, game_serverVersion)!
 
     const championInfo = (player.champion.value !== undefined) ? champions.get(player.champion.value) : undefined
     const championIcon = championInfo?.icon ?? ''
@@ -40,8 +44,10 @@ function makePlayerForm(player: GamePlayer, game: Game): Form {
 
 export async function lobby_pick(ctx: Context){
     const { game } = ctx
-
-    const { champions, spells } = combinations_find(game.clientVersion, game.serverVersion)!
+    //const localGame = game instanceof LocalGame ? game : undefined!
+    //const game_serverVersion = localGame?.serverVersion ?? KnownServers.Unknown
+    const game_serverVersion = KnownServers.Unknown
+    const { champions, spells } = combinations_find(game.clientVersion, game_serverVersion)!
 
     const championsItems = Object.fromEntries(
         champions.values()

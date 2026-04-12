@@ -4,7 +4,7 @@ import { SwitchViewError } from "../tui";
 import { BOTS, players, PLAYERS, Team, type Context } from "./lobby";
 import { bar, button, checkbox, form, icon, inq2gd, label, option, type Form } from "../../ui/remote/types";
 import { render } from "../../ui/remote/view";
-import { combinations_find } from "../../utils/data/constants/client-server-combinations";
+import { combinations_find, KnownServers } from "../../utils/data/constants/client-server-combinations";
 import { AIChampion, AIDifficulty } from "../../utils/data/constants/champions";
 import { getName } from "../../utils/namegen/namegen";
 import { popup } from "../../ui/remote/remote";
@@ -19,9 +19,10 @@ const GATHERING_TIMEOUT_TICK = 1*s
 //export async function lobby(game: Game, opts: Required<AbortOptions>){}
 export async function lobby_gather(ctx: Context){
     const { game } = ctx
+    
     const localGame = game instanceof LocalGame ? game : undefined!
-
-    const combo = combinations_find(game.clientVersion, game.serverVersion)!
+    const game_serverVersion = localGame?.serverVersion ?? KnownServers.Unknown
+    const combo = combinations_find(game.clientVersion, game_serverVersion)!
     const mapInfo = combo.maps.get(game.map.value!)!
     const mapInfo_bots = [...mapInfo.bots.keys()]
 

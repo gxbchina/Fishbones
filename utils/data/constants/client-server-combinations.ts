@@ -3,6 +3,7 @@ import { modes, type ModeInfo } from "./modes"
 import { champions } from "./champions"
 import { spells } from "./spells"
 import { maps } from "./maps"
+import { tr } from "../../translation"
 
 export type ClientVersion = number & { readonly brand: unique symbol }
 const V126 = versionFromString('1.0.0.126')
@@ -22,14 +23,15 @@ export const KnownServers = {
     Default: 1 as ServerVersion,
 }
 
-interface Combination {
+export interface Combination {
     client: ClientInfo
     server: ServerInfo
     maps: Map<number, MapInfo>
     spells: Map<number, SpellInfo>
     champions: Map<number, ChampionInfo>
 }
-interface ClientInfo extends ClientExeInfo, ClientDataInfo {
+interface ClientInfo extends ClientVersionInfo, ClientExeInfo, ClientDataInfo {}
+interface ClientVersionInfo {
     name: string
     version: ClientVersion
 }
@@ -45,7 +47,8 @@ export interface ClientDataInfo {
         skins: Record<number, { image: string }>
     }>
 }
-interface ServerInfo extends ServerExeInfo, ServerDataInfo {
+interface ServerInfo extends ServerVersionInfo, ServerExeInfo, ServerDataInfo {}
+interface ServerVersionInfo {
     name: string
     version: ServerVersion
 }
@@ -133,6 +136,27 @@ export function combinations_find(client: ClientVersion, server: ServerVersion){
 }
 
 export function combinations_merge(){
+
+    //HACK:
+    const superServer: ServerInfo = {
+        name: tr("Unknown"),
+        version: KnownServers.Unknown,
+        infoDir: "",
+        dllDir: "",
+        dll: "",
+        maps: Object.fromEntries(maps.map(map => {
+            const info = {
+                modes: modes.map(mode => mode.short),
+                bots: champions.map(champ => champ.short),
+            }
+            return [ map.id, info ]
+        })),
+        spells: Object.fromEntries(spells.map(spell => [ spell.short, {} ])),
+        champions: Object.fromEntries(champions.map(champ => [ champ.short, {} ])),
+    }
+    for(const client of Object.values(clients))
+        combinations_push(client, superServer)
+
     for(const combo of combinations){
         const { client, server } = combo
 
@@ -181,7 +205,7 @@ export function combinations_merge(){
         combo.maps = new Map(
             Object.entries(server.maps)
             .filter(([ k, v ]) => k in client.maps)
-            .map(([ k, v ]) => {
+            .map(([ k, server_map ]) => {
                 const map = maps.find(map => map.id == Number(k))!
                 const champions = [...combo.champions.values()]
                 const r = {
@@ -189,14 +213,15 @@ export function combinations_merge(){
                     id: map.id,
                     name: map.name,
                     modes: new Map(
-                        v.modes
+                        server_map.modes
                         .map(short => {
                             const r = modes.find(mode => mode.short == short)!
                             return [ r.i, r ]
                         })
                     ),
                     bots: new Map(
-                        v.bots
+                        server_map.bots
+                        .filter(short => short in client.champions)
                         .map(short => {
                             const r = champions.find(champ => champ.short == short)!
                             return [ r.i, r ]
