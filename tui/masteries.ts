@@ -1,16 +1,13 @@
 import type { AbortOptions } from "@libp2p/interface";
 import { DeferredView, render, View } from "../ui/remote/view";
-import { button, form, label, line, list, MouseButton, option, type Form } from "../ui/remote/types";
+import { base, button, form, label, line, list, MouseButton, option, type Form } from "../ui/remote/types";
 import type { RuntimeMasteryInfo, RuntimePageInfo, RuntimeTreeInfo } from "./masteries/types";
 import { MAX_POINTS, page, get_rank, set_rank, pages, set_page, get_tree_points, set_tree_points, save } from "./masteries/pages";
 import { COLS, ROWS, byId, byPos } from "./masteries/trees";
 import { shutdownOptions } from "../utils/process/process";
 
 const emptyCell = form({
-    Inner: {
-        $type: 'base',
-        visible: false,  
-    },
+    Inner: base(false),
 })
 
 function cell_label(info: RuntimeMasteryInfo){
@@ -40,14 +37,8 @@ function tree(tree: RuntimeTreeInfo){
     const entries = tree.grid.map(info => {
         if(!info) return [ `${i++}_empty`, emptyCell ]
         const cell = form({
-            Inner: {
-                $type: 'base',
-                visible: true,  
-            },
-            Handle: {
-                $type: 'base',
-                visible: info.childInfo ? true : undefined,
-            },
+            Inner: base(true),
+            Handle: base(info.childInfo ? true : undefined),
             Icon: {
                 $type: 'button',
                 icon: cell_icon(info),

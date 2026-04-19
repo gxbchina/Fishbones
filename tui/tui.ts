@@ -15,7 +15,7 @@ import * as masteries from './masteries'
 import { chat } from './chat'
 import { tr } from '../utils/translation'
 import { render } from '../ui/remote/view'
-import { button, form } from '../ui/remote/types'
+import { base, button, form } from '../ui/remote/types'
 
 export async function main(node: LibP2PNode, opts: Required<AbortOptions>){
     process.title = TITLE
@@ -130,7 +130,7 @@ async function lobby_crash_report(ctx: Context){
     while(true){
         type Action = ['show_cmd'] | ['relaunch'] | ['exit']
         const view = render<Action>('BugSplat', form({
-            Warning: { $type: 'base', visible: isSpellCrash },
+            Warning: base(isSpellCrash),
             ShowCMD: button(() => view.resolve(['show_cmd']), isSpellCrash),
             Restart: button(() => view.resolve(['relaunch']), isSpellCrash),
             Leave: button(() => view.resolve(['exit'])),

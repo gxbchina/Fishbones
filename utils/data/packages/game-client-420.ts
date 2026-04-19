@@ -119,10 +119,12 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         "SummonerTeleport": { icon: "Summoner_teleport.dds" },
     }
 
+    embeddedChampionIcons = "res://images/champion-icons-120x120.png"
+
     champions = {
         "Aatrox": {
             //icon: "HUD/Aatrox_Square.dds",
-            icon: "res://images/champion-icons-v420.png:0",
+            icon: `${this.embeddedChampionIcons}:0`,
             skins: {
                 0: { image: "Skins/Base/AatroxLoadScreen.dds" },
                 1: { image: "Skins/Skin01/AatroxLoadScreen_1.dds" },
@@ -131,7 +133,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Ahri": {
             //icon: "HUD/Ahri_Square.dds",
-            icon: "res://images/champion-icons-v420.png:1",
+            icon: `${this.embeddedChampionIcons}:1`,
             skins: {
                 0: { image: "Skins/Base/AhriLoadScreen.dds" },
                 1: { image: "Skins/Skin01/AhriLoadScreen_1.dds" },
@@ -142,7 +144,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Akali": {
             //icon: "Info/Akali_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:2",
+            icon: `${this.embeddedChampionIcons}:2`,
             skins: {
                 0: { image: "AkaliLoadScreen.dds" },
                 1: { image: "AkaliLoadScreen_1.DDS" },
@@ -155,7 +157,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Alistar": {
             //icon: "HUD/Minotaur_Square.dds",
-            icon: "res://images/champion-icons-v420.png:3",
+            icon: `${this.embeddedChampionIcons}:3`,
             skins: {
                 0: { image: "Skins/Base/AlistarLoadScreen.dds" },
                 1: { image: "Skins/Skin01/AlistarLoadScreen_1.dds" },
@@ -169,7 +171,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Amumu": {
             //icon: "Info/Amumu_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:4",
+            icon: `${this.embeddedChampionIcons}:4`,
             skins: {
                 0: { image: "AmumuLoadScreen.dds" },
                 1: { image: "AmumuLoadScreen_1.DDS" },
@@ -183,7 +185,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Anivia": {
             //icon: "Info/Cryophoenix_Square.dds",
-            icon: "res://images/champion-icons-v420.png:5",
+            icon: `${this.embeddedChampionIcons}:5`,
             skins: {
                 0: { image: "AniviaLoadScreen.dds" },
                 1: { image: "AniviaLoadScreen_1.DDS" },
@@ -195,7 +197,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Annie": {
             //icon: "HUD/Annie_Square.dds",
-            icon: "res://images/champion-icons-v420.png:6",
+            icon: `${this.embeddedChampionIcons}:6`,
             skins: {
                 0: { image: "Skins/Base/AnnieLoadScreen.dds" },
                 1: { image: "Skins/Skin01/AnnieLoadScreen_1.DDS" },
@@ -210,7 +212,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Ashe": {
             //icon: "HUD/Ashe_Square.dds",
-            icon: "res://images/champion-icons-v420.png:7",
+            icon: `${this.embeddedChampionIcons}:7`,
             skins: {
                 0: { image: "Skins/Base/AsheLoadScreen.dds" },
                 1: { image: "Skins/Skin01/AsheLoadScreen_1.dds" },
@@ -223,7 +225,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Azir": {
             //icon: "HUD/Azir_Square.dds",
-            icon: "res://images/champion-icons-v420.png:8",
+            icon: `${this.embeddedChampionIcons}:8`,
             skins: {
                 0: { image: "Skins/Base/AzirLoadScreen.dds" },
                 1: { image: "Skins/Skin01/AzirLoadScreen_1.dds" },
@@ -231,7 +233,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Blitzcrank": {
             //icon: "Info/Steamgolem_Square.dds",
-            icon: "res://images/champion-icons-v420.png:9",
+            icon: `${this.embeddedChampionIcons}:9`,
             skins: {
                 0: { image: "BlitzcrankLoadScreen.dds" },
                 1: { image: "BlitzcrankLoadScreen_1.DDS" },
@@ -245,7 +247,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Brand": {
             //icon: "info/Brand_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:10",
+            icon: `${this.embeddedChampionIcons}:10`,
             skins: {
                 0: { image: "BrandLoadScreen.dds" },
                 1: { image: "BrandLoadScreen_1.dds" },
@@ -256,7 +258,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Braum": {
             //icon: "HUD/Braum_Square.dds",
-            icon: "res://images/champion-icons-v420.png:11",
+            icon: `${this.embeddedChampionIcons}:11`,
             skins: {
                 0: { image: "Skins/Base/BraumLoadScreen.dds" },
                 1: { image: "Skins/Skin01/BraumLoadScreen_1.dds" },
@@ -264,7 +266,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Caitlyn": {
             //icon: "HUD/Caitlyn_Square.dds",
-            icon: "res://images/champion-icons-v420.png:12",
+            icon: `${this.embeddedChampionIcons}:12`,
             skins: {
                 0: { image: "Skins/Base/CaitlynLoadScreen.dds" },
                 1: { image: "Skins/Skin01/CaitlynLoadScreen_1.dds" },
@@ -277,7 +279,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Cassiopeia": {
             //icon: "HUD/Cassiopeia_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:13",
+            icon: `${this.embeddedChampionIcons}:13`,
             skins: {
                 0: { image: "Skins/Base/CassiopeiaLoadScreen.dds" },
                 1: { image: "Skins/Skin01/CassiopeiaLoadScreen_1.dds" },
@@ -288,7 +290,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Chogath": {
             //icon: "Info/GreenTerror_Square.dds",
-            icon: "res://images/champion-icons-v420.png:14",
+            icon: `${this.embeddedChampionIcons}:14`,
             skins: {
                 0: { image: "ChogathLoadScreen.dds" },
                 1: { image: "ChogathLoadScreen_1.DDS" },
@@ -300,7 +302,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Corki": {
             //icon: "Info/Corki_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:15",
+            icon: `${this.embeddedChampionIcons}:15`,
             skins: {
                 0: { image: "CorkiLoadScreen.dds" },
                 1: { image: "CorkiLoadScreen_1.DDS" },
@@ -314,7 +316,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Darius": {
             //icon: "HUD/Darius_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:16",
+            icon: `${this.embeddedChampionIcons}:16`,
             skins: {
                 0: { image: "Skins/Base/DariusLoadScreen.dds" },
                 1: { image: "Skins/Skin01/DariusLoadScreen_1.dds" },
@@ -325,7 +327,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Diana": {
             //icon: "HUD/Diana_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:17",
+            icon: `${this.embeddedChampionIcons}:17`,
             skins: {
                 0: { image: "Skins/Base/DianaLoadScreen.dds" },
                 1: { image: "Skins/Skin01/DianaLoadScreen_1.dds" },
@@ -334,7 +336,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Draven": {
             //icon: "HUD/Draven_Square.dds",
-            icon: "res://images/champion-icons-v420.png:18",
+            icon: `${this.embeddedChampionIcons}:18`,
             skins: {
                 0: { image: "Skins/Base/DravenLoadScreen.dds" },
                 1: { image: "Skins/Skin01/DravenLoadScreen_1.dds" },
@@ -344,7 +346,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "DrMundo": {
             //icon: "Info/DrMundo_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:19",
+            icon: `${this.embeddedChampionIcons}:19`,
             skins: {
                 0: { image: "DrMundoLoadScreen.dds" },
                 1: { image: "DrMundoLoadScreen_1.dds" },
@@ -358,7 +360,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Elise": {
             //icon: "HUD/Elise_Square.dds",
-            icon: "res://images/champion-icons-v420.png:20",
+            icon: `${this.embeddedChampionIcons}:20`,
             skins: {
                 0: { image: "Skins/Base/EliseLoadScreen.dds" },
                 1: { image: "EliseLoadScreen_1.dds" },
@@ -367,7 +369,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Evelynn": {
             //icon: "Info/Evelynn_Square.dds",
-            icon: "res://images/champion-icons-v420.png:21",
+            icon: `${this.embeddedChampionIcons}:21`,
             skins: {
                 0: { image: "evelynnLoadScreen.dds" },
                 1: { image: "evelynnLoadScreen_1.DDS" },
@@ -378,7 +380,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Ezreal": {
             //icon: "Info/Ezreal_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:22",
+            icon: `${this.embeddedChampionIcons}:22`,
             skins: {
                 0: { image: "EzrealLoadScreen.dds" },
                 1: { image: "EzrealLoadScreen_1.DDS" },
@@ -392,7 +394,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "FiddleSticks": {
             //icon: "info/Fiddlesticks_Square.dds",
-            icon: "res://images/champion-icons-v420.png:23",
+            icon: `${this.embeddedChampionIcons}:23`,
             skins: {
                 0: { image: "fiddlesticksLoadScreen.dds" },
                 1: { image: "fiddlesticksLoadScreen_1.DDS" },
@@ -406,7 +408,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Fiora": {
             //icon: "Info/Fiora_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:24",
+            icon: `${this.embeddedChampionIcons}:24`,
             skins: {
                 0: { image: "FioraLoadScreen.dds" },
                 1: { image: "FioraLoadScreen_1.dds" },
@@ -416,7 +418,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Fizz": {
             //icon: "Info/Fizz_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:25",
+            icon: `${this.embeddedChampionIcons}:25`,
             skins: {
                 0: { image: "FizzLoadScreen.dds" },
                 1: { image: "FizzLoadScreen_1.dds" },
@@ -427,7 +429,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Galio": {
             //icon: "info/Galio_Square.dds",
-            icon: "res://images/champion-icons-v420.png:26",
+            icon: `${this.embeddedChampionIcons}:26`,
             skins: {
                 0: { image: "GalioLoadScreen.dds" },
                 1: { image: "GalioLoadScreen_1.dds" },
@@ -438,7 +440,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Gangplank": {
             //icon: "HUD/Pirate_Square.dds",
-            icon: "res://images/champion-icons-v420.png:27",
+            icon: `${this.embeddedChampionIcons}:27`,
             skins: {
                 0: { image: "Skins/Base/GangplankLoadScreen.dds" },
                 1: { image: "Skins/Skin01/GangplankLoadScreen_1.dds" },
@@ -451,7 +453,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Garen": {
             //icon: "HUD/Garen_Square.dds",
-            icon: "res://images/champion-icons-v420.png:28",
+            icon: `${this.embeddedChampionIcons}:28`,
             skins: {
                 0: { image: "Skins/Base/GarenLoadScreen.dds" },
                 1: { image: "Skins/Skin01/GarenLoadScreen_1.dds" },
@@ -464,7 +466,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Gnar": {
             //icon: "HUD/Gnar_Square.dds",
-            icon: "res://images/champion-icons-v420.png:29",
+            icon: `${this.embeddedChampionIcons}:29`,
             skins: {
                 0: { image: "Skins/Base/GnarLoadScreen.dds" },
                 1: { image: "Skins/Skin01/GnarLoadScreen_1.dds" },
@@ -472,7 +474,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Gragas": {
             //icon: "HUD/Gragas_Square.dds",
-            icon: "res://images/champion-icons-v420.png:30",
+            icon: `${this.embeddedChampionIcons}:30`,
             skins: {
                 0: { image: "Skins/Base/GragasLoadScreen.dds" },
                 1: { image: "Skins/Skin01/GragasLoadScreen_1.DDS" },
@@ -487,7 +489,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Graves": {
             //icon: "Info/Graves_Square.dds",
-            icon: "res://images/champion-icons-v420.png:31",
+            icon: `${this.embeddedChampionIcons}:31`,
             skins: {
                 0: { image: "GravesLoadScreen.dds" },
                 1: { image: "GravesLoadScreen_1.dds" },
@@ -499,7 +501,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Hecarim": {
             //icon: "Info/Hecarim_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:32",
+            icon: `${this.embeddedChampionIcons}:32`,
             skins: {
                 0: { image: "HecarimLoadScreen.dds" },
                 1: { image: "HecarimLoadScreen_1.dds" },
@@ -511,7 +513,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Heimerdinger": {
             //icon: "HUD/Heimerdinger_Square.dds",
-            icon: "res://images/champion-icons-v420.png:33",
+            icon: `${this.embeddedChampionIcons}:33`,
             skins: {
                 0: { image: "Skins/Base/HeimerdingerLoadScreen.dds" },
                 1: { image: "Skins/Skin01/HeimerdingerLoadScreen_1.dds" },
@@ -523,7 +525,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Irelia": {
             //icon: "Info/Irelia_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:34",
+            icon: `${this.embeddedChampionIcons}:34`,
             skins: {
                 0: { image: "IreliaLoadScreen.dds" },
                 1: { image: "IreliaLoadScreen_1.dds" },
@@ -534,7 +536,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Janna": {
             //icon: "HUD/Janna_Square.dds",
-            icon: "res://images/champion-icons-v420.png:35",
+            icon: `${this.embeddedChampionIcons}:35`,
             skins: {
                 0: { image: "Skins/Base/JannaLoadScreen.dds" },
                 1: { image: "Skins/Skin01/JannaLoadScreen_1.dds" },
@@ -547,7 +549,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "JarvanIV": {
             //icon: "Info/JarvanIV_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:36",
+            icon: `${this.embeddedChampionIcons}:36`,
             skins: {
                 0: { image: "JarvanIVLoadScreen.dds" },
                 1: { image: "JarvanIVLoadScreen_1.dds" },
@@ -560,7 +562,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Jax": {
             //icon: "info/Jax_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:37",
+            icon: `${this.embeddedChampionIcons}:37`,
             skins: {
                 0: { image: "JaxLoadScreen.dds" },
                 1: { image: "JaxLoadScreen_1.DDS" },
@@ -575,7 +577,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Jayce": {
             //icon: "HUD/Jayce_Square.dds",
-            icon: "res://images/champion-icons-v420.png:38",
+            icon: `${this.embeddedChampionIcons}:38`,
             skins: {
                 0: { image: "Skins/Base/JayceLoadScreen.dds" },
                 1: { image: "Skins/Skin01/JayceLoadScreen_1.dds" },
@@ -584,7 +586,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Jinx": {
             //icon: "HUD/Jinx_Square.dds",
-            icon: "res://images/champion-icons-v420.png:39",
+            icon: `${this.embeddedChampionIcons}:39`,
             skins: {
                 0: { image: "Skins/Base/JinxLoadScreen.dds" },
                 1: { image: "Skins/Skin01/JinxLoadScreen_1.dds" },
@@ -592,7 +594,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Kalista": {
             //icon: "HUD/Kalista_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:40",
+            icon: `${this.embeddedChampionIcons}:40`,
             skins: {
                 0: { image: "Skins/Base/KalistaLoadScreen.dds" },
                 1: { image: "Skins/Skin01/KalistaLoadScreen_1.dds" },
@@ -600,7 +602,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Karma": {
             //icon: "HUD/Karma_Square.dds",
-            icon: "res://images/champion-icons-v420.png:41",
+            icon: `${this.embeddedChampionIcons}:41`,
             skins: {
                 0: { image: "Skins/Base/KarmaLoadScreen.dds" },
                 1: { image: "Skins/Skin01/KarmaLoadScreen_1.dds" },
@@ -611,7 +613,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Karthus": {
             //icon: "HUD/Karthus_Square.dds",
-            icon: "res://images/champion-icons-v420.png:42",
+            icon: `${this.embeddedChampionIcons}:42`,
             skins: {
                 0: { image: "KarthusLoadScreen.dds" },
                 1: { image: "Skins/Skin01/KarthusLoadScreen_1.dds" },
@@ -623,7 +625,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Kassadin": {
             //icon: "Info/Kassadin_Square.dds",
-            icon: "res://images/champion-icons-v420.png:43",
+            icon: `${this.embeddedChampionIcons}:43`,
             skins: {
                 0: { image: "KassadinLoadScreen.dds" },
                 1: { image: "KassadinLoadScreen_1.DDS" },
@@ -634,7 +636,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Katarina": {
             //icon: "Info/Katarina_Square.dds",
-            icon: "res://images/champion-icons-v420.png:44",
+            icon: `${this.embeddedChampionIcons}:44`,
             skins: {
                 0: { image: "KatarinaLoadScreen.dds" },
                 1: { image: "KatarinaLoadScreen_1.DDS" },
@@ -648,7 +650,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Kayle": {
             //icon: "HUD/Kayle_Square.dds",
-            icon: "res://images/champion-icons-v420.png:45",
+            icon: `${this.embeddedChampionIcons}:45`,
             skins: {
                 0: { image: "KayleLoadScreen.dds" },
                 1: { image: "KayleLoadScreen_1.DDS" },
@@ -662,7 +664,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Kennen": {
             //icon: "Info/Kennen_Square.dds",
-            icon: "res://images/champion-icons-v420.png:46",
+            icon: `${this.embeddedChampionIcons}:46`,
             skins: {
                 0: { image: "KennenLoadScreen.dds" },
                 1: { image: "KennenLoadScreen_1.DDS" },
@@ -674,7 +676,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Khazix": {
             //icon: "HUD/Khazix_Square.dds",
-            icon: "res://images/champion-icons-v420.png:47",
+            icon: `${this.embeddedChampionIcons}:47`,
             skins: {
                 0: { image: "Skins/Base/KhazixLoadScreen.dds" },
                 1: { image: "Skins/Skin01/KhazixLoadScreen_1.dds" },
@@ -683,7 +685,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "KogMaw": {
             //icon: "HUD/Kog'Maw_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:48",
+            icon: `${this.embeddedChampionIcons}:48`,
             skins: {
                 0: { image: "Skins/Base/KogmawLoadScreen.dds" },
                 1: { image: "Skins/Skin01/KogmawLoadScreen_1.dds" },
@@ -698,7 +700,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Leblanc": {
             //icon: "HUD/Leblanc_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:49",
+            icon: `${this.embeddedChampionIcons}:49`,
             skins: {
                 0: { image: "Skins/Base/LeblancLoadScreen.dds" },
                 1: { image: "Skins/Skin01/LeblancLoadScreen_1.dds" },
@@ -709,7 +711,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "LeeSin": {
             //icon: "HUD/LeeSin_Square.dds",
-            icon: "res://images/champion-icons-v420.png:50",
+            icon: `${this.embeddedChampionIcons}:50`,
             skins: {
                 0: { image: "Skins/Base/LeeSinLoadScreen.dds" },
                 1: { image: "Skins/Skin01/LeeSinLoadScreen_1.dds" },
@@ -722,7 +724,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Leona": {
             //icon: "Info/Leona_Square.dds",
-            icon: "res://images/champion-icons-v420.png:51",
+            icon: `${this.embeddedChampionIcons}:51`,
             skins: {
                 0: { image: "LeonaLoadScreen.dds" },
                 1: { image: "LeonaLoadScreen_1.dds" },
@@ -733,7 +735,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Lissandra": {
             //icon: "HUD/Lissandra_Square.dds",
-            icon: "res://images/champion-icons-v420.png:52",
+            icon: `${this.embeddedChampionIcons}:52`,
             skins: {
                 0: { image: "Skins/Base/LissandraLoadScreen.dds" },
                 1: { image: "Skins/skin01/LissandraLoadScreen_1.dds" },
@@ -742,7 +744,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Lucian": {
             //icon: "HUD/Lucian_Square.dds",
-            icon: "res://images/champion-icons-v420.png:53",
+            icon: `${this.embeddedChampionIcons}:53`,
             skins: {
                 0: { image: "Skins/Base/LucianLoadScreen.dds" },
                 1: { image: "Skins/Skin01/LucianLoadScreen_1.dds" },
@@ -751,7 +753,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Lulu": {
             //icon: "Info/Lulu_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:54",
+            icon: `${this.embeddedChampionIcons}:54`,
             skins: {
                 0: { image: "LuluLoadScreen.dds" },
                 1: { image: "LuluLoadScreen_1.dds" },
@@ -762,7 +764,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Lux": {
             //icon: "Info/Lux_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:55",
+            icon: `${this.embeddedChampionIcons}:55`,
             skins: {
                 0: { image: "LuxLoadScreen.dds" },
                 1: { image: "LuxLoadScreen_1.dds" },
@@ -774,7 +776,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Malphite": {
             //icon: "info/Malphite_Square.dds",
-            icon: "res://images/champion-icons-v420.png:56",
+            icon: `${this.embeddedChampionIcons}:56`,
             skins: {
                 0: { image: "MalphiteLoadScreen.dds" },
                 1: { image: "MalphiteLoadScreen_1.DDS" },
@@ -787,7 +789,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Malzahar": {
             //icon: "info/Malzahar_Square.dds",
-            icon: "res://images/champion-icons-v420.png:57",
+            icon: `${this.embeddedChampionIcons}:57`,
             skins: {
                 1: { image: "MalzaharLoadScreen_1.dds" },
                 2: { image: "MalzaharLoadScreen_2.dds" },
@@ -797,7 +799,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Maokai": {
             //icon: "HUD/Maokai_Square.dds",
-            icon: "res://images/champion-icons-v420.png:58",
+            icon: `${this.embeddedChampionIcons}:58`,
             skins: {
                 0: { image: "Skins/Base/MaokaiLoadScreen.dds" },
                 1: { image: "Skins/Skin01/MaokaiLoadScreen_1.dds" },
@@ -809,7 +811,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "MasterYi": {
             //icon: "HUD/MasterYi_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:59",
+            icon: `${this.embeddedChampionIcons}:59`,
             skins: {
                 0: { image: "Skins/Base/MasterYiLoadScreen.dds" },
                 1: { image: "Skins/Skin01/MasterYiLoadScreen_1.dds" },
@@ -821,7 +823,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "MissFortune": {
             //icon: "HUD/MissFortune_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:60",
+            icon: `${this.embeddedChampionIcons}:60`,
             skins: {
                 0: { image: "Skins/Base/MissFortuneLoadScreen.dds" },
                 1: { image: "Skins/Skin01/MissFortuneLoadScreen_1.dds" },
@@ -835,7 +837,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "MonkeyKing": {
             //icon: "Info/MonkeyKing_Square.dds",
-            icon: "res://images/champion-icons-v420.png:61",
+            icon: `${this.embeddedChampionIcons}:61`,
             skins: {
                 0: { image: "MonkeyKingLoadScreen.dds" },
                 1: { image: "MonkeyKingLoadScreen_1.dds" },
@@ -846,7 +848,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Mordekaiser": {
             //icon: "Info/Mordekaiser_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:62",
+            icon: `${this.embeddedChampionIcons}:62`,
             skins: {
                 0: { image: "MordekaiserLoadScreen.dds" },
                 1: { image: "MordekaiserLoadScreen_1.DDS" },
@@ -858,7 +860,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Morgana": {
             //icon: "Info/Morgana_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:63",
+            icon: `${this.embeddedChampionIcons}:63`,
             skins: {
                 0: { image: "MorganaLoadScreen.dds" },
                 1: { image: "MorganaLoadScreen_1.dds" },
@@ -871,7 +873,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Nami": {
             //icon: "HUD/Nami_Square.dds",
-            icon: "res://images/champion-icons-v420.png:64",
+            icon: `${this.embeddedChampionIcons}:64`,
             skins: {
                 0: { image: "skins/base/NamiLoadScreen.dds" },
                 1: { image: "skins/skin01/NamiLoadScreen_1.dds" },
@@ -880,7 +882,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Nasus": {
             //icon: "HUD/Nasus_Square.dds",
-            icon: "res://images/champion-icons-v420.png:65",
+            icon: `${this.embeddedChampionIcons}:65`,
             skins: {
                 0: { image: "Skins/Base/NasusLoadScreen.dds" },
                 1: { image: "Skins/Skin01/NasusLoadScreen_1.dds" },
@@ -892,7 +894,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Nautilus": {
             //icon: "info/Nautilus_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:66",
+            icon: `${this.embeddedChampionIcons}:66`,
             skins: {
                 0: { image: "NautilusLoadScreen.dds" },
                 1: { image: "NautilusLoadScreen_1.dds" },
@@ -902,7 +904,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Nidalee": {
             //icon: "HUD/Nidalee_Square.dds",
-            icon: "res://images/champion-icons-v420.png:67",
+            icon: `${this.embeddedChampionIcons}:67`,
             skins: {
                 0: { image: "Skins/Base/nidaleeLoadScreen.dds" },
                 1: { image: "Skins/Skin01/nidaleeLoadScreen_1.dds" },
@@ -915,7 +917,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Nocturne": {
             //icon: "Info/Nocturne_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:68",
+            icon: `${this.embeddedChampionIcons}:68`,
             skins: {
                 0: { image: "NocturneLoadScreen.dds" },
                 1: { image: "NocturneLoadScreen_1.dds" },
@@ -927,7 +929,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Nunu": {
             //icon: "Info/Yeti_Square.dds",
-            icon: "res://images/champion-icons-v420.png:69",
+            icon: `${this.embeddedChampionIcons}:69`,
             skins: {
                 0: { image: "NunuLoadScreen.dds" },
                 1: { image: "NunuLoadScreen_1.DDS" },
@@ -940,7 +942,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Olaf": {
             //icon: "HUD/Olaf_Square.dds",
-            icon: "res://images/champion-icons-v420.png:70",
+            icon: `${this.embeddedChampionIcons}:70`,
             skins: {
                 0: { image: "Skins/Base/OlafLoadScreen.dds" },
                 1: { image: "Skins/Skin01/OlafLoadScreen_1.dds" },
@@ -951,7 +953,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Orianna": {
             //icon: "Info/Oriana_Square.dds",
-            icon: "res://images/champion-icons-v420.png:71",
+            icon: `${this.embeddedChampionIcons}:71`,
             skins: {
                 3: { image: "OriannaLoadScreen_3.dds" },
                 4: { image: "OriannaLoadScreen_4.dds" },
@@ -959,7 +961,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Pantheon": {
             //icon: "Info/Pantheon_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:72",
+            icon: `${this.embeddedChampionIcons}:72`,
             skins: {
                 0: { image: "PantheonLoadScreen.dds" },
                 1: { image: "PantheonLoadScreen_1.DDS" },
@@ -972,7 +974,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Poppy": {
             //icon: "HUD/Poppy_Square.dds",
-            icon: "res://images/champion-icons-v420.png:73",
+            icon: `${this.embeddedChampionIcons}:73`,
             skins: {
                 0: { image: "Skins/Base/PoppyLoadScreen.dds" },
                 1: { image: "Skins/Skin01/PoppyLoadScreen_1.dds" },
@@ -985,7 +987,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Quinn": {
             //icon: "HUD/Quinn_Square.dds",
-            icon: "res://images/champion-icons-v420.png:74",
+            icon: `${this.embeddedChampionIcons}:74`,
             skins: {
                 0: { image: "Skins/Base/QuinnLoadScreen.dds" },
                 1: { image: "Skins/Skin01/QuinnLoadScreen_1.dds" },
@@ -994,7 +996,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Rammus": {
             //icon: "Info/Armordillo_Square.dds",
-            icon: "res://images/champion-icons-v420.png:75",
+            icon: `${this.embeddedChampionIcons}:75`,
             skins: {
                 0: { image: "RammusLoadScreen.dds" },
                 1: { image: "RammusLoadScreen_1.DDS" },
@@ -1007,7 +1009,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Renekton": {
             //icon: "HUD/Renekton_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:76",
+            icon: `${this.embeddedChampionIcons}:76`,
             skins: {
                 0: { image: "Skins/Base/RenektonLoadScreen.dds" },
                 1: { image: "Skins/Skin01/RenektonLoadScreen_1.dds" },
@@ -1020,7 +1022,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Rengar": {
             //icon: "HUD/Rengar_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:77",
+            icon: `${this.embeddedChampionIcons}:77`,
             skins: {
                 0: { image: "Skins/Base/RengarLoadScreen.dds" },
                 1: { image: "Skins/Skin01/RengarLoadScreen_1.dds" },
@@ -1029,7 +1031,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Riven": {
             //icon: "HUD/Riven_Square.dds",
-            icon: "res://images/champion-icons-v420.png:78",
+            icon: `${this.embeddedChampionIcons}:78`,
             skins: {
                 0: { image: "Skins/Base/RivenLoadScreen.dds" },
                 1: { image: "Skins/skin01/RivenLoadScreen_1.dds" },
@@ -1041,7 +1043,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Rumble": {
             //icon: "HUD/Rumble_Square.dds",
-            icon: "res://images/champion-icons-v420.png:79",
+            icon: `${this.embeddedChampionIcons}:79`,
             skins: {
                 0: { image: "Skins/Base/RumbleLoadScreen.dds" },
                 1: { image: "Skins/Skin01/RumbleLoadScreen_1.dds" },
@@ -1051,7 +1053,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Ryze": {
             //icon: "HUD/Ryze_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:80",
+            icon: `${this.embeddedChampionIcons}:80`,
             skins: {
                 0: { image: "Skins/Base/RyzeLoadScreen.dds" },
                 1: { image: "Skins/Skin01/RyzeLoadScreen_1.dds" },
@@ -1066,7 +1068,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Sejuani": {
             //icon: "HUD/Sejuani_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:81",
+            icon: `${this.embeddedChampionIcons}:81`,
             skins: {
                 0: { image: "Skins/Base/SejuaniLoadScreen.dds" },
                 1: { image: "Skins/Skin01/SejuaniLoadScreen_1.dds" },
@@ -1077,7 +1079,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Shaco": {
             //icon: "HUD/Shaco_Square.dds",
-            icon: "res://images/champion-icons-v420.png:82",
+            icon: `${this.embeddedChampionIcons}:82`,
             skins: {
                 0: { image: "Skins/Base/ShacoLoadScreen.dds" },
                 1: { image: "Skins/Skin01/ShacoLoadScreen_1.dds" },
@@ -1090,7 +1092,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Shen": {
             //icon: "info/Shen_Square.dds",
-            icon: "res://images/champion-icons-v420.png:83",
+            icon: `${this.embeddedChampionIcons}:83`,
             skins: {
                 0: { image: "ShenLoadScreen.dds" },
                 1: { image: "ShenLoadScreen_1.DDS" },
@@ -1103,7 +1105,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Shyvana": {
             //icon: "Info/Shyvana_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:84",
+            icon: `${this.embeddedChampionIcons}:84`,
             skins: {
                 0: { image: "ShyvanaLoadScreen.dds" },
                 3: { image: "ShyvanaLoadScreen_3.dds" },
@@ -1113,7 +1115,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Singed": {
             //icon: "Info/Singed_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:85",
+            icon: `${this.embeddedChampionIcons}:85`,
             skins: {
                 0: { image: "SingedLoadScreen.dds" },
                 1: { image: "SingedLoadScreen_1.dds" },
@@ -1126,7 +1128,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Sion": {
             //icon: "HUD/Sion_Square.dds",
-            icon: "res://images/champion-icons-v420.png:86",
+            icon: `${this.embeddedChampionIcons}:86`,
             skins: {
                 0: { image: "Skins/Base/SionLoadScreen.dds" },
                 1: { image: "Skins/Skin01/SionLoadScreen_1.dds" },
@@ -1137,7 +1139,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Sivir": {
             //icon: "HUD/Sivir_Square.dds",
-            icon: "res://images/champion-icons-v420.png:87",
+            icon: `${this.embeddedChampionIcons}:87`,
             skins: {
                 0: { image: "Skins/Base/SivirLoadScreen.dds" },
                 1: { image: "Skins/Skin01/SivirLoadScreen_1.dds" },
@@ -1150,7 +1152,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Skarner": {
             //icon: "HUD/Skarner_Square.dds",
-            icon: "res://images/champion-icons-v420.png:88",
+            icon: `${this.embeddedChampionIcons}:88`,
             skins: {
                 0: { image: "Skins/Base/SkarnerLoadScreen.dds" },
                 1: { image: "Skins/Skin01/SkarnerLoadScreen_1.dds" },
@@ -1160,7 +1162,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Sona": {
             //icon: "HUD/Sona_Square.dds",
-            icon: "res://images/champion-icons-v420.png:89",
+            icon: `${this.embeddedChampionIcons}:89`,
             skins: {
                 0: { image: "Skins/Base/SonaLoadScreen.dds" },
                 1: { image: "Skins/Skin01/SonaLoadScreen_1.dds" },
@@ -1172,7 +1174,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Soraka": {
             //icon: "HUD/Soraka_Square.dds",
-            icon: "res://images/champion-icons-v420.png:90",
+            icon: `${this.embeddedChampionIcons}:90`,
             skins: {
                 0: { image: "Skins/Base/SorakaLoadScreen.dds" },
                 1: { image: "Skins/Skin01/SorakaLoadScreen_1.dds" },
@@ -1183,7 +1185,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Swain": {
             //icon: "Info/Swain_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:91",
+            icon: `${this.embeddedChampionIcons}:91`,
             skins: {
                 0: { image: "SwainLoadScreen.dds" },
                 1: { image: "SwainLoadScreen_1.DDS" },
@@ -1193,7 +1195,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Syndra": {
             //icon: "info/Syndra_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:92",
+            icon: `${this.embeddedChampionIcons}:92`,
             skins: {
                 0: { image: "SyndraLoadScreen.dds" },
                 1: { image: "SyndraLoadScreen_1.dds" },
@@ -1202,7 +1204,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Talon": {
             //icon: "Info/Talon_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:93",
+            icon: `${this.embeddedChampionIcons}:93`,
             skins: {
                 0: { image: "TalonLoadScreen.dds" },
                 1: { image: "TalonLoadScreen_1.dds" },
@@ -1212,7 +1214,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Taric": {
             //icon: "Info/GemKnight_Square.dds",
-            icon: "res://images/champion-icons-v420.png:94",
+            icon: `${this.embeddedChampionIcons}:94`,
             skins: {
                 0: { image: "TaricLoadScreen.dds" },
                 1: { image: "TaricLoadScreen_1.DDS" },
@@ -1222,7 +1224,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Teemo": {
             //icon: "Info/Teemo_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:95",
+            icon: `${this.embeddedChampionIcons}:95`,
             skins: {
                 0: { image: "teemoLoadScreen.dds" },
                 1: { image: "teemoLoadScreen_1.DDS" },
@@ -1236,7 +1238,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Thresh": {
             //icon: "HUD/Thresh_Square.dds",
-            icon: "res://images/champion-icons-v420.png:96",
+            icon: `${this.embeddedChampionIcons}:96`,
             skins: {
                 0: { image: "Skins/Base/ThreshLoadScreen.dds" },
                 1: { image: "Skins/Skin01/ThreshLoadScreen_1.dds" },
@@ -1245,7 +1247,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Tristana": {
             //icon: "HUD/Tristana_Square.dds",
-            icon: "res://images/champion-icons-v420.png:97",
+            icon: `${this.embeddedChampionIcons}:97`,
             skins: {
                 0: { image: "Skins/Base/TristanaLoadScreen.dds" },
                 1: { image: "Skins/Skin01/TristanaLoadScreen_1.dds" },
@@ -1258,7 +1260,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Trundle": {
             //icon: "HUD/Trundle_Square.dds",
-            icon: "res://images/champion-icons-v420.png:98",
+            icon: `${this.embeddedChampionIcons}:98`,
             skins: {
                 0: { image: "Skins/Base/TrundleLoadScreen.dds" },
                 1: { image: "Skins/Skin01/TrundleLoadScreen_1.dds" },
@@ -1269,7 +1271,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Tryndamere": {
             //icon: "HUD/Tryndamere_Square.dds",
-            icon: "res://images/champion-icons-v420.png:99",
+            icon: `${this.embeddedChampionIcons}:99`,
             skins: {
                 0: { image: "Skins/Base/TryndamereLoadScreen.dds" },
                 1: { image: "Skins/Skin01/TryndamereLoadScreen_1.dds" },
@@ -1282,7 +1284,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "TwistedFate": {
             //icon: "Info/TwistedFate_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:100",
+            icon: `${this.embeddedChampionIcons}:100`,
             skins: {
                 0: { image: "TwistedFateLoadScreen.dds" },
                 1: { image: "TwistedFateLoadScreen_1.DDS" },
@@ -1297,7 +1299,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Twitch": {
             //icon: "HUD/Twitch_Square.dds",
-            icon: "res://images/champion-icons-v420.png:101",
+            icon: `${this.embeddedChampionIcons}:101`,
             skins: {
                 0: { image: "Skins/Base/TwitchLoadScreen.dds" },
                 1: { image: "Skins/Skin01/TwitchLoadScreen_1.dds" },
@@ -1310,7 +1312,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Udyr": {
             //icon: "HUD/Udyr_Square.dds",
-            icon: "res://images/champion-icons-v420.png:102",
+            icon: `${this.embeddedChampionIcons}:102`,
             skins: {
                 0: { image: "Skins/Base/UdyrLoadScreen.dds" },
                 1: { image: "Skins/skin01/UdyrLoadScreen_1.dds" },
@@ -1320,7 +1322,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Urgot": {
             //icon: "HUD/Urgot_Square.dds",
-            icon: "res://images/champion-icons-v420.png:103",
+            icon: `${this.embeddedChampionIcons}:103`,
             skins: {
                 0: { image: "Skins/Base/UrgotLoadScreen.dds" },
                 1: { image: "Skins/Skin01/UrgotLoadScreen_1.dds" },
@@ -1330,7 +1332,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Varus": {
             //icon: "Info/Varus_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:104",
+            icon: `${this.embeddedChampionIcons}:104`,
             skins: {
                 0: { image: "VarusLoadScreen.dds" },
                 1: { image: "VarusLoadScreen_1.dds" },
@@ -1340,7 +1342,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Vayne": {
             //icon: "Info/Vayne_Square.dds",
-            icon: "res://images/champion-icons-v420.png:105",
+            icon: `${this.embeddedChampionIcons}:105`,
             skins: {
                 0: { image: "VayneLoadScreen.dds" },
                 1: { image: "VayneLoadScreen_1.dds" },
@@ -1352,7 +1354,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Veigar": {
             //icon: "HUD/Veigar_Square.dds",
-            icon: "res://images/champion-icons-v420.png:106",
+            icon: `${this.embeddedChampionIcons}:106`,
             skins: {
                 0: { image: "Skins/Base/VeigarLoadScreen.dds" },
                 1: { image: "Skins/Skin01/VeigarLoadScreen_1.dds" },
@@ -1367,7 +1369,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Velkoz": {
             //icon: "HUD/Velkoz_Square.dds",
-            icon: "res://images/champion-icons-v420.png:107",
+            icon: `${this.embeddedChampionIcons}:107`,
             skins: {
                 0: { image: "Skins/Base/VelkozLoadScreen.dds" },
                 1: { image: "Skins/Skin01/VelkozLoadScreen_1.dds" },
@@ -1375,7 +1377,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Vi": {
             //icon: "HUD/Vi_Square.dds",
-            icon: "res://images/champion-icons-v420.png:108",
+            icon: `${this.embeddedChampionIcons}:108`,
             skins: {
                 0: { image: "Skins/Base/ViLoadScreen.dds" },
                 1: { image: "Skins/Skin01/ViLoadScreen_1.dds" },
@@ -1385,7 +1387,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Viktor": {
             //icon: "HUD/Viktor_Square.dds",
-            icon: "res://images/champion-icons-v420.png:109",
+            icon: `${this.embeddedChampionIcons}:109`,
             skins: {
                 0: { image: "Skins/Base/ViktorLoadScreen.dds" },
                 1: { image: "Skins/Skin01/ViktorLoadScreen_1.dds" },
@@ -1395,7 +1397,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Vladimir": {
             //icon: "Info/Vladimir_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:110",
+            icon: `${this.embeddedChampionIcons}:110`,
             skins: {
                 0: { image: "VladimirLoadScreen.dds" },
                 1: { image: "VladimirLoadScreen_1.dds" },
@@ -1408,7 +1410,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Volibear": {
             //icon: "Info/Volibear_Square.dds",
-            icon: "res://images/champion-icons-v420.png:111",
+            icon: `${this.embeddedChampionIcons}:111`,
             skins: {
                 0: { image: "VolibearLoadScreen.dds" },
                 1: { image: "VolibearLoadScreen_1.dds" },
@@ -1419,7 +1421,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Warwick": {
             //icon: "Info/Warwick_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:112",
+            icon: `${this.embeddedChampionIcons}:112`,
             skins: {
                 0: { image: "WarwickLoadScreen.dds" },
                 1: { image: "WarwickLoadScreen_1.DDS" },
@@ -1433,7 +1435,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Xerath": {
             //icon: "HUD/Xerath_Square.dds",
-            icon: "res://images/champion-icons-v420.png:113",
+            icon: `${this.embeddedChampionIcons}:113`,
             skins: {
                 0: { image: "Skins/Base/XerathLoadScreen.dds" },
                 1: { image: "Skins/Skin01/XerathLoadScreen_1.dds" },
@@ -1443,7 +1445,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "XinZhao": {
             //icon: "Info/XinZhao_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:114",
+            icon: `${this.embeddedChampionIcons}:114`,
             skins: {
                 0: { image: "XinZhaoLoadScreen.dds" },
                 1: { image: "XinZhaoLoadScreen_1.dds" },
@@ -1455,7 +1457,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Yasuo": {
             //icon: "HUD/Yasuo_Square.dds",
-            icon: "res://images/champion-icons-v420.png:115",
+            icon: `${this.embeddedChampionIcons}:115`,
             skins: {
                 0: { image: "Skins/Base/YasuoLoadScreen.dds" },
                 1: { image: "Skins/Skin01/YasuoLoadScreen_1.dds" },
@@ -1464,7 +1466,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Yorick": {
             //icon: "Info/Yorick_Square.dds",
-            icon: "res://images/champion-icons-v420.png:116",
+            icon: `${this.embeddedChampionIcons}:116`,
             skins: {
                 0: { image: "YorickLoadScreen.dds" },
                 1: { image: "YorickLoadScreen_1.dds" },
@@ -1473,7 +1475,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Zac": {
             //icon: "HUD/Zac_Square.dds",
-            icon: "res://images/champion-icons-v420.png:117",
+            icon: `${this.embeddedChampionIcons}:117`,
             skins: {
                 0: { image: "Skins/Base/ZacLoadScreen.dds" },
                 1: { image: "Skins/Skin01/ZacLoadScreen_1.dds" },
@@ -1481,7 +1483,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Zed": {
             //icon: "HUD/Zed_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:118",
+            icon: `${this.embeddedChampionIcons}:118`,
             skins: {
                 0: { image: "ZedLoadScreen.dds" },
                 1: { image: "ZedLoadScreen_1.dds" },
@@ -1490,7 +1492,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Ziggs": {
             //icon: "Info/Ziggs_Square.dds",
-            icon: "res://images/champion-icons-v420.png:119",
+            icon: `${this.embeddedChampionIcons}:119`,
             skins: {
                 0: { image: "ZiggsLoadScreen.dds" },
                 1: { image: "ZiggsLoadScreen_1.dds" },
@@ -1501,7 +1503,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Zilean": {
             //icon: "Info/Chronokeeper_Square.dds",
-            icon: "res://images/champion-icons-v420.png:120",
+            icon: `${this.embeddedChampionIcons}:120`,
             skins: {
                 0: { image: "ZileanLoadScreen.dds" },
                 1: { image: "ZileanLoadScreen_1.dds" },
@@ -1512,7 +1514,7 @@ export class ClientDataInfoV420 extends ClientDataInfoCommon implements ClientDa
         },
         "Zyra": {
             //icon: "Info/Zyra_Square_0.dds",
-            icon: "res://images/champion-icons-v420.png:121",
+            icon: `${this.embeddedChampionIcons}:121`,
             skins: {
                 0: { image: "ZyraLoadScreen.dds" },
                 1: { image: "ZyraLoadScreen_1.dds" },

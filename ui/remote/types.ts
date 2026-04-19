@@ -112,6 +112,7 @@ export const inq2gd = (choices: { value: number, name: string }[], enabled?: num
         .map(({ value: id, name: text }) => ({ id, text }))
 }
 
+export const base = (visible?: boolean) => ({ $type: 'base' as const, visible })
 export const form = (fields?: Record<string, Config>, props?: Omit<Tabs, '$type' | 'fields'>) => ({ $type: 'form' as const, fields })
 export const list = (items?: Record<string, Config>, placeholderText?: string) => ({ $type: 'list' as const, items, placeholderText })
 export const label = (text?: string) => ({ $type: 'label' as const, text })

@@ -98,6 +98,8 @@ export class ChronobreakDataInfo implements ServerDataInfo {
         12: { bots: [], modes: [ 'ARAM', /*'TUTORIAL',*/ 'FIRSTBLOOD' ] },
     }
 
+    bots = []
+
     spells = {
         "SummonerBattleCry": {},
         //"SummonerBattleCryBuff": {},

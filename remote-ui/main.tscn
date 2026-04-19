@@ -189,18 +189,17 @@ select = ExtResource("5_w48qg")
 checkbox = ExtResource("6_vivmo")
 input = ExtResource("7_2cqfq")
 embedded_js = "res://embedded/index-0.0.3.40.js"
-embedded_exe = "res://embedded/bun-1.3.10-windows-x64-baseline.exe"
-embedded_lib_0 = "res://embedded/node_datachannel-8fg8wz1b.node"
-embedded_file_0 = "res://embedded/7za-2501-windows-x64.exe"
+embedded_exe = "res://embedded/bun-1.3.10-linux-x64-baseline.exe"
+embedded_lib_0 = "res://embedded/node_datachannel-bfgv6pn8.node"
+embedded_file_0 = "res://embedded/7zzs-2501-linux-x64.exe"
 embedded_file_1 = "res://embedded/ChildrenOfTheGrave-Gameserver.7z.torrent"
 embedded_file_2 = "res://embedded/Chronobreak.GameServer.7z.torrent"
 embedded_file_3 = "res://embedded/League of Legends_UNPACKED.7z.torrent"
-embedded_file_4 = "res://embedded/PortableGit-2.52.0-64-bit.7z.exe.torrent"
-embedded_file_5 = "res://embedded/aria2c-1.37.0-win-64bit-build1.exe"
-embedded_file_6 = "res://embedded/d3dx9_39.dll"
-embedded_file_7 = "res://embedded/dotnet-sdk-10.0.103-win-x64.zip.torrent"
-embedded_file_8 = "res://embedded/modded_levels_paste_on_client.7z.torrent"
-embedded_file_9 = "res://embedded/playable_client_126.7z.torrent"
+embedded_file_4 = "res://embedded/aria2c-1.36.0-linux-x64.exe"
+embedded_file_5 = "res://embedded/d3dx9_39.dll"
+embedded_file_6 = "res://embedded/dotnet-sdk-10.0.103-linux-x64.tar.gz.torrent"
+embedded_file_7 = "res://embedded/modded_levels_paste_on_client.7z.torrent"
+embedded_file_8 = "res://embedded/playable_client_126.7z.torrent"
 container = NodePath("MariginContainer")
 bars_container = NodePath("Container/TabContainer/#Install/VBoxContainer/BarsContainer")
 show_console_toggle = NodePath("VBoxContainer/ShowConsoleToggle")
@@ -2381,13 +2380,21 @@ visible = false
 custom_minimum_size = Vector2(0, 31)
 layout_mode = 2
 
-[node name="#TabContainer" type="TabContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2" unique_id=1294879941]
+[node name="MarginContainer" type="MarginContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2" unique_id=833503347]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="#TabContainer" type="TabContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/MarginContainer" unique_id=1294879941]
 layout_mode = 2
 size_flags_vertical = 3
 current_tab = 0
 script = ExtResource("13_2cqfq")
 
-[node name="Champions" type="MarginContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/#TabContainer" unique_id=367384194]
+[node name="Champions" type="MarginContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/MarginContainer/#TabContainer" unique_id=367384194]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_left = 0
@@ -2396,18 +2403,18 @@ theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 metadata/_tab_index = 0
 
-[node name="ScrollContainer" type="ScrollContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/#TabContainer/Champions" unique_id=1660303746]
+[node name="ScrollContainer" type="ScrollContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/MarginContainer/#TabContainer/Champions" unique_id=1660303746]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 4
 
-[node name="MarginContainer" type="MarginContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/#TabContainer/Champions/ScrollContainer" unique_id=683812306]
+[node name="MarginContainer" type="MarginContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/MarginContainer/#TabContainer/Champions/ScrollContainer" unique_id=683812306]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="#Champions" type="HFlowContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/#TabContainer/Champions/ScrollContainer/MarginContainer" unique_id=1779779558]
+[node name="#Champions" type="HFlowContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/MarginContainer/#TabContainer/Champions/ScrollContainer/MarginContainer" unique_id=1779779558]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -2417,7 +2424,7 @@ alignment = 1
 last_wrap_alignment = 1
 script = ExtResource("14_yaehf")
 
-[node name="Button1" type="Button" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/#TabContainer/Champions/ScrollContainer/MarginContainer/#Champions" unique_id=1710385780]
+[node name="Button1" type="Button" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/MarginContainer/#TabContainer/Champions/ScrollContainer/MarginContainer/#Champions" unique_id=1710385780]
 custom_minimum_size = Vector2(60, 60)
 layout_mode = 2
 theme = SubResource("Theme_dg77c")
@@ -2428,12 +2435,12 @@ autowrap_trim_flags = 192
 icon_alignment = 1
 expand_icon = true
 
-[node name="#ChampionsDisabled" type="ColorRect" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/#TabContainer/Champions" unique_id=2077166236]
+[node name="#ChampionsDisabled" type="ColorRect" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/MarginContainer/#TabContainer/Champions" unique_id=2077166236]
 visible = false
 layout_mode = 2
 color = Color(0.3491902, 0.3491902, 0.3491902, 0.3)
 
-[node name="Skins" type="MarginContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/#TabContainer" unique_id=1480133539]
+[node name="Skins" type="MarginContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/MarginContainer/#TabContainer" unique_id=1480133539]
 visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 0
@@ -2442,13 +2449,13 @@ theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 metadata/_tab_index = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/#TabContainer/Skins" unique_id=1510818865]
+[node name="ScrollContainer" type="ScrollContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/MarginContainer/#TabContainer/Skins" unique_id=1510818865]
 layout_mode = 2
 follow_focus = true
 horizontal_scroll_mode = 4
 vertical_scroll_mode = 0
 
-[node name="#Skins" type="HBoxContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/#TabContainer/Skins/ScrollContainer" unique_id=628735905]
+[node name="#Skins" type="HBoxContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/MarginContainer/#TabContainer/Skins/ScrollContainer" unique_id=628735905]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -2456,24 +2463,35 @@ theme_override_constants/separation = 0
 alignment = 1
 script = ExtResource("14_yaehf")
 
-[node name="MarginContainer" type="MarginContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/#TabContainer/Skins/ScrollContainer/#Skins" unique_id=1070213145]
+[node name="MarginContainer" type="MarginContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/MarginContainer/#TabContainer/Skins/ScrollContainer/#Skins" unique_id=1070213145]
 layout_mode = 2
 theme_override_constants/margin_top = 64
 theme_override_constants/margin_bottom = 64
 script = ExtResource("13_2cqfq")
 
-[node name="#Texture" type="TextureRect" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/#TabContainer/Skins/ScrollContainer/#Skins/MarginContainer" unique_id=1950524280]
+[node name="#Texture" type="TextureRect" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/MarginContainer/#TabContainer/Skins/ScrollContainer/#Skins/MarginContainer" unique_id=1950524280]
 layout_mode = 2
 expand_mode = 3
 stretch_mode = 5
 
-[node name="#Button" type="Button" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/#TabContainer/Skins/ScrollContainer/#Skins/MarginContainer" unique_id=677461678]
+[node name="#Button" type="Button" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/MarginContainer/#TabContainer/Skins/ScrollContainer/#Skins/MarginContainer" unique_id=677461678]
 show_behind_parent = true
 layout_mode = 2
 
-[node name="HSeparator1" type="HSeparator" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2" unique_id=225898775]
-visible = false
+[node name="TopContainer" type="Control" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/MarginContainer" unique_id=932210528]
 layout_mode = 2
+mouse_filter = 2
+
+[node name="#SearchBar" type="LineEdit" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2/MarginContainer/TopContainer" unique_id=1401168650]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 450.0
+offset_bottom = 31.0
+grow_horizontal = 2
+placeholder_text = "Search"
+emoji_menu_enabled = false
+clear_button_enabled = true
 
 [node name="PanelContainer" type="PanelContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2" unique_id=732192149]
 layout_mode = 2
@@ -2528,10 +2546,6 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_2cqfq")
 icon_alignment = 1
 expand_icon = true
-
-[node name="HSeparator2" type="HSeparator" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2" unique_id=1190014274]
-visible = false
-layout_mode = 2
 
 [node name="VBoxContainer" type="HBoxContainer" parent="Container/TabContainer/#ChampionSelect/HBoxContainer2/VBoxContainer2" unique_id=380126514]
 layout_mode = 2
@@ -3357,7 +3371,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=1115391706]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

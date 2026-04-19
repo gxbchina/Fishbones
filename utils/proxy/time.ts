@@ -5,8 +5,12 @@ import { tr } from "../translation"
 
 const SYNC_TIME_INTERVAL = 15 * 60 * 1000
 
-export function time(){
-    return () => new TimeService()
+interface TimeServiceOpions {
+    enableSync: boolean
+}
+
+export function time(options: TimeServiceOpions){
+    return () => new TimeService(options)
 }
 
 const timeSync = NtpTimeSync.getInstance()
@@ -15,9 +19,13 @@ export class TimeService implements Startable {
     syncInterval: ReturnType<typeof setInterval> | null = null
     //lastResult: NtpTimeResult | null = null
     lastResult_offset: number = 0
+    
+    public constructor(
+        private options: TimeServiceOpions
+    ){}
 
     public start(){
-        if(!this.syncInterval){
+        if(!this.syncInterval && this.options.enableSync){
             this.syncInterval = setInterval(this.syncTime, SYNC_TIME_INTERVAL)
             this.syncTime()
         }

@@ -29,6 +29,7 @@ export interface Combination {
     maps: Map<number, MapInfo>
     spells: Map<number, SpellInfo>
     champions: Map<number, ChampionInfo>
+    bots: Map<number, ChampionInfo>
 }
 interface ClientInfo extends ClientVersionInfo, ClientExeInfo, ClientDataInfo {}
 interface ClientVersionInfo {
@@ -64,6 +65,7 @@ export interface ServerDataInfo {
     }>
     spells: Record<string, {}>
     champions: Record<string, {}>
+    bots: string[]
 }
 interface MapInfo {
     i: number
@@ -108,13 +110,14 @@ export function clients_push(exeInfo: ClientExeInfo, dataInfo: ClientDataInfo, v
 export const servers: Record<ServerVersion, ServerInfo> = {}
 export function servers_push(exeInfo: ServerExeInfo, dataInfo: ServerDataInfo, version: ServerVersion, name: string){
     const { dll, dllDir, infoDir } = exeInfo
-    const { maps, spells, champions } = dataInfo
+    const { maps, spells, champions, bots } = dataInfo
     const server: ServerInfo = {
         name, version,
         dll, dllDir, infoDir,
         maps: Object.assign({}, maps),
         spells: Object.assign({}, spells),
         champions: Object.assign({}, champions),
+        bots: [...bots],
     }
     servers[version] = server
     return server
@@ -122,7 +125,7 @@ export function servers_push(exeInfo: ServerExeInfo, dataInfo: ServerDataInfo, v
 
 export const combinations: Combination[] = []
 export function combinations_push(client: ClientInfo, server: ServerInfo){
-    const combo = { client, server, maps: new Map(), spells: new Map(), champions: new Map() }
+    const combo = { client, server, maps: new Map(), spells: new Map(), champions: new Map(), bots: new Map() }
     combinations.push(combo)
     return combo
 }
@@ -153,6 +156,7 @@ export function combinations_merge(){
         })),
         spells: Object.fromEntries(spells.map(spell => [ spell.short, {} ])),
         champions: Object.fromEntries(champions.map(champ => [ champ.short, {} ])),
+        bots: champions.map(champ => champ.short)
     }
     for(const client of Object.values(clients))
         combinations_push(client, superServer)
@@ -230,6 +234,12 @@ export function combinations_merge(){
                 }
                 return [ r.i, r ]
             })
+        )
+
+        combo.bots = new Map(
+            combo.champions.values()
+            .filter(({ short }) => server.bots.includes(short))
+            .map((info) => [ info.i, info ])
         )
     }
 }

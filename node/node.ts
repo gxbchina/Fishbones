@@ -220,7 +220,9 @@ async function createNodeInternal(port: number, opts: Required<AbortOptions>){
             mdns: mdns(),
             
             proxy: proxy(),
-            time: time(),
+            time: time({
+                enableSync: false,
+            }),
         },
         //@ts-expect-error: Types of parameters 'key' and 'key' are incompatible.
         datastore,

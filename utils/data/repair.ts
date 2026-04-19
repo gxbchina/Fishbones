@@ -283,15 +283,19 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
             repairArchived_sdkPkg_opts,
             (async () => {
                 if(args.update.enabled || args.mr.enabled){
-                    if(os.platform() === 'win32'){
-                        await repairArchived(gitPkg, opts)
-                        if(await fs_exists(gitPkg.postInstall, opts, false))
-                            await runPostInstall(opts)
+                    try {
+                        if(os.platform() === 'win32'){
+                            await repairArchived(gitPkg, opts)
+                            if(await fs_exists(gitPkg.postInstall, opts, false))
+                                await runPostInstall(opts)
+                        }
+                        updated = await update(gsPkg, opts)
+                        return // OK
+                    } catch(err) {
+                        console_log(tr('Updating game server package failed:', {}), Bun.inspect(err))
                     }
-                    updated = await update(gsPkg, opts)
-                } else {
-                    await repairArchived(gsPkg, opts)
                 }
+                await repairArchived(gsPkg, opts)
             })(),
         ]).then(async (results) => {
             throwAnyRejection(results)

@@ -18,7 +18,7 @@ for(const staticTree of data){
     const tree = byPos[treeIndex]!
     for(const staticInfo of staticTree){
         
-        const icons = 'res://images/mastery-icons.png'
+        const icons = 'res://images/mastery-icons-58x58.png'
         const info: RuntimeMasteryInfo = Object.assign({
             iconEnabled: `${icons}:${infoIndex * 2}`,
             iconDisabled: `${icons}:${infoIndex * 2 + 1}`,

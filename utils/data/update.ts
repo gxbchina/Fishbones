@@ -32,7 +32,7 @@ export async function update(pkg: PkgInfoGit, opts: Required<AbortOptions>){
 
     args.mr.enabled = !!args.mr.value
     if(!args.update.enabled && !args.mr.enabled){
-        //console.log(`Pretending to update ${pkg.dirName}...`)
+        //console.log(`Pretending to update ${pkg.name}...`)
         return false
     }
 
@@ -40,61 +40,59 @@ export async function update(pkg: PkgInfoGit, opts: Required<AbortOptions>){
     let updated = false
     try {
         await fs_ensureDir(pkg.dir, opts)
-        //await git(['config', /*'--global',*/ 'core.longpaths', 'true'], pkg, opts)
-        if(!await fs_exists(path.join(pkg.dir, '.git'), opts)){
+        
+        const init = !(await fs_exists(path.join(pkg.dir, '.git'), opts))
 
-            await git([ 'init' ], pkg, opts)
-            await git([ 'config', 'core.longpaths', 'true' ], pkg, opts, true)
-            await git([ 'remote', 'add', pkg.gitRemoteName, pkg.gitOriginURL ], pkg, opts)
-            await git([ 'fetch', pkg.gitRemoteName ], pkg, opts)
-            await git([ 'checkout', '-b', `${pkg.gitRemoteName}-${pkg.gitBranchName}`, `${pkg.gitRemoteName}/${pkg.gitBranchName}`, '--force' ], pkg, opts)
-            
-            await getHeadCommitHash(pkg, opts)
-            updated = true
+        if(init) await git([ 'init' ], pkg, opts)
+        await git([ 'config', 'core.longpaths', 'true' ], pkg, opts, true)
+        await git([ 'remote', 'add', pkg.gitRemoteName, pkg.gitOriginURL ], pkg, opts, true)
 
+        const prevHash = init ? undefined : await getHeadCommitHash(pkg, opts, true)
+        if(args.mr.enabled){
+            const newBranchName = `mr-${pkg.gitRemoteName}-${args.mr.value}`
+            console_log(tr(`Switching the branch to {newBranchName}...`, { newBranchName }))
+
+            await git([ 'fetch', pkg.gitRemoteName, `merge-requests/${args.mr.value}/head:${newBranchName}`], pkg, opts)
+            await git([ 'checkout',  newBranchName ], pkg, opts)
         } else {
+            const newBranchName = `${pkg.gitRemoteName}-${pkg.gitBranchName}`
+            console_log(tr(`Switching the branch to {newBranchName}...`, { newBranchName }))
 
-            await git(['config', 'core.longpaths', 'true'], pkg, opts, true)
-
-            const prevHash = await getHeadCommitHash(pkg, opts)
-            if(args.mr.enabled){
-                const newBranchName = `mr-${pkg.gitRemoteName}-${args.mr.value}`
-                console_log(tr(`Switching the branch to {newBranchName}...`, { newBranchName }))
-
-                await git([ 'remote', 'add', pkg.gitRemoteName, pkg.gitOriginURL ], pkg, opts, true)
-                await git([ 'fetch', pkg.gitRemoteName, `merge-requests/${args.mr.value}/head:${newBranchName}`], pkg, opts)
-                await git([ 'checkout',  newBranchName ], pkg, opts)
-            } else {
-                const newBranchName = `${pkg.gitRemoteName}-${pkg.gitBranchName}`
-                console_log(tr(`Switching the branch to {newBranchName}...`, { newBranchName }))
-
-                await git([ 'remote', 'add', pkg.gitRemoteName, pkg.gitOriginURL ], pkg, opts, true)
-                await git([ 'fetch', pkg.gitRemoteName ], pkg, opts)
-                await git([ 'checkout', '-b', newBranchName, `${pkg.gitRemoteName}/${pkg.gitBranchName}` ], pkg, opts, true)
-                await git([ 'checkout', newBranchName], pkg, opts)
-                await git([ 'merge', `${pkg.gitRemoteName}/${pkg.gitBranchName}` ], pkg, opts)
-            }
-            const currHash = await getHeadCommitHash(pkg, opts)
-            updated = prevHash != currHash
+            await git([ 'fetch', pkg.gitRemoteName ], pkg, opts)
+            await git([ 'checkout', '-b', newBranchName, `${pkg.gitRemoteName}/${pkg.gitBranchName}`, ...(init ? [ '--force' ] : []) ], pkg, opts, true)
+            await git([ 'checkout', newBranchName], pkg, opts)
+            await git([ 'merge', `${pkg.gitRemoteName}/${pkg.gitBranchName}` ], pkg, opts)
         }
-    } catch(err){
-        console_log(tr('The update failed, see the log for details.', {}))
-        if(err instanceof TerminationError){ /* Ignore */ }
-        else throw err
+        const currHash = await getHeadCommitHash(pkg, opts)
+        updated = init || prevHash != currHash
+        
+    //} catch(err){
+    //    console_log(tr('The update failed, see the log for details.', {}))
+    //    //if(err instanceof TerminationError){ /* Ignore */ } else
+    //    throw err
     } finally {
         bar?.stop()
     }
+
+    if(!await fs_exists(pkg.checkUnpackBy, opts))
+        throw new Error(`Unable to update ${pkg.name}`)
+
     return updated
 }
 
-export async function getHeadCommitHash(pkg: PkgInfoGit, opts: Required<AbortOptions>) {
-    let { stdout } = await git([ 'rev-parse', 'HEAD' ], pkg, opts)
-    stdout = stdout.trim()
-    if(/^\w{40}$/.test(stdout)){
-        pkg.gitRevision = stdout
-        return stdout
+export async function getHeadCommitHash(pkg: PkgInfoGit, opts: Required<AbortOptions>, quiet = false){
+    try {
+        let { stdout } = await git([ 'rev-parse', 'HEAD' ], pkg, opts)
+        stdout = stdout.trim()
+        if(/^\w{40}$/.test(stdout)){
+            pkg.gitRevision = stdout
+            return stdout
+        }
+    } catch(err){
+        if(!quiet) throw err
     }
-    //else throw new Error('Failed to get the head commit hash')
+    if(!quiet) throw new Error('Failed to get the head commit hash')
+    return undefined
 }
 
 const logPrefix = "GIT"

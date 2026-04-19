@@ -2,13 +2,14 @@ import { LocalGame } from "../../game/game-local";
 import type { GamePlayer, PlayerId, PPP } from "../../game/game-player";
 import { SwitchViewError } from "../tui";
 import { BOTS, players, PLAYERS, Team, type Context } from "./lobby";
-import { bar, button, checkbox, form, icon, inq2gd, label, option, type Form } from "../../ui/remote/types";
+import { bar, base, button, checkbox, form, icon, inq2gd, label, option, type Form } from "../../ui/remote/types";
 import { render } from "../../ui/remote/view";
 import { combinations_find, KnownServers } from "../../utils/data/constants/client-server-combinations";
 import { AIChampion, AIDifficulty } from "../../utils/data/constants/champions";
 import { getName } from "../../utils/namegen/namegen";
 import { popup } from "../../ui/remote/remote";
 import { tr } from "../../utils/translation";
+import { sortInplace } from "../../utils/helpers";
 
 const ms = 1
 const s = 1000*ms
@@ -22,15 +23,21 @@ export async function lobby_gather(ctx: Context){
     
     const localGame = game instanceof LocalGame ? game : undefined!
     const game_serverVersion = localGame?.serverVersion ?? KnownServers.Unknown
-    const combo = combinations_find(game.clientVersion, game_serverVersion)!
-    const mapInfo = combo.maps.get(game.map.value!)!
-    const mapInfo_bots = [...mapInfo.bots.keys()]
+    const { maps, champions, bots } = combinations_find(game.clientVersion, game_serverVersion)!
+    const map = maps.get(game.map.value!)!
+    const allBotIDs = new Set([ ...map.bots.keys(), ...bots.keys() ]) //TODO:
+    const allBots = champions.values().filter(({ i }) => allBotIDs.has(i))
+    const botsItems =
+        sortInplace([...allBots], info => info.short, 'asc')
+        .map(({ i, name }) => {
+            return { id: i, text: name }
+        })
 
     const makePlayerForm = (player: GamePlayer): Form => {
 
         const { name: championName, icon: iconPath } =
             (player.champion.value !== undefined) ?
-                combo.champions.get(player.champion.value!)! : {}
+                champions.get(player.champion.value!)! : {}
 
         if(!player.isBot){
             const isMe = game.getPlayer() === player
@@ -44,7 +51,7 @@ export async function lobby_gather(ctx: Context){
         } else {
             return form({
                 Icon: icon(iconPath, championName),
-                Champion: option(inq2gd(AIChampion.choices, mapInfo_bots), player.champion.value, undefined, !localGame),
+                Champion: option(botsItems, player.champion.value, undefined, !localGame),
                 Difficulty: option(inq2gd(AIDifficulty.choices), player.difficulty.value, undefined, !localGame),
                 Kick: button(undefined, !localGame),
             })
@@ -53,7 +60,7 @@ export async function lobby_gather(ctx: Context){
 
     const team = (team: Team) => form({
         Join: button(() => game.set('team', team), game.getPlayer()?.team.value == team),
-        AddBot: button(() => localGame.addBot(team), !localGame || mapInfo_bots.length === 0),
+        AddBot: button(() => localGame.addBot(team), !localGame || allBotIDs.size === 0),
         //Players: list(players(game, team, PLAYERS, makePlayerForm)),
         //Bots: list(players(game, team, BOTS, makePlayerForm)),
     })
@@ -66,8 +73,8 @@ export async function lobby_gather(ctx: Context){
             () => { if(gatheringTimeout <= 0) localGame.start() },
             !localGame || !game.areAllPlayersFullyConnected() || gatheringTimeout > 0,
         ),
-        Explanation: { $type: 'base', visible: false },
-        Autofill: button(autofill, !localGame || mapInfo_bots.length === 0),
+        Explanation: base(false),
+        Autofill: button(autofill, !localGame || allBotIDs.size === 0),
         GatheringProgress: bar(0, 0, 100, gatheringTimeout > 0),
         Team1: team(0),
         Team2: team(1),
@@ -105,7 +112,7 @@ export async function lobby_gather(ctx: Context){
         view.get('Team1/Join').update(button(undefined, game.getPlayer()?.team.value == Team.Blue))
         view.get('Team2/Join').update(button(undefined, game.getPlayer()?.team.value == Team.Purple))
         view.get('Start').update(button(undefined, !localGame || allPlayersAreFullyConnected || gatheringTimeout > 0))
-        view.get('Explanation').update({ $type: 'base', visible: allPlayersAreFullyConnected },)
+        view.get('Explanation').update(base(allPlayersAreFullyConnected))
     }
 
     view.addEventListener(game, 'joined', notifyPlayerJoined)

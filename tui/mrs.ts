@@ -1,5 +1,5 @@
 import type { AbortOptions } from '@libp2p/interface'
-import { button, form, label, list } from '../ui/remote/types'
+import { base, button, form, label, list } from '../ui/remote/types'
 import { console_log } from '../ui/remote/remote'
 import { gsPkg } from '../utils/data/packages'
 import { render } from '../ui/remote/view'
@@ -23,7 +23,7 @@ export async function mrs(opts: Required<AbortOptions>){
     
     const view = render<number | null>('MergeRequests', form({
         Cancel: button(() => view.resolve(null)),
-        NoMRs: { $type: 'base', visible: false },
+        NoMRs: base(false),
         List: list(),
     }), opts, [
         {
@@ -60,8 +60,8 @@ export async function mrs(opts: Required<AbortOptions>){
         )
     } else {
         view.update(form({
-            Placeholder: { $type: 'base', visible: false },
-            NoMRs: { $type: 'base', visible: true },
+            Placeholder: base(false),
+            NoMRs: base(true),
         }))
     }
 

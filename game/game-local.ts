@@ -50,7 +50,7 @@ export class LocalGame extends Game {
 
         const combo = combinations_find(this.clientVersion, this.serverVersion)!
         const map = combo.maps.get(this.map.value!)!
-        const bots: number[] = [...(new Set(map.bots.keys()).difference(new Set(existingBots))).values()]
+        const bots = [...(new Set([...map.bots.keys(), ...combo.bots.keys()]).difference(new Set(existingBots))).values()]
         const peersRequests: LobbyNotificationMessage.PeerRequests[] = []
 
         counts.forEach((count, team) => {
