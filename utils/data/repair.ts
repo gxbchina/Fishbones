@@ -2,7 +2,7 @@ import { build } from "./build"
 import { download, appendPartialDownloadFileExt, repairAria2, seed } from "./download/download"
 import { gcPkg, gc420Pkg, gitPkg, gsPkg, gs420Pkg, modPck1, type PkgInfo, repairTorrents, sdkPkg, type PkgInfoCSProj } from "./packages"
 import { console_log, createBar, currentExe, extractFile } from "../../ui/remote/remote"
-import { console_log_fs_err, cwd, downloads, fs_chmod, fs_copyFile, fs_ensureDir, fs_exists, fs_exists_and_size_eq, fs_moveFile, fs_overwrite, fs_removeFile, fs_rmdir, fs_stat, fs_statfs, fs_truncate, fs_writeFile, rwx_rx_rx } from './fs'
+import { console_log_fs_err, cwd, downloads, fs_chmod, fs_copyFile, fs_ensureDir, fs_exists, fs_exists_and_size_eq, fs_moveFile, fs_overwrite, fs_readdir, fs_removeFile, fs_rmdir, fs_stat, fs_statfs, fs_truncate, fs_writeFile, rwx_rx_rx } from './fs'
 import { readTrackersTxt } from "./download/trackers"
 import { appendPartialUnpackFileExt, DataError, repair7z, unpack } from "./unpack"
 import { TerminationError, unwrapAbortError } from "../process/process"
@@ -288,6 +288,10 @@ async function repairImpl(view: DeferredView<void>, opts: Required<AbortOptions>
                             await repairArchived(gitPkg, opts)
                             if(await fs_exists(gitPkg.postInstall, opts, false))
                                 await runPostInstall(opts)
+                        }
+                        const existingEntries = await fs_readdir(gsPkg.dir, opts)
+                        if(existingEntries.length > 0 && !existingEntries.includes('.git')){
+                            await fs_moveFile(gsPkg.dir, `${gsPkg.dir}-backup-${Date.now().toString(16)}`, opts)
                         }
                         updated = await update(gsPkg, opts)
                         return // OK
