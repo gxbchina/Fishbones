@@ -233,7 +233,7 @@ function gameInfoToChoice(
     let game = cacheEntry?.game
     let choice = cacheEntry?.choice
     if(!cacheEntry || !game || !choice){
-        game = RemoteGame.create(node, server, gameInfo)
+        game = new RemoteGame(node, server)
         choice = form({
             Owner: label(),
             Name: label(),
@@ -253,8 +253,11 @@ function gameInfoToChoice(
         })
         cacheEntry = { game, choice }
         games.set(gameInfo.id, cacheEntry)
-    } else {
+    }
+    try {
         game.decodeInplace(gameInfo)
+    } catch(err) {
+        //TODO: Handle.
     }
 
     const players = game.getPlayersCount()

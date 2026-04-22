@@ -78,6 +78,7 @@ interface UnpackablePkgInfo {
 }
 
 export async function unpack(pkg: UnpackablePkgInfo, opts: Required<AbortOptions>){
+    const opts_rf = { ...opts, recursive: true, force: true }
     
     if(!args.unpack.enabled){
         console.log(`Pretending to unpack ${pkg.zipName}...`)
@@ -92,13 +93,36 @@ export async function unpack(pkg: UnpackablePkgInfo, opts: Required<AbortOptions
     try {
     
         const pkgDir = pkg.dir
+        const zipHasSingleRootEntry = pkg.zipHasSingleRootEntry ?? !pkg.makeDir
         const zipRoot = pkg.zipRoot ?? ((pkg.dirName && !pkg.makeDir) ? [ pkg.dirName! ] : [])
-        //TODO: if(zipRoot.length == 1 && pkg.zipHasSingleRootEntry && path.basename(pkgDir) == zipRoot[0])
-        const tmpDir = path.join(path.dirname(pkgDir), path.basename(pkgDir) + '_temp')
-        const rootDir = path.join(tmpDir, ...zipRoot)
-        const opts_rf = { ...opts, recursive: true, force: true }
-        await fs_removeFile(pkgDir, opts_rf, false) //TODO: Be less destructive.
-        await fs_ensureDir(tmpDir, opts)
+
+        const TEMP_POSTFIX = '_temp'
+
+        let dirToUnpackTo: string, dirToMove: string, dirToRemove: string | undefined
+        if(zipRoot.length == 0){
+            dirToUnpackTo = pkgDir
+        } else if(zipHasSingleRootEntry && zipRoot.length == 1){
+            dirToUnpackTo = path.dirname(pkgDir)
+        } else if(zipHasSingleRootEntry && zipRoot.length >= 2 && zipRoot[0] != path.basename(pkgDir)){
+            dirToUnpackTo = path.dirname(pkgDir)
+            dirToRemove = path.join(dirToUnpackTo, zipRoot[0]!)
+        } else {
+            dirToUnpackTo = pkgDir + TEMP_POSTFIX
+            dirToRemove = dirToUnpackTo
+        }
+        dirToMove = path.join(dirToUnpackTo, ...zipRoot)
+
+        // logger.log(`
+        //     EXTRACTION
+        //         pkgDir: ${pkgDir}
+        //         zipHasSingleRootEntry: ${zipHasSingleRootEntry}
+        //         zipRoot: ${zipRoot}
+        //         tmpDir: ${tmpDir}
+        //         rootDir: ${rootDir}
+        //         tmpDirShouldBeRemoved: ${tmpDirShouldBeRemoved}
+        // `.trim())
+
+        await fs_ensureDir(dirToUnpackTo, opts)
     
         const lockfile = appendPartialUnpackFileExt(pkg.zip)
         await fs_writeFile(lockfile, '', { ...opts, encoding: 'utf8' })
@@ -107,7 +131,7 @@ export async function unpack(pkg: UnpackablePkgInfo, opts: Required<AbortOptions
         //const signal = AbortSignal.any([ controller.signal, opts.signal ])
         const { signal } = controller
 
-        const args = ['-aoa', `-o${tmpDir}`, '-bsp1']
+        const args = ['-aoa', `-o${dirToUnpackTo}`, '-bsp1']
         
         const spawnOpts = {
             cwd: downloads,
@@ -169,9 +193,14 @@ export async function unpack(pkg: UnpackablePkgInfo, opts: Required<AbortOptions
         await Promise.all(s7zs.map(async (proc) => successfulTermination(
             proc.logPrefix, proc, opts, [ 0, s7zExitCodes.Warning ]
         )))
-
-        await fs_moveFile(rootDir, pkgDir, opts)
-        await fs_removeFile(tmpDir, opts_rf, false)
+        
+        if(dirToMove != pkgDir){
+            await fs_removeFile(pkgDir, opts_rf, false) //TODO: Be less destructive.
+            await fs_moveFile(dirToMove, pkgDir, opts)
+        }
+        if(dirToRemove){
+            await fs_removeFile(dirToRemove, opts_rf, false)
+        }
         await fs_removeFile(lockfile, opts)
     
     } finally {

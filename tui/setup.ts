@@ -18,7 +18,8 @@ export async function setup(game: LocalGame, server: LocalServer, opts: Required
     setCombo(index)
     function setCombo(index: number){
         combo = combinations[index]!
-        const map = [...combo.maps.values()][0]!
+        let map = combo.maps.get(4) //HACK: Twisted Treeline.
+            map ??= [...combo.maps.values()][0]!
         const mode = [...map.modes.values()][0]!
         game.map.value = map.i
         game.mode.value = mode.i

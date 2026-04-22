@@ -33,7 +33,7 @@ export const maps = [
 
 export class GameMap extends PickableValue {
     public static readonly name = 'Game Map'
-    public static values: { [k: string]: string }
-    public static choices: { value: number, name: string }[]
+    public static values = maps.map(({ short }) => short)
+    public static choices = maps.map(({ i, short, name }) => ({ value: i, short, name }))
 }
 export const GameMapsEnabled = enabled(GameMap)

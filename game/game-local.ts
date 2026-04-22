@@ -18,7 +18,8 @@ import { tr } from '../utils/translation'
 export class LocalGame extends Game {
     protected log = logger('launcher:game-local')
 
-    public readonly canStart = true
+    //public readonly canStart = true
+    public isPrivate: boolean = false
     
     private readonly peerId: PeerId
     private readonly playerId: PlayerId

@@ -73,7 +73,7 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
     public readonly ownerId: PeerId
     
     public readonly name = new Name(tr(`Game`))
-    public readonly map = new GameMap(4, () => this.server.maps) //HACK: Twisted Treeline.
+    public readonly map = new GameMap(0, () => this.server.maps)
     public readonly mode = new GameMode(0, () => this.server.modes)
     public readonly type = new GameType(0)
     public readonly playersMax = new PlayerCount(6)
@@ -81,9 +81,8 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
     public readonly features = new FeaturesEnabled()
     public readonly commit = new HexStringValue()
 
-    public isPrivate: boolean = false
     public serverVersion: ServerVersion = KnownServers.Unknown
-    public clientVersion: ClientVersion = KnownClients.Unknown
+    public clientVersion: ClientVersion = KnownClients.v126 //TODO: Support other clients.
 
     protected player?: GamePlayer
     public getPlayer(id?: PlayerId){
@@ -150,7 +149,7 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
         this.launched = false
     }
 
-    public abstract get canStart(): boolean
+    //public abstract get canStart(): boolean
     //public abstract get canKick(): boolean
 
     private proxyServer?: ProxyServer
@@ -877,7 +876,7 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
             gameInfo: {
 
                 TICK_RATE: this.server.tickRate.value ?? 30,
-                FORCE_START_TIMER: 180, //TODO: Unhardcode
+                FORCE_START_TIMER: 60, //TODO: Unhardcode
                 IS_DAMAGE_TEXT_GLOBAL: false,
                 SUPRESS_SCRIPT_NOT_FOUND_LOGS: true,
 

@@ -14,12 +14,10 @@ import { logger } from '@libp2p/logger'
 export class RemoteGame extends Game {
     protected log = logger('launcher:game-remote')
 
-    public readonly canStart = false
+    //public readonly canStart = false
 
-    public static create(node: LibP2PNode, server: Server, gameInfo: PBPeer.AdditionalData.GameInfo){
-        const game = new RemoteGame(node, server.id, server)
-        game.decodeInplace(gameInfo)
-        return game
+    public constructor(node: LibP2PNode, server: Server){
+        super(node, server.id, server)
     }
 
     public async connect(opts: Required<AbortOptions>){

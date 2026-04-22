@@ -21,7 +21,7 @@ const GATHERING_TIMEOUT_TICK = 1*s
 export async function lobby_gather(ctx: Context){
     const { game } = ctx
     
-    const localGame = game instanceof LocalGame ? game : undefined!
+    const localGame = game instanceof LocalGame ? game : undefined
     const game_serverVersion = localGame?.serverVersion ?? KnownServers.Unknown
     const { maps, champions, bots } = combinations_find(game.clientVersion, game_serverVersion)!
     const map = maps.get(game.map.value!)!
@@ -60,19 +60,19 @@ export async function lobby_gather(ctx: Context){
 
     const team = (team: Team) => form({
         Join: button(() => game.set('team', team), game.getPlayer()?.team.value == team),
-        AddBot: button(() => localGame.addBot(team), !localGame || allBotIDs.size === 0),
+        AddBot: button(() => localGame?.addBot(team), !localGame || allBotIDs.size === 0),
         //Players: list(players(game, team, PLAYERS, makePlayerForm)),
         //Bots: list(players(game, team, BOTS, makePlayerForm)),
     })
 
-    let gatheringTimeout = (!game.isPrivate) ? GATHERING_TIMEOUT : 0
+    let gatheringTimeout = (localGame?.isPrivate == false) ? GATHERING_TIMEOUT : 0
+    const startbutton = (cb?: () => void) => button(
+        cb, !localGame || !game.areAllPlayersFullyConnected() || gatheringTimeout > 0
+    )
 
     const view = render('GatheringLobby', form({
         Quit: button(() => view.reject(new SwitchViewError({ cause: null }))),
-        Start: button(
-            () => { if(gatheringTimeout <= 0) localGame.start() },
-            !localGame || !game.areAllPlayersFullyConnected() || gatheringTimeout > 0,
-        ),
+        Start: startbutton(() => { if(gatheringTimeout <= 0) localGame?.start() }),
         Explanation: base(false),
         Autofill: button(autofill, !localGame || allBotIDs.size === 0),
         GatheringProgress: bar(0, 0, 100, gatheringTimeout > 0),
@@ -84,7 +84,7 @@ export async function lobby_gather(ctx: Context){
             listener: (m) => {
                 //const team = parseInt(m.groups!.team!)
                 const playerId = parseInt(m.groups!.playerId!) as PlayerId
-                localGame.kick(localGame.getPlayer(playerId)!)
+                localGame?.kick(localGame.getPlayer(playerId)!)
             }
         },
         {
@@ -96,7 +96,7 @@ export async function lobby_gather(ctx: Context){
                     (m.groups!.prop! === 'Difficulty') ? 'difficulty' :
                     undefined!
                 const playerId = parseInt(m.groups!.playerId!) as PlayerId
-                localGame.setBot(prop, index, playerId)
+                localGame?.setBot(prop, index, playerId)
             }
         }
     ])
@@ -104,15 +104,14 @@ export async function lobby_gather(ctx: Context){
     updateDynamicElements()
     view.addEventListener(game, 'update', updateDynamicElements)
     function updateDynamicElements(){
-        const allPlayersAreFullyConnected = !game.areAllPlayersFullyConnected()
         view.get('Team1/Players').setItems(players(game, Team.Blue, PLAYERS, makePlayerForm))
         view.get('Team2/Players').setItems(players(game, Team.Purple, PLAYERS, makePlayerForm))
         view.get('Team1/Bots').setItems(players(game, Team.Blue, BOTS, makePlayerForm))
         view.get('Team2/Bots').setItems(players(game, Team.Purple, BOTS, makePlayerForm))
         view.get('Team1/Join').update(button(undefined, game.getPlayer()?.team.value == Team.Blue))
         view.get('Team2/Join').update(button(undefined, game.getPlayer()?.team.value == Team.Purple))
-        view.get('Start').update(button(undefined, !localGame || allPlayersAreFullyConnected || gatheringTimeout > 0))
-        view.get('Explanation').update(base(allPlayersAreFullyConnected))
+        view.get('Explanation').update(base(!game.areAllPlayersFullyConnected()))
+        view.get('Start').update(startbutton())
     }
 
     view.addEventListener(game, 'joined', notifyPlayerJoined)
@@ -131,7 +130,7 @@ export async function lobby_gather(ctx: Context){
         const playerCounts = teams.map(team => players.filter(player => player.team.value == team).length)
         const playersMax = Math.max(...playerCounts, game.playersMax.value ?? 0)
         const countsToAdd = playerCounts.map(playersCount => Math.max(0, playersMax - playersCount))
-        localGame.addBots(countsToAdd)
+        localGame?.addBots(countsToAdd)
     }
 
     if(gatheringTimeout > 0){
@@ -146,7 +145,7 @@ export async function lobby_gather(ctx: Context){
                 clearInterval(gatheringTickInterval)
                 view.update(form({
                     GatheringProgress: { $type: 'progress-bar', value: 0, visible: false },
-                    Start: { $type: 'button', disabled: false },
+                    Start: startbutton(),
                 }))
             }
         }, GATHERING_TIMEOUT_TICK)
