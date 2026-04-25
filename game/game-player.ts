@@ -29,9 +29,9 @@ export class GamePlayer {
     }
     
     public readonly team = new Team()
-    public readonly champion = new Champion(undefined, () => this.game.server.champions)
-    public readonly spell1 = new SummonerSpell(undefined, () => this.game.server.spells)
-    public readonly spell2 = new SummonerSpell(undefined, () => this.game.server.spells)
+    public readonly champion = new Champion(undefined, () => this.game.champions)
+    public readonly spell1 = new SummonerSpell(undefined, () => this.game.spells)
+    public readonly spell2 = new SummonerSpell(undefined, () => this.game.spells)
     public readonly lock = new Lock(+false)
     public readonly serverStarted = new BooleanValue(false)
     public readonly maxPingObserved = new FloatValue(0)

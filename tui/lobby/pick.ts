@@ -53,7 +53,7 @@ export async function lobby_pick(ctx: Context){
     const championsItems = Object.fromEntries(
         sortInplace([...champions.values()], info => info.short, 'asc')
         .map(({ i, name, icon: icon_path }) => {
-            const disabled = !game.server.champions.value.includes(i)
+            const disabled = !game.champions.value.includes(i)
             return [ i, icon(icon_path, name, disabled) ]
         })
     )
@@ -61,7 +61,7 @@ export async function lobby_pick(ctx: Context){
     const summonerSpellsItems = Object.fromEntries(
         spells.values()
         .map(({ i, name, icon: iconPath }) => {
-            const disabled = !game.server.spells.value.includes(i)
+            const disabled = !game.spells.value.includes(i)
             return [i, icon(iconPath, name, disabled)]
         })
     )

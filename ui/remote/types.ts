@@ -118,7 +118,7 @@ export const list = (items?: Record<string, Config>, placeholderText?: string) =
 export const label = (text?: string) => ({ $type: 'label' as const, text })
 export const line = (text?: string, changed?: (text: string) => void, editable?: boolean) => ({ $type: 'line' as const, editable, text, $listeners: { changed } })
 export const text = (text?: string, changed?: (text: string) => void) => ({ $type: 'text' as const, text, $listeners: { changed } })
-export const checkbox = (button_pressed?: boolean, toggled?: (on: boolean) => void) => ({ $type: 'checkbox' as const, button_pressed, $listeners: { toggled } })
+export const checkbox = (button_pressed?: boolean, toggled?: (on: boolean) => void, disabled?: boolean) => ({ $type: 'checkbox' as const, disabled, button_pressed, $listeners: { toggled } })
 export const button = (pressed?: () => void, disabled?: boolean) => ({ $type: 'button' as const, disabled, $listeners: { pressed } })
 export const option = (options?: { id: number, text: string }[], selected?: number, item_selected?: (index: number) => void, disabled?: boolean) => ({ $type: 'option' as const, disabled, selected, options, $listeners: { selected: item_selected } })
 export const texture = (texture?: string) => ({ $type: 'texture' as const, texture })

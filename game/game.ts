@@ -1,11 +1,10 @@
-import { blowfishKey, FeaturesEnabled, GameType, HexStringValue, LOCALHOST, Name, Password, PlayerCount, Team, type u } from '../utils/constants'
+import { blowfishKey, FeaturesEnabled, GameType, HexStringValue, LOCALHOST, Name, Password, PlayerCount, Team, TickRate, type u } from '../utils/constants'
 import { TypedEventEmitter, type AbortOptions, type PeerId, type Stream } from '@libp2p/interface'
 import { publicKeyFromProtobuf, publicKeyToProtobuf } from '@libp2p/crypto/keys'
 import { peerIdFromPublicKey } from '@libp2p/peer-id'
 import { obtainConnection, type LibP2PNode } from '../node/node'
 import { GamePlayer, type PlayerId, type PPP } from './game-player'
 import type { Peer as PBPeer } from '../message/peer'
-import type { Server } from './server'
 import { KickReason, LobbyNotificationMessage, PickRequest, State, type LobbyRequestMessage } from '../message/lobby'
 import { arr2text, text2arr } from 'uint8-util'
 import type { GameInfo, GameInfo420 } from '../game/game-info'
@@ -19,9 +18,11 @@ import { safeOptions, shutdownOptions, TerminationError } from '../utils/process
 import { Deferred } from '../utils/promises'
 import { logger } from '../utils/log'
 import { getBotName, getName } from '../utils/namegen/namegen'
-import { GameMap } from '../utils/data/constants/maps'
+import { GameMap, maps } from '../utils/data/constants/maps'
 import { GameMode } from '../utils/data/constants/modes'
 import { runes } from '../utils/data/constants/runes'
+import { ChampionsEnabled } from '../utils/data/constants/champions'
+import { SummonerSpellsEnabled } from '../utils/data/constants/spells'
 import { KnownClients, KnownServers, type ClientVersion, type ServerVersion } from '../utils/data/constants/client-server-combinations'
 import { VERSION, versionFromString, versionToString } from '../utils/constants-build'
 import { console_log } from '../ui/remote/remote'
@@ -69,12 +70,11 @@ const MAX_PING_MULTIPLIER = 0.5
 export abstract class Game extends TypedEventEmitter<GameEvents> {
     
     public readonly node: LibP2PNode
-    public readonly server: Server
     public readonly ownerId: PeerId
     
     public readonly name = new Name(tr(`Game`))
-    public readonly map = new GameMap(0, () => this.server.maps)
-    public readonly mode = new GameMode(0, () => this.server.modes)
+    public readonly map = new GameMap(0)
+    public readonly mode = new GameMode(0)
     public readonly type = new GameType(0)
     public readonly playersMax = new PlayerCount(6)
     public readonly password = new Password()
@@ -82,7 +82,11 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
     public readonly commit = new HexStringValue()
 
     public serverVersion: ServerVersion = KnownServers.Unknown
-    public clientVersion: ClientVersion = KnownClients.v126 //TODO: Support other clients.
+    public clientVersion: ClientVersion = KnownClients.Default
+
+    public readonly champions = new ChampionsEnabled()
+    public readonly spells = new SummonerSpellsEnabled()
+    public readonly tickRate = new TickRate(30)
 
     protected player?: GamePlayer
     public getPlayer(id?: PlayerId){
@@ -113,10 +117,9 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
         }
     }
 
-    protected constructor(node: LibP2PNode, ownerId: PeerId, server: Server){
+    protected constructor(node: LibP2PNode, ownerId: PeerId){
         super()
         this.node = node
-        this.server = server
         this.ownerId = ownerId
     }
 
@@ -751,8 +754,19 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
         this.safeDispatchEvent('chat', { detail: { player, message } })
     }
 
-    public encode(): PBPeer.AdditionalData.GameInfo {
-        return {
+    public encode(): {
+        gameInfo: PBPeer.AdditionalData.GameInfo,
+        serverSettings: PBPeer.AdditionalData.ServerSettings,
+    } {
+        const serverSettings: PBPeer.AdditionalData.ServerSettings = {
+            name: '',
+            maps: [ this.map.encode() ],
+            modes: [ this.mode.encode() ],
+            tickRate: this.tickRate.encode(),
+            champions: this.champions.encode(),
+            spells: this.spells.encode(),
+        }
+        const gameInfo: PBPeer.AdditionalData.GameInfo = {
             id: 0,
             name: this.name.encode(),
             map: this.map.encode(),
@@ -762,9 +776,18 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
             features: this.features.encode(),
             passwordProtected: this.password.isSet,
             commit: this.commit.encode(),
+            clientVersion: this.clientVersion,
+            serverVersion: this.serverVersion,
+        }
+        return {
+            serverSettings,
+            gameInfo,
         }
     }
-    public decodeInplace(gi: PBPeer.AdditionalData.GameInfo): boolean {
+    public decodeInplace(
+        gi: PBPeer.AdditionalData.GameInfo,
+        ss: PBPeer.AdditionalData.ServerSettings,
+    ): boolean {
         let ret = true
             ret &&= this.name.decodeInplace(gi.name)
             ret &&= this.map.decodeInplace(gi.map)
@@ -774,6 +797,13 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
             ret &&= this.playersMax.decodeInplace(gi.playersMax)
             ret &&= this.features.decodeInplace(gi.features)
             ret &&= !gi.commit || this.commit.decodeInplace(gi.commit)
+            ret &&= this.champions.decodeInplace(ss.champions)
+            ret &&= this.spells.decodeInplace(ss.spells)
+            ret &&= this.tickRate.decodeInplace(ss.tickRate)
+        if(gi.clientVersion !== undefined)
+            this.clientVersion = gi.clientVersion as ClientVersion
+        if(gi.serverVersion !== undefined)
+            this.serverVersion = gi.serverVersion as ServerVersion
         this.password.value = gi.passwordProtected ? 'non-empty' : undefined
         return ret
     }
@@ -861,10 +891,10 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
     }
     */
     public getGameInfo(): GameInfo {
+        //const this_map_value = maps.find(map => map.i == this.map.value)?.id ?? 0
         return {
             gameId: 0,
             game: {
-                
                 map: this.map.value ?? 4,
                 gameMode: this.mode.toString(),
                 mutators: Array<string>(8).fill(''),
@@ -875,7 +905,7 @@ export abstract class Game extends TypedEventEmitter<GameEvents> {
             },
             gameInfo: {
 
-                TICK_RATE: this.server.tickRate.value ?? 30,
+                TICK_RATE: this.tickRate.value ?? 30,
                 FORCE_START_TIMER: 60, //TODO: Unhardcode
                 IS_DAMAGE_TEXT_GLOBAL: false,
                 SUPRESS_SCRIPT_NOT_FOUND_LOGS: true,

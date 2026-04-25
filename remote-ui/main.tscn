@@ -10,6 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://0et06t4e4fkf" path="res://components/background/sr_platform.jpg" id="7_5vw27"]
 [ext_resource type="PackedScene" uid="uid://cmq3d2g3odndm" path="res://components/console.tscn" id="7_272bh"]
 [ext_resource type="Shader" uid="uid://c4ougvurpqa1d" path="res://components/background/simple_blur.gdshader" id="7_kek77"]
+[ext_resource type="Script" uid="uid://du4g1egmbn5bj" path="res://components/slide_show.gd" id="11_d13ii"]
 [ext_resource type="Script" uid="uid://daigcqlxjwp5f" path="res://copy_paste_button.gd" id="11_ycdy4"]
 [ext_resource type="Script" uid="uid://c1341hmee22s6" path="res://dictionary_view.gd" id="13_2cqfq"]
 [ext_resource type="FontFile" uid="uid://delgr4grjpybo" path="res://fonts/NotoEmoji-Regular.ttf" id="13_getpj"]
@@ -190,7 +191,7 @@ spinner = ExtResource("4_ycdy4")
 select = ExtResource("5_w48qg")
 checkbox = ExtResource("6_vivmo")
 input = ExtResource("7_2cqfq")
-embedded_js = "res://embedded/index-0.0.3.42.js"
+embedded_js = "res://embedded/index-0.0.3.43.js"
 embedded_exe = "res://embedded/bun-1.3.10-windows-x64-baseline.exe"
 embedded_lib_0 = "res://embedded/node_datachannel-8fg8wz1b.node"
 embedded_file_0 = "res://embedded/7za-2501-windows-x64.exe"
@@ -494,25 +495,7 @@ layout_mode = 2
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="PanelContainer" type="PanelContainer" parent="Container/TabContainer/#Install/VBoxContainer/CenterContainer" unique_id=1909692620]
-visible = false
-custom_minimum_size = Vector2(132, 0)
-layout_mode = 0
-offset_left = 506.0
-offset_top = 252.0
-offset_right = 638.0
-offset_bottom = 283.0
-
-[node name="MarginContainer" type="MarginContainer" parent="Container/TabContainer/#Install/VBoxContainer/CenterContainer/PanelContainer" unique_id=999808883]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="Container/TabContainer/#Install/VBoxContainer/CenterContainer/PanelContainer/MarginContainer" unique_id=509385133]
-layout_mode = 2
-text = "Installing..."
-horizontal_alignment = 1
-
-[node name="MarginContainer" type="MarginContainer" parent="Container/TabContainer/#Install/VBoxContainer/CenterContainer" unique_id=142728288]
-visible = false
+[node name="HBoxContainer" type="HBoxContainer" parent="Container/TabContainer/#Install/VBoxContainer/CenterContainer" unique_id=476561701]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -520,15 +503,74 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Panel" type="Panel" parent="Container/TabContainer/#Install/VBoxContainer/CenterContainer/MarginContainer" unique_id=2111670037]
+[node name="PrevButton" type="Button" parent="Container/TabContainer/#Install/VBoxContainer/CenterContainer/HBoxContainer" unique_id=983544861]
+custom_minimum_size = Vector2(0, 62)
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "<"
 
-[node name="MarginContainer" type="MarginContainer" parent="Container/TabContainer/#Install/VBoxContainer/CenterContainer/MarginContainer" unique_id=1107722111]
+[node name="TabContainer" type="TabContainer" parent="Container/TabContainer/#Install/VBoxContainer/CenterContainer/HBoxContainer" unique_id=1238593347]
 layout_mode = 2
+size_flags_horizontal = 3
+tab_alignment = 1
+current_tab = 0
+tabs_position = 1
+script = ExtResource("11_d13ii")
 
-[node name="#TroubleshootingGuide" type="RichTextLabel" parent="Container/TabContainer/#Install/VBoxContainer/CenterContainer/MarginContainer/MarginContainer" unique_id=1151623892]
+[node name="RichTextLabel1" type="RichTextLabel" parent="Container/TabContainer/#Install/VBoxContainer/CenterContainer/HBoxContainer/TabContainer" unique_id=834408461]
 layout_mode = 2
 bbcode_enabled = true
+text = "[b]What is Fishbones?[/b]
+Fishbones is an installer and launcher (one of) for custom servers and clients for League of Legends.
+Currently, the main supported server is [hint=\"which is a continuation of ChildrenOfTheGrave development\"]BrokenWings[/hint], recreating Season-1."
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_tab_index = 0
+metadata/_tab_name = ""
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="Container/TabContainer/#Install/VBoxContainer/CenterContainer/HBoxContainer/TabContainer" unique_id=99726087]
+visible = false
+layout_mode = 2
+bbcode_enabled = true
+text = "[b]Where is the game server located?[/b]
+In Fishbones the game servers are hosted by the players themselves.
+After installation, you will be able to join other players' servers...
+or run the game server on your computer and let other players connect or play alone.
+You can play both on the local network and via the Internet."
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_tab_index = 1
+metadata/_tab_name = ""
+
+[node name="RichTextLabel3" type="RichTextLabel" parent="Container/TabContainer/#Install/VBoxContainer/CenterContainer/HBoxContainer/TabContainer" unique_id=1841118373]
+visible = false
+layout_mode = 2
+bbcode_enabled = true
+text = "[b]Top BrokenWings contributors[/b]
+skelsoft
+IceCreamMan
+memiczny
+Derepote
+super-fella
+Jinx
+Pwnie
+APYi
+seROBOT"
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_tab_index = 2
+metadata/_tab_name = ""
+
+[node name="Timer" type="Timer" parent="Container/TabContainer/#Install/VBoxContainer/CenterContainer/HBoxContainer/TabContainer" unique_id=1779697727]
+wait_time = 10.0
+
+[node name="NextButton" type="Button" parent="Container/TabContainer/#Install/VBoxContainer/CenterContainer/HBoxContainer" unique_id=861936079]
+custom_minimum_size = Vector2(0, 62)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = ">"
 
 [node name="#DiskSpaceWarning" type="PanelContainer" parent="Container/TabContainer/#Install/VBoxContainer/CenterContainer" unique_id=576755778]
 visible = false
@@ -581,10 +623,13 @@ layout_mode = 2
 size_flags_horizontal = 8
 text = "Retry ↻"
 
-[node name="HSeparator" type="HSeparator" parent="Container/TabContainer/#Install/VBoxContainer" unique_id=1110585966]
+[node name="HSeparator1" type="HSeparator" parent="Container/TabContainer/#Install/VBoxContainer" unique_id=1110585966]
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 24
+
+[node name="HSeparator2" type="Control" parent="Container/TabContainer/#Install/VBoxContainer" unique_id=403059262]
+layout_mode = 2
 
 [node name="BarsContainer" type="VBoxContainer" parent="Container/TabContainer/#Install/VBoxContainer" unique_id=1426232879]
 custom_minimum_size = Vector2(0, 101)
@@ -3397,3 +3442,9 @@ stretch_mode = 4
 [node name="AnimationPlayer" type="AnimationPlayer" parent="TextureRect" unique_id=584753564]
 libraries/ = SubResource("AnimationLibrary_1u8w0")
 autoplay = &"FadeOut"
+
+[connection signal="pressed" from="Container/TabContainer/#Install/VBoxContainer/CenterContainer/HBoxContainer/PrevButton" to="Container/TabContainer/#Install/VBoxContainer/CenterContainer/HBoxContainer/TabContainer" method="prev"]
+[connection signal="pressed" from="Container/TabContainer/#Install/VBoxContainer/CenterContainer/HBoxContainer/PrevButton" to="Container/TabContainer/#Install/VBoxContainer/CenterContainer/HBoxContainer/TabContainer/Timer" method="stop"]
+[connection signal="timeout" from="Container/TabContainer/#Install/VBoxContainer/CenterContainer/HBoxContainer/TabContainer/Timer" to="Container/TabContainer/#Install/VBoxContainer/CenterContainer/HBoxContainer/TabContainer" method="next"]
+[connection signal="pressed" from="Container/TabContainer/#Install/VBoxContainer/CenterContainer/HBoxContainer/NextButton" to="Container/TabContainer/#Install/VBoxContainer/CenterContainer/HBoxContainer/TabContainer" method="next"]
+[connection signal="pressed" from="Container/TabContainer/#Install/VBoxContainer/CenterContainer/HBoxContainer/NextButton" to="Container/TabContainer/#Install/VBoxContainer/CenterContainer/HBoxContainer/TabContainer/Timer" method="stop"]

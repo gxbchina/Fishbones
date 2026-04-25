@@ -1,5 +1,5 @@
 import { RemoteGame } from '../game/game-remote'
-import { LocalServer, RemoteServer } from '../game/server'
+import { combinations_find, KnownServers } from '../utils/data/constants/client-server-combinations'
 import { type LibP2PNode } from '../node/node'
 import { type AbortOptions } from '@libp2p/interface'
 import { args } from '../utils/args'
@@ -18,7 +18,6 @@ import { gsPkg } from '../utils/data/packages'
 import { tr } from '../utils/translation'
 
 interface CacheEntry {
-    server: RemoteServer
     games: Map<number, {
         game: RemoteGame
         choice: Form
@@ -30,7 +29,7 @@ const objs = new Map<string, RemoteGame>()
 let nextObjId = 0
 
 type Lobby = (game: Game, opts: Required<AbortOptions>) => Promise<void>
-type Setup = (game: LocalGame, server: LocalServer, opts: Required<AbortOptions>) => Promise<void>
+type Setup = (game: LocalGame, opts: Required<AbortOptions>) => Promise<void>
 export async function browser(node: LibP2PNode, lobby: Lobby, setup: Setup, opts: Required<AbortOptions>){
 
     const name = '' //getUsername(node.peerId.toString())
@@ -115,21 +114,21 @@ async function hostLocal(node: LibP2PNode, name: string, lobby: Lobby, setup: Se
     const pspd = node.services.pubsubPeerDiscovery
     const ps = node.services.pubsub
 
-    const server = new LocalServer(node)
-    const game = new LocalGame(node, server)
+    const game = new LocalGame(node)
 
     try {
-        await setup(game, server, opts)
+        await setup(game, opts)
     } catch(error) {
         if(error instanceof AbortPromptError) return
         throw error
     }
     
     let prevPlayerCount = 0
+    const { gameInfo, serverSettings } = game.encode()
     let data: Peer.AdditionalData = {
         name: name,
-        serverSettings: server.encode(),
-        gameInfos: [ game.encode() ],
+        serverSettings,
+        gameInfos: [ gameInfo ],
     }
     try {
         await game.startListening(opts)
@@ -199,41 +198,35 @@ function getChoices(node: LibP2PNode){
 }
 
 function peerInfoToChoices(node: LibP2PNode, pwd: PeerIdWithData){
-    const settings = pwd.data.serverSettings
-    if(!settings) return []
+    const { gameInfos, serverSettings } = pwd.data
+    if(!serverSettings || !gameInfos || gameInfos.length == 0) return []
 
     let cacheEntry = cache.get(pwd.id)
-    let server = cacheEntry?.server
     let games = cacheEntry?.games
-    if(!cacheEntry || !server || !games){
-        server = RemoteServer.create(node, pwd.id, settings)
+    if(!cacheEntry || !games){
         games = new Map()
-        cacheEntry = { server, games }
+        cacheEntry = { games }
         cache.set(pwd.id, cacheEntry)
-    } else {
-        server.decodeInplace(settings)
     }
 
-    if(!server.validate()) return []
-
-    return pwd.data.gameInfos.map((gameInfo) => {
-        return gameInfoToChoice(node, pwd, server, games, gameInfo)
+    return gameInfos.map((gameInfo) => {
+        return gameInfoToChoice(node, pwd, games, gameInfo, serverSettings)
     })
 }
 
 function gameInfoToChoice(
     node: LibP2PNode,
     pwd: PeerIdWithData,
-    server: RemoteServer,
     games: CacheEntry['games'],
     gameInfo: Peer.AdditionalData.GameInfo,
+    serverSettings: Peer.AdditionalData.ServerSettings,
 ){
 
     let cacheEntry = games.get(gameInfo.id)
     let game = cacheEntry?.game
     let choice = cacheEntry?.choice
     if(!cacheEntry || !game || !choice){
-        game = new RemoteGame(node, server)
+        game = new RemoteGame(node, pwd.id)
         choice = form({
             Owner: label(),
             Name: label(),
@@ -255,7 +248,7 @@ function gameInfoToChoice(
         games.set(gameInfo.id, cacheEntry)
     }
     try {
-        game.decodeInplace(gameInfo)
+        game.decodeInplace(gameInfo, serverSettings)
     } catch(err) {
         //TODO: Handle.
     }
@@ -286,15 +279,17 @@ function gameInfoToChoice(
     ;(choice.fields!.Cheats as Checkbox).visible = game.features.isCheatsEnabled
 
     const commitHashMismatch = game.features.isHalfPingEnabled && game.commit.value != gsPkg.gitRevision
-    const dangerOfCrash = game.features.isSpellsEnabled && server.spells.value.length > 0 && isSpellCrashDetected()
+    const dangerOfCrash = game.features.isSpellsEnabled && game.spells.value.length > 0 && isSpellCrashDetected()
+    const clientUnavaible = combinations_find(game.clientVersion, KnownServers.Unknown) == undefined
 
     let explanation = ''
     if(commitHashMismatch) explanation += tr('The commit (version) of the remote server does not match the commit (version) of your local server') + '\n'
     if(dangerOfCrash) explanation += tr('The game client will crash at the beginning of the game') + '\n'
+    if(clientUnavaible) explanation += tr('You do not have the client version required to play on this server') + '\n'
 
     ;(choice.fields!.Explanation as Base).visible = explanation != ''
     ;(choice.fields!.Explanation as Base).tooltip_text = explanation.trim()
-    ;(choice.fields!.Join as Button).disabled = commitHashMismatch
+    ;(choice.fields!.Join as Button).disabled = commitHashMismatch || clientUnavaible
 
     //TODO: ;(choice.fields!.Join as Button).disabled = !localClientMaps.includes(game.map.value!)
 

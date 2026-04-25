@@ -25,15 +25,15 @@ export const maps = [
     { i: 19, id: 19, short: 'Map19', name: tr(`Substructure 43`) },
     { i: 20, id: 20, short: 'Map20', name: tr(`Crash Site`) },
     { i: 21, id: 21, short: 'Map21', name: tr(`Temple of Lily and Lotus`) },
-    //{ i: 24, id: 22, short: 'Map22', name: tr(`Magma Chamber (recreated in Minecraft)`) },
-    //{ i: 25, id: 30, short: 'Map30', name: tr(`Arena: Rings of Wrath`) },
-    { i: 22, id: 30, short: 'Map30', name: tr(`New Proving Grounds`) },
-    { i: 23, id: 35, short: 'Map35', name: tr(`The Bandlewood`) },
+    //{ i: 22, id: 22, short: 'Map22', name: tr(`Magma Chamber (recreated in Minecraft)`) },
+    //{ i: 30, id: 30, short: 'Map30', name: tr(`Arena: Rings of Wrath`) },
+    { i: 30, id: 30, short: 'Map30', name: tr(`New Proving Grounds`) },
+    { i: 35, id: 35, short: 'Map35', name: tr(`The Bandlewood`) },
 ]
 
 export class GameMap extends PickableValue {
     public static readonly name = 'Game Map'
-    public static values = maps.map(({ short }) => short)
+    public static values = maps.map(({ name }) => name)
     public static choices = maps.map(({ i, short, name }) => ({ value: i, short, name }))
 }
 export const GameMapsEnabled = enabled(GameMap)

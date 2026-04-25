@@ -1,14 +1,13 @@
 import type { AbortOptions } from "@libp2p/interface";
 import { isSpellCrashDetected } from "../game/game";
 import type { LocalGame } from "../game/game-local";
-import type { LocalServer } from "../game/server";
 import { render } from "../ui/remote/view";
 import { Features, PlayerCount, TickRate } from "../utils/constants";
 import { button, checkbox, form, inq2gd, line, option } from "../ui/remote/types";
 import { AbortPromptError } from "@inquirer/core";
 import { combinations, combinations_findIndex as combinations_findIndex, KnownClients, KnownServers, type Combination } from "../utils/data/constants/client-server-combinations";
 
-export async function setup(game: LocalGame, server: LocalServer, opts: Required<AbortOptions>){
+export async function setup(game: LocalGame, opts: Required<AbortOptions>){
     
     game.features.set(Features.SPELLS_DISABLED, isSpellCrashDetected())
 
@@ -43,7 +42,7 @@ export async function setup(game: LocalGame, server: LocalServer, opts: Required
         GameName: line(game.name.value, value => game.name.value = value),
         Password: line(game.password.value ?? '', value => game.password.value = value),
         
-        TickRate: option(inq2gd(TickRate.choices), server.tickRate.value, value => server.tickRate.value = value),
+        TickRate: option(inq2gd(TickRate.choices), game.tickRate.value, value => game.tickRate.value = value),
         TeamSize: option(inq2gd(PlayerCount.choices), game.playersMax.value, value => game.playersMax.value = value),
         
         //GameType: option(inq2gd(GameType.choices), game.type.value, value => game.type.value = value),
@@ -63,7 +62,7 @@ export async function setup(game: LocalGame, server: LocalServer, opts: Required
         Minions: checkbox(game.features.isMinionsEnabled, value => game.features.set(Features.MINIONS_DISABLED, !value)),
         Cheats: checkbox(game.features.isCheatsEnabled, value => game.features.set(Features.CHEATS_ENABLED, value)),
         HalfPing: checkbox(game.features.isHalfPingEnabled, value => game.features.set(Features.HALF_PING_MODE_ENABLED, value)),
-        Firewall: checkbox(game.features.isFirewallEnabled, value => game.features.set(Features.FIREWALL_ENABLED, value)),
+        Firewall: checkbox(game.features.isFirewallEnabled, value => game.features.set(Features.FIREWALL_ENABLED, value), false),
         Bypass: checkbox(game.features.isBypassEnabled, value => game.features.set(Features.BYPASS_ENABLED, value)),
         Spells: checkbox(game.features.isSpellsEnabled, value => {
             game.features.set(Features.SPELLS_DISABLED, !value)
@@ -87,7 +86,7 @@ export async function setup(game: LocalGame, server: LocalServer, opts: Required
                 view.update(form({
                     GameMap: gameMap(),
                     GameMode: gameMode(),
-                    PublishGame: button(undefined, isDefaultVersion) //HACK:
+                    Firewall: checkbox(undefined, undefined, isDefaultVersion),
                 }))
             },
         ),
@@ -99,11 +98,9 @@ export async function setup(game: LocalGame, server: LocalServer, opts: Required
 
     await view.promise
 
-    server.maps.value = [] //TODO: Deprecate.
-    server.modes.value = [] //TODO: Deprecate.
-    server.spells.value = combo.spells.keys().toArray()
-    server.champions.value = combo.champions.keys().toArray()
+    game.spells.value = combo.spells.keys().toArray()
+    game.champions.value = combo.champions.keys().toArray()
 
     if(!game.features.isSpellsEnabled)
-        server.spells.value = []
+        game.spells.value = []
 }

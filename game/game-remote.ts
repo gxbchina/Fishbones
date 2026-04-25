@@ -1,13 +1,12 @@
 import { LOBBY_PROTOCOL } from '../utils/constants'
 import { Peer as PBPeer } from '../message/peer'
-import { type AbortOptions, type IncomingStreamData, type Stream } from '@libp2p/interface'
+import { type AbortOptions, type IncomingStreamData, type PeerId, type Stream } from '@libp2p/interface'
 import { obtainConnection, type LibP2PNode } from '../node/node'
 import * as lp from 'it-length-prefixed'
 import { pbStream, type MessageStream } from '../utils/pb-stream'
 import { pipe } from 'it-pipe'
 import { LobbyRequestMessage, LobbyNotificationMessage } from '../message/lobby'
 import { Game } from './game'
-import type { Server } from './server'
 import { logger } from '@libp2p/logger'
 //import { logger as myLogger } from '../utils/log'
 
@@ -16,8 +15,8 @@ export class RemoteGame extends Game {
 
     //public readonly canStart = false
 
-    public constructor(node: LibP2PNode, server: Server){
-        super(node, server.id, server)
+    public constructor(node: LibP2PNode, ownerId: PeerId){
+        super(node, ownerId)
     }
 
     public async connect(opts: Required<AbortOptions>){

@@ -6,7 +6,6 @@ import { pipe } from 'it-pipe'
 import { LobbyRequestMessage, LobbyNotificationMessage, KickReason } from '../message/lobby'
 import { Game } from './game'
 import { logger } from '@libp2p/logger'
-import type { Server } from './server'
 import type { GamePlayer, PlayerId, PPP } from './game-player'
 import { PeerMap } from '@libp2p/peer-collections'
 import { pbStream } from '../utils/pb-stream'
@@ -23,8 +22,8 @@ export class LocalGame extends Game {
     
     private readonly peerId: PeerId
     private readonly playerId: PlayerId
-    public constructor(node: LibP2PNode, server: Server){
-        super(node, node.peerId, server)
+    public constructor(node: LibP2PNode){
+        super(node, node.peerId)
         this.playerId = this.peerIdToPlayerId(node.peerId)
         this.commit.value = gsPkg.gitRevision
         this.peerId = node.peerId
